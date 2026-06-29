@@ -183,6 +183,20 @@ var SheetService = {
     return pending;
   },
 
+  getBookingsByEmail: function (email) {
+    var sheet = this._getSheet(CONFIG.SHEET_BOOKINGS);
+    if (!sheet) return [];
+    var data = sheet.getDataRange().getValues();
+    var bookings = [];
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][5]).toLowerCase() === String(email).toLowerCase()) {
+        bookings.push(this._rowToBooking(i + 1, data[i]));
+      }
+    }
+    bookings.sort(function (a, b) { return b.timestamp.localeCompare(a.timestamp); });
+    return bookings;
+  },
+
   getAllBookings: function (filter) {
     var sheet = this._getSheet(CONFIG.SHEET_BOOKINGS);
     if (!sheet) return [];

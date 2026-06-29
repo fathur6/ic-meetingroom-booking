@@ -1,15 +1,17 @@
 {
-  "timeZone": "Asia/Singapore",
+  "timeZone": "Asia/Kuala_Lumpur",
   "dependencies": {
-    "enabledAdvancedServices": [{
-      "userSymbol": "Calendar",
-      "serviceId": "calendar",
-      "version": "v3"
-    }]
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Calendar",
+        "version": "v3",
+        "serviceId": "calendar"
+      }
+    ]
   },
   "webapp": {
-    "access": "ANYONE_ANONYMOUS",
-    "executeAs": "USER_DEPLOYING"
+    "access": "ANYONE",
+    "executeAs": "USER_ACCESSING"
   },
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8"

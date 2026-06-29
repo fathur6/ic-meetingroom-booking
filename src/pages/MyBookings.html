@@ -8,108 +8,104 @@
   <div class="container">
     <?!= include('pages/_header') ?>
 
-    <div class="card" id="searchCard">
+    <? var u = getCurrentUser(); if (u) { ?>
+    <div style="text-align:right;margin-top:-14px;margin-bottom:20px;padding-right:8px">
+      <span class="user-banner">
+        <span class="u-dot"></span>
+        <span class="u-email"><?= u ?></span>
+        <button class="u-change" onclick="changeUser()">Change user</button>
+      </span>
+    </div>
+    <? } else { ?>
+    <div class="card" style="margin-bottom:20px;background:rgba(255,176,32,.06);border:1px solid rgba(255,176,32,.25)">
+      <p style="color:var(--amber);text-align:center;margin:0;font-weight:600">Sign in with your Google account to view your bookings.</p>
+    </div>
+    <? } ?>
+
+    <div class="card" id="bookingList">
       <h2>My <span>Bookings</span></h2>
-      <p class="text-muted mb-20">Look up your booking by email and booking ID.</p>
-      <div class="form-grid">
-        <div>
-          <label for="lookupEmail">Email *</label>
-          <input type="email" id="lookupEmail" placeholder="your@email.com" required>
-        </div>
-        <div>
-          <label for="lookupId">Booking ID *</label>
-          <input type="text" id="lookupId" placeholder="IC-YYYYMMDD-XXXX" class="text-mono" required>
-        </div>
+      <div id="loadingMsg" class="text-center" style="padding:24px">
+        <span class="spinner"></span> <span class="text-muted">Loading your bookings...</span>
       </div>
-      <div class="mt-20">
-        <button class="btn btn-primary" onclick="lookupBooking()">Look Up</button>
-        <span class="text-muted" style="margin-left:12px">You can cancel only <em>Pending</em> bookings.</span>
+      <div id="bookingContainer" style="display:none"></div>
+      <div id="emptyMsg" class="empty-state" style="display:none">
+        <div class="icon">&#x1F4C5;</div>
+        <p>No bookings found for this account.</p>
       </div>
-      <div id="lookupStatus" class="text-muted mt-12" style="display:none"></div>
     </div>
 
-    <div class="card" id="resultCard" style="display:none">
-      <h2>Booking <span>Details</span></h2>
-      <div id="bookingDetails"></div>
-      <div id="cancelSection" class="mt-20" style="display:none">
-        <button class="btn btn-danger" onclick="cancelBooking()">Cancel This Booking</button>
-      </div>
+    <div class="card" id="cancelSection" style="display:none">
+      <h2>Cancel <span>Booking</span></h2>
+      <p class="text-muted mb-12">Select a pending booking above to cancel it.</p>
+      <div id="cancelTarget" class="mb-12"></div>
+      <button class="btn btn-danger" id="cancelBtn" onclick="doCancel()" style="display:none">Cancel This Booking</button>
     </div>
   </div>
 
   <script>
-    var currentBooking = null;
+    var allBookings = [];
+    var selectedId = null;
 
-    function lookupBooking() {
-      var email = document.getElementById('lookupEmail').value.trim();
-      var id = document.getElementById('lookupId').value.trim();
-      if (!email || !id) { showToast('Please enter both email and booking ID.', 'error'); return; }
-      document.getElementById('lookupStatus').style.display = 'block';
-      document.getElementById('lookupStatus').innerHTML = '<span class="spinner"></span> Looking up...';
-
+    function init() {
       google.script.run
-        .withSuccessHandler(function(b) {
-          document.getElementById('lookupStatus').style.display = 'none';
-          if (!b) {
-            showToast('Booking not found.', 'error');
-            document.getElementById('resultCard').style.display = 'none';
+        .withSuccessHandler(function(bookings) {
+          document.getElementById('loadingMsg').style.display = 'none';
+          allBookings = bookings || [];
+          if (allBookings.length === 0) {
+            document.getElementById('emptyMsg').style.display = 'block';
             return;
           }
-          if (b.email.toLowerCase() !== email.toLowerCase()) {
-            showToast('Email does not match the booking record.', 'error');
-            document.getElementById('resultCard').style.display = 'none';
-            return;
-          }
-          currentBooking = b;
-          renderBooking(b);
+          document.getElementById('bookingContainer').style.display = 'block';
+          renderList();
         })
         .withFailureHandler(function(err) {
-          document.getElementById('lookupStatus').style.display = 'block';
-          document.getElementById('lookupStatus').textContent = 'Error: ' + err.message;
+          document.getElementById('loadingMsg').innerHTML = '<span class="text-muted">Error: ' + err.message + '</span>';
         })
-        .getBookingById(id);
+        .getMyBookings();
     }
 
-    function renderBooking(b) {
-      document.getElementById('resultCard').style.display = 'block';
-      document.getElementById('cancelSection').style.display = b.status === 'Pending' ? 'block' : 'none';
-
-      var dAt = b.decisionAt ? new Date(b.decisionAt).toLocaleString('en-MY', {timeZone:'Asia/Kuala_Lumpur'}) : '';
-      var html = '<table><tbody>' +
-        '<tr><th>Booking ID</th><td class="mono">' + esc(b.bookingId) + '</td></tr>' +
-        '<tr><th>Status</th><td><span class="pill ' + b.status.toLowerCase() + '">' + esc(b.status) + '</span></td></tr>' +
-        '<tr><th>Name</th><td>' + esc(b.name) + '</td></tr>' +
-        '<tr><th>Office</th><td>' + esc(b.office || '—') + '</td></tr>' +
-        '<tr><th>Tel</th><td>' + esc(b.tel) + '</td></tr>' +
-        '<tr><th>Email</th><td>' + esc(b.email) + '</td></tr>' +
-        '<tr><th>Room</th><td>' + esc(b.room) + '</td></tr>' +
-        '<tr><th>Date</th><td>' + esc(b.date) + '</td></tr>' +
-        '<tr><th>Time</th><td>' + esc(b.startTime) + ' – ' + esc(b.endTime) + '</td></tr>' +
-        '<tr><th>Purpose</th><td>' + esc(b.purpose) + '</td></tr>';
-      if (b.notes) html += '<tr><th>Notes</th><td>' + esc(b.notes) + '</td></tr>';
-      if (b.decisionBy) html += '<tr><th>Decided By</th><td>' + esc(b.decisionBy) + '</td></tr>';
-      if (b.decisionAt) html += '<tr><th>Decided At</th><td>' + esc(dAt) + '</td></tr>';
+    function renderList() {
+      var html = '<table><thead><tr><th>ID</th><th>Room</th><th>Date</th><th>Time</th><th>Status</th><th>Action</th></tr></thead><tbody>';
+      for (var i = 0; i < allBookings.length; i++) {
+        var b = allBookings[i];
+        html += '<tr>' +
+          '<td class="mono">' + esc(b.bookingId) + '</td>' +
+          '<td>' + esc(b.room) + '</td>' +
+          '<td>' + esc(b.date) + '</td>' +
+          '<td class="mono">' + esc(b.startTime) + '–' + esc(b.endTime) + '</td>' +
+          '<td><span class="pill ' + b.status.toLowerCase() + '">' + esc(b.status) + '</span></td>' +
+          '<td>' + (b.status === 'Pending' ? '<button class="btn btn-danger btn-sm" onclick="selectCancel(\'' + esc(b.bookingId) + '\')">Cancel</button>' : '—') + '</td>' +
+        '</tr>';
+      }
       html += '</tbody></table>';
-      document.getElementById('bookingDetails').innerHTML = html;
+      document.getElementById('bookingContainer').innerHTML = html;
     }
 
-    function cancelBooking() {
-      if (!currentBooking) return;
-      if (!confirm('Cancel booking ' + currentBooking.bookingId + '? This cannot be undone.')) return;
+    function selectCancel(bookingId) {
+      selectedId = bookingId;
+      document.getElementById('cancelSection').style.display = 'block';
+      document.getElementById('cancelBtn').style.display = 'inline-flex';
+      document.getElementById('cancelTarget').innerHTML = '<span class="mono">' + esc(bookingId) + '</span>';
+    }
+
+    function doCancel() {
+      if (!selectedId) return;
+      if (!confirm('Cancel booking ' + selectedId + '?')) return;
       google.script.run
         .withSuccessHandler(function(r) {
           if (r.success) {
-            showToast('Booking cancelled successfully.', 'success');
-            currentBooking.status = 'Cancelled';
-            renderBooking(currentBooking);
-          } else {
-            showToast(r.message, 'error');
-          }
+            showToast('Booking cancelled.', 'success');
+            init();
+            document.getElementById('cancelSection').style.display = 'none';
+            selectedId = null;
+          } else { showToast(r.message, 'error'); }
         })
-        .withFailureHandler(function(err) {
-          showToast('Error: ' + err.message, 'error');
-        })
-        .cancelMyBooking(currentBooking.bookingId, currentBooking.email);
+        .withFailureHandler(function(err) { showToast('Error: ' + err.message, 'error'); })
+        .cancelMyBooking(selectedId, '<?!= getCurrentUser() ?>');
+    }
+
+    function changeUser() {
+      window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>?page=my');
     }
 
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -120,6 +116,8 @@
       document.body.appendChild(t);
       setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 300); }, 5000);
     }
+
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>

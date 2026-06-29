@@ -2,7 +2,6 @@ var APP_TITLE = 'IC Meeting Room Booking';
 
 function doGet(e) {
   var page = e && e.parameter && e.parameter.page ? e.parameter.page : 'index';
-
   var fileMap = {
     'index': 'Index',
     'booking': 'pages/Booking',
@@ -28,6 +27,17 @@ function doGet(e) {
 
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
+
+function getDeploymentUrl() {
+  var did = PropertiesService.getScriptProperties().getProperty('DEPLOYMENT_ID');
+  return 'https://script.google.com/macros/s/' + (did || 'YOUR_DEPLOYMENT_ID') + '/exec';
+}
+
+function getCurrentUser() {
+  var email = '';
+  try { email = Session.getActiveUser().getEmail(); } catch (ex) {}
+  return email || '';
 }
 
 function setup(sheetId, approvalEmail) {

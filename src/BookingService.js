@@ -21,7 +21,24 @@ var BookingService = {
     };
   },
 
+  getMyBookings: function () {
+    var email = '';
+    try { email = Session.getActiveUser().getEmail(); } catch (ex) {}
+    if (!email) return [];
+    return SheetService.getBookingsByEmail(email);
+  },
+
   submitBooking: function (form) {
+    var currentUser = '';
+    try { currentUser = Session.getActiveUser().getEmail().toLowerCase(); } catch (ex) {}
+
+    if (!currentUser) {
+      return { success: false, message: 'Please sign in with your Google account to book.' };
+    }
+    if (String(form.email).toLowerCase() !== currentUser) {
+      return { success: false, message: 'Email must match your signed-in Google account.' };
+    }
+
     if (!form.name || !form.email || !form.phone || !form.room || !form.date || !form.startTime || !form.endTime || !form.purpose) {
       return { success: false, message: 'All fields are required.' };
     }
@@ -81,7 +98,7 @@ var BookingService = {
         name: form.name,
         office: form.office || '',
         tel: form.phone || '',
-        email: form.email,
+        email: currentUser,
         room: form.room,
         roomName: form.roomName || form.room,
         date: form.date,
@@ -102,6 +119,11 @@ var BookingService = {
   },
 
   cancelMyBooking: function (bookingId, email) {
+    var currentUser = '';
+    try { currentUser = Session.getActiveUser().getEmail().toLowerCase(); } catch (ex) {}
+    if (currentUser && String(email).toLowerCase() !== currentUser) {
+      return { success: false, message: 'Email must match your signed-in Google account.' };
+    }
     var result = SheetService.cancelBooking(bookingId, email);
     if (result.success) {
       try { EmailService.sendCancellationNotice(result.booking); } catch (e) {}

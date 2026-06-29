@@ -15,6 +15,15 @@
       <p class="subtitle">International Centre · Meeting Room Booking</p>
     </div>
 
+    <? var u = getCurrentUser(); if (u) { ?>
+    <div style="text-align:right;margin-top:-14px;margin-bottom:20px;padding-right:8px">
+      <span class="user-banner">
+        <span class="u-dot"></span>
+        <span class="u-email"><?= u ?></span>
+      </span>
+    </div>
+    <? } ?>
+
     <div class="card admin-login" id="loginCard">
       <h2><span>Admin</span> Login</h2>
       <label for="adminKey">Admin Key</label>
@@ -33,6 +42,15 @@
       <h1 class="title">Admin Panel</h1>
       <p class="subtitle">Manage bookings · Approve or Reject</p>
     </div>
+
+    <? var uDash = getCurrentUser(); if (uDash) { ?>
+    <div style="text-align:right;margin-top:-14px;margin-bottom:20px;padding-right:8px">
+      <span class="user-banner">
+        <span class="u-dot"></span>
+        <span class="u-email"><?= uDash ?></span>
+      </span>
+    </div>
+    <? } ?>
 
     <div class="tabs">
       <button class="tab active" onclick="switchTab('pending')">Pending Bookings <span id="pendingCount" style="margin-left:4px;color:var(--amber)"></span></button>
@@ -80,7 +98,6 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Verifying...';
       document.getElementById('loginStatus').style.display = 'none';
-
       google.script.run
         .withSuccessHandler(function(r) {
           btn.disabled = false;
@@ -93,9 +110,7 @@
             document.getElementById('dashboardContainer').style.display = 'block';
             renderPending();
             renderHistory();
-          } else {
-            showToast(r.message || 'Invalid admin key.', 'error');
-          }
+          } else { showToast(r.message || 'Invalid admin key.', 'error'); }
         })
         .withFailureHandler(function(err) {
           btn.disabled = false;
@@ -180,10 +195,8 @@
       if (!confirm('Approve booking ' + bookingId + '?')) return;
       google.script.run
         .withSuccessHandler(function(r) {
-          if (r.success) {
-            showToast('Approved: ' + bookingId + '. Email sent & calendar event created.', 'success');
-            refreshDashboard();
-          } else { showToast(r.message, 'error'); }
+          if (r.success) { showToast('Approved: ' + bookingId + '. Email sent & calendar event created.', 'success'); refreshDashboard(); }
+          else { showToast(r.message, 'error'); }
         })
         .withFailureHandler(function(err) { showToast('Error: ' + err.message, 'error'); })
         .approveBooking(bookingId, adminKey, '');
@@ -198,31 +211,19 @@
     function confirmReject() {
       var reason = document.getElementById('rejectReason').value.trim() || 'Slot unavailable';
       var btn = document.getElementById('confirmRejectBtn');
-      btn.disabled = true;
-      btn.textContent = 'Rejecting...';
+      btn.disabled = true; btn.textContent = 'Rejecting...';
       google.script.run
         .withSuccessHandler(function(r) {
-          btn.disabled = false;
-          btn.textContent = 'Reject';
+          btn.disabled = false; btn.textContent = 'Reject';
           closeRejectModal();
-          if (r.success) {
-            showToast('Rejected: ' + rejectTarget + '. Email sent.', 'info');
-            refreshDashboard();
-          } else { showToast(r.message, 'error'); }
+          if (r.success) { showToast('Rejected: ' + rejectTarget + '. Email sent.', 'info'); refreshDashboard(); }
+          else { showToast(r.message, 'error'); }
         })
-        .withFailureHandler(function(err) {
-          btn.disabled = false;
-          btn.textContent = 'Reject';
-          showToast('Error: ' + err.message, 'error');
-        })
+        .withFailureHandler(function(err) { btn.disabled = false; btn.textContent = 'Reject'; showToast('Error: ' + err.message, 'error'); })
         .rejectBooking(rejectTarget, adminKey, reason);
     }
 
-    function closeRejectModal() {
-      document.getElementById('rejectModal').style.display = 'none';
-      rejectTarget = null;
-    }
-
+    function closeRejectModal() { document.getElementById('rejectModal').style.display = 'none'; rejectTarget = null; }
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     function trunc(s, n) { return s.length > n ? s.slice(0,n) + '…' : s; }
     function fmtDateShort(ts) { if (!ts) return ''; var d = new Date(ts); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
