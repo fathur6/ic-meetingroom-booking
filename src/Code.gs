@@ -40,16 +40,18 @@ function getCurrentUser() {
 }
 
 function checkAuth() {
+  var email = '';
+  try { email = Session.getActiveUser().getEmail(); } catch (ex) {}
+  if (!email) return { authorized: false, user: '', needsAuth: true, authUrl: '' };
+
   try {
-    var email = Session.getActiveUser().getEmail();
-    return { authorized: !!email, user: email || '', needsAuth: false };
-  } catch (ex) {
-    try {
-      return { authorized: false, user: '', needsAuth: true, authUrl: ScriptApp.getAuthorizationInfo(ScriptApp.AuthMode.FULL).getAuthorizationUrl() };
-    } catch (e2) {
-      return { authorized: false, user: '', needsAuth: true, authUrl: '' };
+    var info = ScriptApp.getAuthorizationInfo(ScriptApp.AuthMode.FULL);
+    if (info.getAuthorizationStatus() === ScriptApp.AuthorizationStatus.REQUIRED) {
+      return { authorized: false, user: email, needsAuth: true, authUrl: info.getAuthorizationUrl() };
     }
-  }
+  } catch (e) {}
+
+  return { authorized: true, user: email, needsAuth: false, authUrl: '' };
 }
 
 function getAuthUrl() {

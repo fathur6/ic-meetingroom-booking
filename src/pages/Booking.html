@@ -103,16 +103,16 @@
     <div class="modal-box">
       <h2><span>Authorization</span> Required</h2>
       <p style="color:var(--muted);margin-bottom:14px">Google needs your permission to save bookings and create calendar events.</p>
-      <a id="authLink" href="#" class="btn btn-primary" target="_blank" onclick="document.getElementById('authModal').style.display='none';setTimeout(checkAuth,2000)">Authorize This App</a>
-      <p class="text-muted mt-12" style="font-size:11px">After authorizing, close the new tab and continue.</p>
-      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('authModal').style.display='none'">Done</button>
+      <a id="authLink" href="#" class="btn btn-primary" target="_blank">Authorize This App</a>
+      <p class="text-muted mt-12" style="font-size:11px">After authorizing, close the new tab and click Done.</p>
+      <button class="btn btn-ghost btn-sm" id="authDoneBtn" onclick="authDone()">Done</button>
     </div>
   </div>
 
   <script>
     var busySlots = [];
     var timeSlots = [];
-    var submitTimeout = null;
+    var authChecked = false;
 
     function init() {
       generateTimeOptions();
@@ -132,10 +132,24 @@
           if (!r.authorized && r.authUrl) {
             document.getElementById('authModal').style.display = 'flex';
             document.getElementById('authLink').href = r.authUrl;
-          } else { loadRooms(); }
+          } else {
+            document.getElementById('authModal').style.display = 'none';
+            authChecked = true;
+            loadRooms();
+          }
         })
-        .withFailureHandler(function() { loadRooms(); })
+        .withFailureHandler(function() {
+          document.getElementById('authModal').style.display = 'none';
+          authChecked = true;
+          loadRooms();
+        })
         .checkAuth();
+    }
+
+    function authDone() {
+      document.getElementById('authDoneBtn').textContent = 'Checking...';
+      document.getElementById('authDoneBtn').disabled = true;
+      doAuthCheck();
     }
 
     function loadRooms() {
@@ -280,17 +294,8 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Submitting...';
 
-      if (submitTimeout) clearTimeout(submitTimeout);
-      submitTimeout = setTimeout(function() {
-        btn.disabled = false;
-        btn.textContent = 'Submit Booking';
-        showToast('Request timed out. You may need to authorize this app first. Close any popups and try again.', 'info');
-        doAuthCheck();
-      }, 20000);
-
       google.script.run
         .withSuccessHandler(function(r) {
-          clearTimeout(submitTimeout);
           btn.disabled = false;
           btn.textContent = 'Submit Booking';
           if (r.success) {
@@ -301,11 +306,9 @@
           } else { showToast(r.message, 'error'); }
         })
         .withFailureHandler(function(err) {
-          clearTimeout(submitTimeout);
           btn.disabled = false;
           btn.textContent = 'Submit Booking';
-          showToast('Error: ' + (err.message || 'Submission failed. You may need to authorize this app.'), 'error');
-          doAuthCheck();
+          showToast('Error: ' + err.message, 'error');
         })
         .submitBooking(form);
       return false;
