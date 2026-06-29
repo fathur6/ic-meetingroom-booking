@@ -41,12 +41,13 @@ function getCurrentUser() {
 
 function setup(sheetId, approvalEmail) {
   if (!sheetId) sheetId = '1uHAoStcJRcItncRHjro8eWDj4wZBTwitSy1lUx2DhPE';
-  if (!approvalEmail) approvalEmail = 'nasarudinsaleh@unisza.edu.my';
+  if (!approvalEmail) approvalEmail = 'nasarudinsalleh@unisza.edu.my';
 
   PropertiesService.getScriptProperties().setProperties({
     'SHEET_ID': sheetId,
     'APPROVAL_EMAIL': approvalEmail,
     'ADMIN_EMAILS': 'fathurrahman@unisza.edu.my,' + approvalEmail,
+    'CALENDAR_ID': 'c_854f187e5ca0901ada94a8a45d5c6c145bc290e887dd21e9571c6c0c33400ed0@group.calendar.google.com',
     'SCRIPT_OWNER': Session.getActiveUser().getEmail() || 'fathurrahman@unisza.edu.my',
     'DEPLOYMENT_ID': 'AKfycbzxMaFsVw31onceNdX1Xi2UuWGK579VwVtW35mxMyrDrpFL5Dq8AAHbEHmLw-Y0ykeUUw'
   }, true);

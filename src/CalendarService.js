@@ -2,14 +2,26 @@ var CalendarService = {
   _calendarIdCache: null,
 
   ensureCalendar: function () {
+    var hardId = CONFIG.CALENDAR_ID;
+    if (hardId) {
+      try {
+        var cal = CalendarApp.getCalendarById(hardId);
+        if (cal) {
+          this._calendarIdCache = hardId;
+          return hardId;
+        }
+      } catch (e) {}
+    }
+
     var name = CONFIG.CALENDAR_NAME;
     var cals = CalendarApp.getCalendarsByName(name);
     if (cals.length > 0) {
       this._calendarIdCache = cals[0].getId();
       return this._calendarIdCache;
     }
-    var cal = CalendarApp.createCalendar(name);
-    this._calendarIdCache = cal.getId();
+
+    var newCal = CalendarApp.createCalendar(name);
+    this._calendarIdCache = newCal.getId();
     return this._calendarIdCache;
   },
 
@@ -48,6 +60,10 @@ var CalendarService = {
 
   createEvent: function (booking) {
     var cal = CalendarApp.getCalendarById(this.getCalendarId());
+    if (!cal) {
+      Logger.log('Cannot access calendar: ' + this.getCalendarId());
+      return '';
+    }
     var startDate = this.parseDateTime(booking.date, booking.startTime);
     var endDate = this.parseDateTime(booking.date, booking.endTime);
 
@@ -76,6 +92,7 @@ var CalendarService = {
     if (!eventId) return;
     try {
       var cal = CalendarApp.getCalendarById(this.getCalendarId());
+      if (!cal) return;
       var event = cal.getEventById(eventId);
       if (!event) return;
       switch (status) {
@@ -93,6 +110,7 @@ var CalendarService = {
     if (!eventId) return;
     try {
       var cal = CalendarApp.getCalendarById(this.getCalendarId());
+      if (!cal) return;
       var event = cal.getEventById(eventId);
       if (event) event.deleteEvent();
     } catch (e) {

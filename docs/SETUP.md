@@ -53,16 +53,16 @@ In the Apps Script editor:
 3. Grant permissions when prompted (Sheets, Calendar, Gmail).
 4. You should see a success log in View → Logs:
    ```
-   Setup complete. Calendar ID: xxxxx@group.calendar.google.com. Calendar shared with nasarudinsaleh@unisza.edu.my
+   Setup complete. Calendar ID: xxxxx@group.calendar.google.com. Calendar shared with nasarudinsalleh@unisza.edu.my
    ```
 
 This will:
 - Create/verify the 4 sheet tabs: `Bookings`, `Rooms`, `Settings`, `Admins`
 - Seed `Rooms` with 3 starter rooms
 - Seed `Settings` with defaults (admin key: `ic-admin-2026`)
-- Seed `Admins` with `fathurrahman@unisza.edu.my` and `nasarudinsaleh@unisza.edu.my`
+- Seed `Admins` with `fathurrahman@unisza.edu.my` and `nasarudinsalleh@unisza.edu.my`
 - Find or create the Google Calendar **"IC Booking Schedule"**
-- Share the calendar with `nasarudinsaleh@unisza.edu.my` (writer access)
+- Share the calendar with `nasarudinsalleh@unisza.edu.my` (writer access)
 
 ## 6. Set Gmail "Send mail as" alias
 
@@ -76,15 +76,15 @@ On `fathurrahman@unisza.edu.my`'s Gmail account:
 4. In the **Send mail as** section, click **Add another email address**.
 5. A popup will appear. Fill in:
    - **Name**: `IC Meeting Room`
-   - **Email address**: `nasarudinsaleh@unisza.edu.my`
+   - **Email address**: `nasarudinsalleh@unisza.edu.my`
    - Leave "Treat as an alias" checked.
 6. Click **Next Step**.
-7. Gmail will send a verification code to `nasarudinsaleh@unisza.edu.my`.
-8. Go to nasarudinsaleh's inbox, find the verification email, copy the code.
+7. Gmail will send a verification code to `nasarudinsalleh@unisza.edu.my`.
+ 8. Go to nasarudinsalleh's inbox, find the verification email, copy the code.
 9. Enter the code in the popup, click **Verify**.
-10. Done — `fathurrahman@unisza.edu.my` can now send emails **as** `nasarudinsaleh@unisza.edu.my`.
+10. Done — `fathurrahman@unisza.edu.my` can now send emails **as** `nasarudinsalleh@unisza.edu.my`.
 
-This allows `EmailService` to use `GmailApp.sendEmail({from: 'nasarudinsaleh@unisza.edu.my'})` — all booking notifications will appear to come from nasarudinsaleh.
+This allows `EmailService` to use `GmailApp.sendEmail({from: 'nasarudinsalleh@unisza.edu.my'})` — all booking notifications will appear to come from nasarudinsalleh.
 
 ## 7. Update web app deployment
 
@@ -136,7 +136,7 @@ If the automatic sharing in `setup()` doesn't work (e.g. permissions issue with 
 
 1. Open Google Calendar as `fathurrahman@unisza.edu.my`.
 2. Find **IC Booking Schedule**.
-3. Settings → Share with specific people → Add `nasarudinsaleh@unisza.edu.my` with **Make changes to events** permission.
+3. Settings → Share with specific people → Add `nasarudinsalleh@unisza.edu.my` with **Make changes to events** permission.
 
 ---
 

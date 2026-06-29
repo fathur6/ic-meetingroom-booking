@@ -91,7 +91,7 @@ var SheetService = {
     var data = sheet.getDataRange().getValues();
     if (data.length > 1) return;
     sheet.appendRow(['fathurrahman@unisza.edu.my', 'Owner']);
-    sheet.appendRow(['nasarudinsaleh@unisza.edu.my', 'Admin']);
+    sheet.appendRow(['nasarudinsalleh@unisza.edu.my', 'Admin']);
   },
 
   getRooms: function () {
