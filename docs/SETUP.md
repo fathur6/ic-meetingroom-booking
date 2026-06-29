@@ -66,13 +66,25 @@ This will:
 
 ## 6. Set Gmail "Send mail as" alias
 
-On `fathurrahman@unisza.edu.my`'s Gmail:
+This is **critical** — without it, emails will fail or come from the wrong address.
 
-1. Go to **Settings** → **Accounts and Import** → **Send mail as**.
-2. Add `nasarudinsaleh@unisza.edu.my` as an alias.
-3. Verify ownership.
+On `fathurrahman@unisza.edu.my`'s Gmail account:
 
-This is required so `EmailService.send*()` functions can send emails with `from: nasarudinsaleh@unisza.edu.my`.
+1. Open [Gmail](https://mail.google.com).
+2. Click the gear icon (top-right) → **See all settings**.
+3. Go to the **Accounts and Import** tab.
+4. In the **Send mail as** section, click **Add another email address**.
+5. A popup will appear. Fill in:
+   - **Name**: `IC Meeting Room`
+   - **Email address**: `nasarudinsaleh@unisza.edu.my`
+   - Leave "Treat as an alias" checked.
+6. Click **Next Step**.
+7. Gmail will send a verification code to `nasarudinsaleh@unisza.edu.my`.
+8. Go to nasarudinsaleh's inbox, find the verification email, copy the code.
+9. Enter the code in the popup, click **Verify**.
+10. Done — `fathurrahman@unisza.edu.my` can now send emails **as** `nasarudinsaleh@unisza.edu.my`.
+
+This allows `EmailService` to use `GmailApp.sendEmail({from: 'nasarudinsaleh@unisza.edu.my'})` — all booking notifications will appear to come from nasarudinsaleh.
 
 ## 7. Update web app deployment
 
