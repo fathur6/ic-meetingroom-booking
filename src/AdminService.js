@@ -18,25 +18,16 @@ var AdminService = {
     if (!booking) return { success: false, message: 'Booking not found.' };
     if (booking.status !== 'Pending') return { success: false, message: 'Booking is not pending. Current status: ' + booking.status + '.' };
 
-    var room = '';
-    var rooms = SheetService.getRooms();
-    for (var r = 0; r < rooms.length; r++) {
-      if (rooms[r].roomId === booking.room) {
-        room = rooms[r].roomName;
-        break;
-      }
+    if (booking.calendarEventId) {
+      CalendarService.updateEventColor(booking.calendarEventId, 'Approved');
     }
-    booking.roomName = room || booking.room;
-    booking.notes = notes || '';
-    booking.decisionBy = 'Admin';
 
-    var eventId = CalendarService.createEvent(booking);
-    SheetService.updateBookingStatus(bookingId, 'Approved', 'Admin', notes, eventId);
+    SheetService.updateBookingStatus(bookingId, 'Approved', 'Admin', notes, booking.calendarEventId);
 
     var updated = SheetService.getBookingById(bookingId);
-    try { EmailService.sendApproval(updated); } catch (e) { Logger.log('Approval email failed: ' + e); }
+    try { EmailService.sendApproval(updated); } catch (ex) { Logger.log('Approval email: ' + ex); }
 
-    return { success: true, message: 'Booking approved and calendar event created.', booking: updated };
+    return { success: true, message: 'Booking approved.', booking: updated };
   },
 
   rejectBooking: function (bookingId, adminKey, reason) {
@@ -48,13 +39,14 @@ var AdminService = {
     if (!booking) return { success: false, message: 'Booking not found.' };
     if (booking.status !== 'Pending') return { success: false, message: 'Booking is not pending.' };
 
-    booking.notes = reason || 'Not specified';
-    booking.decisionBy = 'Admin';
+    if (booking.calendarEventId) {
+      CalendarService.updateEventColor(booking.calendarEventId, 'Rejected');
+    }
 
-    SheetService.updateBookingStatus(bookingId, 'Rejected', 'Admin', reason, '');
+    SheetService.updateBookingStatus(bookingId, 'Rejected', 'Admin', reason, booking.calendarEventId);
 
     var updated = SheetService.getBookingById(bookingId);
-    try { EmailService.sendRejection(updated); } catch (e) { Logger.log('Rejection email failed: ' + e); }
+    try { EmailService.sendRejection(updated); } catch (ex) { Logger.log('Rejection email: ' + ex); }
 
     return { success: true, message: 'Booking rejected.', booking: updated };
   },

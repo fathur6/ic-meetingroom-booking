@@ -50,23 +50,43 @@ var CalendarService = {
     var cal = CalendarApp.getCalendarById(this.getCalendarId());
     var startDate = this.parseDateTime(booking.date, booking.startTime);
     var endDate = this.parseDateTime(booking.date, booking.endTime);
-    var roomInfo = booking.roomName || booking.room;
-    var title = '[' + roomInfo + '] ' + (booking.purpose || 'Meeting');
+
+    var office = booking.office || 'IC';
+    var title = '[' + office + '] - ' + (booking.purpose || 'Meeting');
     if (title.length > 200) title = title.substring(0, 197) + '...';
+
+    var roomInfo = booking.roomName || booking.room || '';
     var desc = [
       'Booking ID: ' + booking.bookingId,
       'Name: ' + (booking.name || ''),
-      'Office: ' + (booking.office || ''),
+      'Office: ' + office,
       'Tel: ' + (booking.tel || ''),
       'Email: ' + (booking.email || ''),
-      'Room: ' + roomInfo,
       'Purpose: ' + (booking.purpose || ''),
-      '',
-      'Approved by: ' + (booking.decisionBy || 'Admin'),
-    ].join('\n');
+    ];
+    if (roomInfo) desc.push('Room: ' + roomInfo);
+    desc = desc.join('\n');
 
     var event = cal.createEvent(title, startDate, endDate, { description: desc });
+    event.setColor(CalendarApp.EventColor.PALE_GRAY);
     return event.getId();
+  },
+
+  updateEventColor: function (eventId, status) {
+    if (!eventId) return;
+    try {
+      var cal = CalendarApp.getCalendarById(this.getCalendarId());
+      var event = cal.getEventById(eventId);
+      if (!event) return;
+      switch (status) {
+        case 'Approved':  event.setColor(CalendarApp.EventColor.GREEN); break;
+        case 'Rejected':  event.setColor(CalendarApp.EventColor.PALE_RED); break;
+        case 'Cancelled': event.setColor(CalendarApp.EventColor.GRAY); break;
+        default:          event.setColor(CalendarApp.EventColor.PALE_GRAY); break;
+      }
+    } catch (e) {
+      Logger.log('updateEventColor error: ' + e.toString());
+    }
   },
 
   deleteEvent: function (eventId) {

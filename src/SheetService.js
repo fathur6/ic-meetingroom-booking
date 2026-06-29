@@ -117,7 +117,7 @@ var SheetService = {
     sheet.appendRow([
       booking.bookingId, new Date(), booking.name, booking.office, booking.tel,
       booking.email, booking.room, booking.date, booking.startTime, booking.endTime,
-      booking.purpose, 'Pending', '', '', '', ''
+      booking.purpose, 'Pending', '', '', booking.calendarEventId || '', ''
     ]);
     return booking.bookingId;
   },

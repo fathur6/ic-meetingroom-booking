@@ -58,7 +58,6 @@ var BookingService = {
 
     var dateParts = form.date.split('-');
     var selectedDate = new Date(parseInt(dateParts[0], 10), parseInt(dateParts[1], 10) - 1, parseInt(dateParts[2], 10));
-
     var todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     var maxStart = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate());
 
@@ -107,10 +106,14 @@ var BookingService = {
         purpose: form.purpose
       };
 
+      var eventId = '';
+      try { eventId = CalendarService.createEvent(booking); } catch (ex) { Logger.log('Event create on submit: ' + ex); }
+
+      booking.calendarEventId = eventId;
       SheetService.addBooking(booking);
 
-      try { EmailService.sendReceipt(booking); } catch (e) { Logger.log('Receipt email failed: ' + e); }
-      try { EmailService.sendAdminNotice(booking); } catch (e) { Logger.log('Admin notice failed: ' + e); }
+      try { EmailService.sendReceipt(booking); } catch (ex) { Logger.log('Receipt email: ' + ex); }
+      try { EmailService.sendAdminNotice(booking); } catch (ex) { Logger.log('Admin notice: ' + ex); }
 
       return { success: true, bookingId: bookingId, message: 'Booking submitted. You will be emailed within 1 working day.' };
     } finally {
@@ -124,9 +127,13 @@ var BookingService = {
     if (currentUser && String(email).toLowerCase() !== currentUser) {
       return { success: false, message: 'Email must match your signed-in Google account.' };
     }
+    var booking = SheetService.getBookingById(bookingId);
+    if (booking && booking.calendarEventId) {
+      CalendarService.updateEventColor(booking.calendarEventId, 'Cancelled');
+    }
     var result = SheetService.cancelBooking(bookingId, email);
     if (result.success) {
-      try { EmailService.sendCancellationNotice(result.booking); } catch (e) {}
+      try { EmailService.sendCancellationNotice(result.booking); } catch (ex) {}
     }
     return result;
   }

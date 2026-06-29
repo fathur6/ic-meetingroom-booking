@@ -30,8 +30,7 @@ function include(filename) {
 }
 
 function getDeploymentUrl() {
-  var did = PropertiesService.getScriptProperties().getProperty('DEPLOYMENT_ID');
-  return 'https://script.google.com/macros/s/' + (did || 'YOUR_DEPLOYMENT_ID') + '/exec';
+  return 'https://script.google.com/a/macros/unisza.edu.my/s/AKfycbzxMaFsVw31onceNdX1Xi2UuWGK579VwVtW35mxMyrDrpFL5Dq8AAHbEHmLw-Y0ykeUUw/exec';
 }
 
 function getCurrentUser() {
