@@ -235,8 +235,8 @@ var SheetService = {
     if (String(booking.email).toLowerCase() !== String(email).toLowerCase()) {
       return { success: false, message: 'Email does not match the booking record.' };
     }
-    if (booking.status !== 'Pending') {
-      return { success: false, message: 'Only pending bookings can be cancelled. Current status: ' + booking.status };
+    if (booking.status !== 'Pending' && booking.status !== 'Approved') {
+      return { success: false, message: 'Only pending or approved bookings can be cancelled. Current status: ' + booking.status };
     }
     this.updateBookingStatus(bookingId, 'Cancelled', email, 'Cancelled by user', '');
     return { success: true, booking: booking };

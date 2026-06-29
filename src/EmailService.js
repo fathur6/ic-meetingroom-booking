@@ -92,15 +92,37 @@ var EmailService = {
       '<h2 style="color:#8892b0">Booking Cancelled by User</h2>',
       '<p><strong>' + booking.bookingId + '</strong> has been cancelled by the user.</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
-      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + booking.room + '</td></tr>',
-      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + booking.date + '</td></tr>',
-      '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + booking.startTime + ' – ' + booking.endTime + '</td></tr>',
+      '<tr><td style="color:#8892b0">Name</td><td style="color:#e6f1ff">' + (booking.name || '—') + '</td></tr>',
+      '<tr><td style="color:#8892b0">Email</td><td style="color:#e6f1ff">' + (booking.email || '—') + '</td></tr>',
+      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + (booking.room || '—') + '</td></tr>',
+      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + (booking.date || '—') + '</td></tr>',
+      '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + (booking.startTime || '—') + ' – ' + (booking.endTime || '—') + '</td></tr>',
       '</table>',
       '<hr style="border-color:rgba(136,146,176,.12)">',
       '<p style="font-size:11px;color:#555">UniSZA International Centre · Meeting Room Booking System</p>',
       '</div>'
     ].join('');
     this._send(adminEmail, subject, body);
+  },
+
+  sendCancellationToUser: function (booking) {
+    var subject = 'Booking Cancelled: ' + booking.bookingId + ' — IC Meeting Room';
+    var body = [
+      '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<h2 style="color:#8892b0">Booking Cancelled</h2>',
+      '<p>Your booking <strong style="color:#e6f1ff">' + booking.bookingId + '</strong> has been cancelled as requested.</p>',
+      '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
+      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + (booking.room || '—') + '</td></tr>',
+      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + (booking.date || '—') + '</td></tr>',
+      '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + (booking.startTime || '—') + ' – ' + (booking.endTime || '—') + '</td></tr>',
+      '<tr><td style="color:#8892b0">Purpose</td><td style="color:#e6f1ff">' + (booking.purpose || '—') + '</td></tr>',
+      '</table>',
+      '<p style="color:#8892b0">The slot is now available for other bookings.</p>',
+      '<hr style="border-color:rgba(136,146,176,.12)">',
+      '<p style="font-size:11px;color:#555">UniSZA International Centre · Meeting Room Booking System</p>',
+      '</div>'
+    ].join('');
+    if (booking.email) this._send(booking.email, subject, body);
   },
 
   _send: function (to, subject, htmlBody) {

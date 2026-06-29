@@ -134,6 +134,7 @@ var BookingService = {
     var result = SheetService.cancelBooking(bookingId, email);
     if (result.success) {
       try { EmailService.sendCancellationNotice(result.booking); } catch (ex) {}
+      try { EmailService.sendCancellationToUser(result.booking); } catch (ex) {}
     }
     return result;
   }
