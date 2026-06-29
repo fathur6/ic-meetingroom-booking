@@ -99,9 +99,20 @@
   </div>
   <? } ?>
 
+  <div class="modal-overlay" id="authModal" style="display:none">
+    <div class="modal-box">
+      <h2><span>Authorization</span> Required</h2>
+      <p style="color:var(--muted);margin-bottom:14px">Google needs your permission to save bookings and create calendar events.</p>
+      <a id="authLink" href="#" class="btn btn-primary" target="_blank" onclick="document.getElementById('authModal').style.display='none';setTimeout(checkAuth,2000)">Authorize This App</a>
+      <p class="text-muted mt-12" style="font-size:11px">After authorizing, close the new tab and continue.</p>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('authModal').style.display='none'">Done</button>
+    </div>
+  </div>
+
   <script>
     var busySlots = [];
     var timeSlots = [];
+    var submitTimeout = null;
 
     function init() {
       generateTimeOptions();
@@ -110,16 +121,30 @@
       if (introEl) {
         if (!sessionStorage.getItem('icBookingIntroShown')) {
           sessionStorage.setItem('icBookingIntroShown', '1');
-        } else {
-          introEl.style.display = 'none';
-        }
+        } else { introEl.style.display = 'none'; }
       }
+      doAuthCheck();
+    }
+
+    function doAuthCheck() {
+      google.script.run
+        .withSuccessHandler(function(r) {
+          if (!r.authorized && r.authUrl) {
+            document.getElementById('authModal').style.display = 'flex';
+            document.getElementById('authLink').href = r.authUrl;
+          } else { loadRooms(); }
+        })
+        .withFailureHandler(function() { loadRooms(); })
+        .checkAuth();
+    }
+
+    function loadRooms() {
       google.script.run
         .withSuccessHandler(function(rooms) {
           var sel = document.getElementById('room');
           sel.innerHTML = '<option value="">Select room...</option>';
           if (rooms.length === 0) {
-            sel.innerHTML += '<option value="" disabled>No rooms available — admin must run setup()</option>';
+            sel.innerHTML += '<option value="" disabled>No rooms — admin must run setup()</option>';
           }
           for (var i = 0; i < rooms.length; i++) {
             var opt = document.createElement('option');
@@ -135,10 +160,7 @@
         .getRooms();
     }
 
-    function closeIntroModal() {
-      document.getElementById('firstVisitModal').style.display = 'none';
-    }
-
+    function closeIntroModal() { document.getElementById('firstVisitModal').style.display = 'none'; }
     function changeUser() {
       window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>?page=booking');
     }
@@ -170,8 +192,7 @@
       var endSel = document.getElementById('endTime');
       for (var i = 0; i < slots.length; i++) {
         var o1 = document.createElement('option');
-        o1.value = slots[i];
-        o1.textContent = slots[i];
+        o1.value = slots[i]; o1.textContent = slots[i];
         startSel.appendChild(o1);
       }
     }
@@ -184,8 +205,7 @@
       for (var i = 0; i < timeSlots.length; i++) {
         if (timeSlots[i] > start) {
           var o = document.createElement('option');
-          o.value = timeSlots[i];
-          o.textContent = timeSlots[i];
+          o.value = timeSlots[i]; o.textContent = timeSlots[i];
           endSel.appendChild(o);
         }
       }
@@ -223,8 +243,7 @@
     function highlightSlots() {
       var start = document.getElementById('startTime').value;
       var end = document.getElementById('endTime').value;
-      var slotsAll = document.querySelectorAll('.slot');
-      slotsAll.forEach(function(sl) { sl.classList.remove('selected'); });
+      document.querySelectorAll('.slot').forEach(function(sl) { sl.classList.remove('selected'); });
       if (!start || !end) return;
       var startIdx = timeSlots.indexOf(start);
       var endIdx = timeSlots.indexOf(end);
@@ -261,8 +280,17 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Submitting...';
 
+      if (submitTimeout) clearTimeout(submitTimeout);
+      submitTimeout = setTimeout(function() {
+        btn.disabled = false;
+        btn.textContent = 'Submit Booking';
+        showToast('Request timed out. You may need to authorize this app first. Close any popups and try again.', 'info');
+        doAuthCheck();
+      }, 20000);
+
       google.script.run
         .withSuccessHandler(function(r) {
+          clearTimeout(submitTimeout);
           btn.disabled = false;
           btn.textContent = 'Submit Booking';
           if (r.success) {
@@ -270,14 +298,14 @@
             document.getElementById('form').reset();
             renderSlots({ busySlots: [] });
             document.getElementById('availabilitySection').style.display = 'none';
-          } else {
-            showToast(r.message, 'error');
-          }
+          } else { showToast(r.message, 'error'); }
         })
         .withFailureHandler(function(err) {
+          clearTimeout(submitTimeout);
           btn.disabled = false;
           btn.textContent = 'Submit Booking';
-          showToast('Error: ' + err.message, 'error');
+          showToast('Error: ' + (err.message || 'Submission failed. You may need to authorize this app.'), 'error');
+          doAuthCheck();
         })
         .submitBooking(form);
       return false;
@@ -288,7 +316,7 @@
       t.className = 'toast ' + type;
       t.textContent = msg;
       document.body.appendChild(t);
-      setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 300); }, 5000);
+      setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 300); }, 6000);
     }
 
     document.addEventListener('DOMContentLoaded', init);

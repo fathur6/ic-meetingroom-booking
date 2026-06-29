@@ -39,6 +39,27 @@ function getCurrentUser() {
   return email || '';
 }
 
+function checkAuth() {
+  try {
+    var email = Session.getActiveUser().getEmail();
+    return { authorized: !!email, user: email || '', needsAuth: false };
+  } catch (ex) {
+    try {
+      return { authorized: false, user: '', needsAuth: true, authUrl: ScriptApp.getAuthorizationInfo(ScriptApp.AuthMode.FULL).getAuthorizationUrl() };
+    } catch (e2) {
+      return { authorized: false, user: '', needsAuth: true, authUrl: '' };
+    }
+  }
+}
+
+function getAuthUrl() {
+  try {
+    return ScriptApp.getAuthorizationInfo(ScriptApp.AuthMode.FULL).getAuthorizationUrl();
+  } catch (ex) {
+    return '';
+  }
+}
+
 function setup(sheetId, approvalEmail) {
   if (!sheetId) sheetId = '1uHAoStcJRcItncRHjro8eWDj4wZBTwitSy1lUx2DhPE';
   if (!approvalEmail) approvalEmail = 'nasarudinsalleh@unisza.edu.my';
