@@ -1,3 +1,5 @@
+var DEPLOYMENT_URL = 'https://script.google.com/a/macros/unisza.edu.my/s/AKfycbzxMaFsVw31onceNdX1Xi2UuWGK579VwVtW35mxMyrDrpFL5Dq8AAHbEHmLw-Y0ykeUUw/exec';
+
 var EmailService = {
   sendReceipt: function (booking) {
     var subject = 'Booking Received: ' + booking.bookingId + ' — IC Meeting Room';
@@ -36,7 +38,10 @@ var EmailService = {
       '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + booking.startTime + ' – ' + booking.endTime + '</td></tr>',
       '<tr><td style="color:#8892b0">Purpose</td><td style="color:#e6f1ff">' + (booking.purpose || '—') + '</td></tr>',
       '</table>',
-      '<p style="color:#8892b0">Log in to the <strong>Admin Panel</strong> to approve or reject.</p>',
+      '<p style="color:#8892b0;margin-bottom:16px">Log in to the Admin Panel to approve or reject.</p>',
+      this._adminBtn(),
+      '<hr style="border-color:rgba(0,240,255,.12)">',
+      '<p style="font-size:11px;color:#555">UniSZA International Centre · Meeting Room Booking System</p>',
       '</div>'
     ].join('');
     this._send(adminEmail, subject, body);
@@ -98,6 +103,8 @@ var EmailService = {
       '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + (booking.date || '—') + '</td></tr>',
       '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + (booking.startTime || '—') + ' – ' + (booking.endTime || '—') + '</td></tr>',
       '</table>',
+      '<p style="color:#8892b0;margin-bottom:16px">The slot is now available. Check the Admin Panel for details.</p>',
+      this._adminBtn(),
       '<hr style="border-color:rgba(136,146,176,.12)">',
       '<p style="font-size:11px;color:#555">UniSZA International Centre · Meeting Room Booking System</p>',
       '</div>'
@@ -123,6 +130,13 @@ var EmailService = {
       '</div>'
     ].join('');
     if (booking.email) this._send(booking.email, subject, body);
+  },
+
+  _adminBtn: function () {
+    var url = DEPLOYMENT_URL + '?page=admin';
+    return '<table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 16px"><tr><td style="border-radius:8px;background:#00f0ff;padding:10px 22px;text-align:center">' +
+      '<a href="' + url + '" style="color:#001216;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.3px;display:inline-block">Go to Admin Panel</a>' +
+      '</td></tr></table>';
   },
 
   _send: function (to, subject, htmlBody) {
