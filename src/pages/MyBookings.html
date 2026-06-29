@@ -22,6 +22,8 @@
     </div>
     <? } ?>
 
+    <a class="back-link" href="javascript:void(0)" onclick="goBack()">← Back</a>
+
     <div class="card" id="bookingList">
       <h2>My <span>Bookings</span></h2>
       <div id="loadingMsg" class="text-center" style="padding:24px">
@@ -106,6 +108,10 @@
 
     function changeUser() {
       window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>?page=my');
+    }
+
+    function goBack() {
+      window.top.location.href = '<?!= getDeploymentUrl() ?>';
     }
 
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }

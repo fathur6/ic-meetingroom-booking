@@ -24,6 +24,8 @@
     </div>
     <? } ?>
 
+    <a class="back-link" href="javascript:void(0)" onclick="goBack()">← Back</a>
+
     <div class="card admin-login" id="loginCard">
       <h2><span>Admin</span> Login</h2>
       <label for="adminKey">Admin Key</label>
@@ -51,6 +53,8 @@
       </span>
     </div>
     <? } ?>
+
+    <a class="back-link" href="javascript:void(0)" onclick="goBack()">← Back</a>
 
     <div class="tabs">
       <button class="tab active" onclick="switchTab('pending')">Pending Bookings <span id="pendingCount" style="margin-left:4px;color:var(--amber)"></span></button>
@@ -224,6 +228,7 @@
     }
 
     function closeRejectModal() { document.getElementById('rejectModal').style.display = 'none'; rejectTarget = null; }
+    function goBack() { window.top.location.href = '<?!= getDeploymentUrl() ?>'; }
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     function trunc(s, n) { return s.length > n ? s.slice(0,n) + '…' : s; }
     function fmtDateShort(ts) { if (!ts) return ''; var d = new Date(ts); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
