@@ -107,3 +107,37 @@ function getConfig() {
     todayStr: Utilities.formatDate(new Date(), CONFIG.TIMEZONE, 'yyyy-MM-dd')
   };
 }
+
+// --- Global wrappers for google.script.run ---
+
+function getAvailability(roomId, dateStr) {
+  return BookingService.getAvailability(roomId, dateStr);
+}
+
+function submitBooking(form) {
+  return BookingService.submitBooking(form);
+}
+
+function getMyBookings() {
+  return BookingService.getMyBookings();
+}
+
+function cancelMyBooking(bookingId, email) {
+  return BookingService.cancelMyBooking(bookingId, email);
+}
+
+function getDashboard(adminKey) {
+  return AdminService.getDashboard(adminKey);
+}
+
+function approveBooking(bookingId, adminKey, notes) {
+  return AdminService.approveBooking(bookingId, adminKey, notes);
+}
+
+function rejectBooking(bookingId, adminKey, reason) {
+  return AdminService.rejectBooking(bookingId, adminKey, reason);
+}
+
+function getBookingById(bookingId) {
+  return SheetService.getBookingById(bookingId);
+}
