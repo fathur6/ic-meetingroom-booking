@@ -40,7 +40,7 @@ var AdminService = {
     if (booking.status !== 'Pending') return { success: false, message: 'Booking is not pending.' };
 
     if (booking.calendarEventId) {
-      CalendarService.updateEventColor(booking.calendarEventId, 'Rejected');
+      CalendarService.deleteEvent(booking.calendarEventId);
     }
 
     SheetService.updateBookingStatus(bookingId, 'Rejected', 'Admin', reason, booking.calendarEventId);

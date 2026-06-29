@@ -129,7 +129,7 @@ var BookingService = {
     }
     var booking = SheetService.getBookingById(bookingId);
     if (booking && booking.calendarEventId) {
-      CalendarService.updateEventColor(booking.calendarEventId, 'Cancelled');
+      CalendarService.deleteEvent(booking.calendarEventId);
     }
     var result = SheetService.cancelBooking(bookingId, email);
     if (result.success) {
