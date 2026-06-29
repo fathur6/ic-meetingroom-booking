@@ -6,7 +6,7 @@ var CONFIG = (function () {
     CALENDAR_NAME: 'IC Booking Schedule',
     CALENDAR_ID: sp.getProperty('CALENDAR_ID') || 'YOUR_CALENDAR_ID',
     SCRIPT_OWNER: sp.getProperty('SCRIPT_OWNER') || '',
-    APPROVAL_EMAIL: sp.getProperty('APPROVAL_EMAIL') || '',
+    APPROVAL_EMAIL: sp.getProperty('APPROVAL_EMAIL') || 'YOUR_EMAIL',
     ADMIN_EMAILS: sp.getProperty('ADMIN_EMAILS') || '',
     TIMEZONE: 'Asia/Kuala_Lumpur',
     WORKDAY_NUMBERS: [0, 1, 2, 3, 4],
