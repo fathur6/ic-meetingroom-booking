@@ -10,6 +10,8 @@
     .nav-card .icon { font-size: 36px; margin-bottom: 10px; }
     .nav-card .label { font-weight: 700; font-size: 16px; letter-spacing: .3px; }
     .nav-card .desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .cal-embed { width: 100%; height: 520px; border: 1px solid var(--border); border-radius: var(--radius); filter: invert(.92) hue-rotate(180deg); }
+    .cal-label { font-size: 10px; color: var(--muted); letter-spacing: .6px; text-transform: uppercase; margin-bottom: 6px; }
   </style>
 </head>
 <body>
@@ -48,6 +50,9 @@
       </div>
       <p class="text-muted text-center mt-20" style="font-size:11px">Sunday – Thursday · 08:00 – 17:00 · Book up to 60 days ahead</p>
     </div>
+
+    <div class="cal-label">IC Booking Schedule · Calendar</div>
+    <iframe class="cal-embed" src="https://calendar.google.com/calendar/embed?src=Y184NTRmMTg3ZTVjYTA5MDFhZGE5NGE4YTQ1ZDVjNmMxNDViYzI5MGU4ODdkZDIxZTk1NzFjNmMwYzMzNDAwZWQwQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20&mode=MONTH&showTitle=0&showNav=1&showPrint=0&showTabs=0&showCalendars=0&showTz=0" scrolling="no"></iframe>
   </div>
 
   <script>
