@@ -97,12 +97,27 @@ var CalendarService = {
       if (!event) return;
       switch (status) {
         case 'Approved':  event.setColor(CalendarApp.EventColor.GREEN); break;
-        case 'Rejected':  event.setColor(CalendarApp.EventColor.PALE_RED); break;
-        case 'Cancelled': event.setColor(CalendarApp.EventColor.GRAY); break;
         default:          event.setColor(CalendarApp.EventColor.PALE_GRAY); break;
       }
     } catch (e) {
       Logger.log('updateEventColor error: ' + e.toString());
+    }
+  },
+
+  prefixEventTitle: function (eventId, prefix) {
+    if (!eventId) return;
+    try {
+      var cal = CalendarApp.getCalendarById(this.getCalendarId());
+      if (!cal) return;
+      var event = cal.getEventById(eventId);
+      if (!event) return;
+      var title = event.getTitle();
+      var tag = '[' + prefix + ']';
+      if (title.indexOf(tag) === -1) {
+        event.setTitle(tag + ' ' + title);
+      }
+    } catch (e) {
+      Logger.log('prefixEventTitle error: ' + e.toString());
     }
   },
 
