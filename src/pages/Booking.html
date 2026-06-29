@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <?!= include('pages/_styles') ?>
+</head>
+<body>
+  <div class="container">
+    <?!= include('pages/_header') ?>
+
+    <div class="card" id="bookingForm">
+      <h2>Book a <span>Meeting Room</span></h2>
+      <p class="text-muted mb-12">Fill in the details below. You will be notified within 1 working day.</p>
+      <form id="form" onsubmit="return handleSubmit(event)">
+        <div class="form-grid">
+          <div>
+            <label for="name">Full Name *</label>
+            <input type="text" id="name" placeholder="Your full name" required>
+          </div>
+          <div>
+            <label for="office">Office / Department</label>
+            <input type="text" id="office" placeholder="E.g. Faculty of Science">
+          </div>
+          <div>
+            <label for="tel">Telephone *</label>
+            <input type="tel" id="tel" placeholder="01X-XXXXXXX" required>
+          </div>
+          <div>
+            <label for="email">Email *</label>
+            <input type="email" id="email" placeholder="your@email.com" required>
+          </div>
+          <div>
+            <label for="room">Room *</label>
+            <select id="room" required onchange="checkAvailability()">
+              <option value="">Loading rooms...</option>
+            </select>
+          </div>
+          <div>
+            <label for="date">Date *</label>
+            <input type="date" id="date" required onchange="checkAvailability()">
+          </div>
+          <div>
+            <label for="startTime">Start Time *</label>
+            <select id="startTime" required onchange="onStartChange()">
+              <option value="">Select start time...</option>
+            </select>
+          </div>
+          <div>
+            <label for="endTime">End Time *</label>
+            <select id="endTime" required>
+              <option value="">Select end time...</option>
+            </select>
+          </div>
+          <div class="full">
+            <label for="purpose">Meeting Purpose *</label>
+            <textarea id="purpose" placeholder="Describe the purpose of your meeting..." required></textarea>
+          </div>
+        </div>
+
+        <div id="availabilitySection" class="full" style="display:none">
+          <div class="slot-grid-label">Availability · 30 min slots</div>
+          <div id="slotGrid" class="slot-grid"></div>
+        </div>
+
+        <div class="full mt-20">
+          <button type="submit" class="btn btn-primary" id="submitBtn">Submit Booking</button>
+          <span style="margin-left:12px;font-size:12px;color:var(--muted)">You will be notified within 1 working day.</span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    var busySlots = [];
+    var timeSlots = [];
+
+    function init() {
+      generateTimeOptions();
+      setDateConstraints();
+      google.script.run
+        .withSuccessHandler(function(rooms) {
+          var sel = document.getElementById('room');
+          sel.innerHTML = '<option value="">Select room...</option>';
+          if (rooms.length === 0) {
+            sel.innerHTML += '<option value="" disabled>No rooms available — admin must run setup()</option>';
+          }
+          for (var i = 0; i < rooms.length; i++) {
+            var opt = document.createElement('option');
+            opt.value = rooms[i].roomId;
+            opt.textContent = rooms[i].roomName;
+            sel.appendChild(opt);
+          }
+        })
+        .withFailureHandler(function(err) {
+          document.getElementById('room').innerHTML = '<option value="">Error loading rooms</option>';
+          showToast('Failed to load rooms. Admin must run setup(). ' + err.message, 'error');
+        })
+        .getRooms();
+    }
+
+    function setDateConstraints() {
+      var today = new Date();
+      var maxDate = new Date(today);
+      maxDate.setDate(today.getDate() + 60);
+      var d = document.getElementById('date');
+      d.min = fmtDate(today);
+      d.max = fmtDate(maxDate);
+    }
+
+    function fmtDate(d) {
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+
+    function generateTimeOptions() {
+      var slots = [];
+      for (var h = 8; h < 17; h++) {
+        for (var m = 0; m < 60; m += 30) {
+          if (h === 16 && m === 30) break;
+          var t = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+          slots.push(t);
+        }
+      }
+      timeSlots = slots;
+      var startSel = document.getElementById('startTime');
+      var endSel = document.getElementById('endTime');
+      for (var i = 0; i < slots.length; i++) {
+        var o1 = document.createElement('option');
+        o1.value = slots[i];
+        o1.textContent = slots[i];
+        startSel.appendChild(o1);
+      }
+    }
+
+    function onStartChange() {
+      var start = document.getElementById('startTime').value;
+      var endSel = document.getElementById('endTime');
+      endSel.innerHTML = '<option value="">Select end time...</option>';
+      if (!start) return;
+      for (var i = 0; i < timeSlots.length; i++) {
+        if (timeSlots[i] > start) {
+          var o = document.createElement('option');
+          o.value = timeSlots[i];
+          o.textContent = timeSlots[i];
+          endSel.appendChild(o);
+        }
+      }
+      highlightSlots();
+    }
+
+    function checkAvailability() {
+      var room = document.getElementById('room').value;
+      var date = document.getElementById('date').value;
+      if (!room || !date) {
+        document.getElementById('availabilitySection').style.display = 'none';
+        return;
+      }
+      google.script.run
+        .withSuccessHandler(renderSlots)
+        .withFailureHandler(function(err) {
+          document.getElementById('slotGrid').innerHTML = '<span class="text-muted">Could not load availability.</span>';
+        })
+        .getAvailability(room, date);
+    }
+
+    function renderSlots(data) {
+      busySlots = data.busySlots;
+      var html = '';
+      for (var i = 0; i < timeSlots.length; i++) {
+        var s = timeSlots[i];
+        var endIdx = timeSlots.indexOf(s) + 1;
+        var e = endIdx < timeSlots.length ? timeSlots[endIdx] : '17:00';
+        var isBusy = false;
+        for (var j = 0; j < busySlots.length; j++) {
+          if (s < busySlots[j].endTime && e > busySlots[j].startTime) { isBusy = true; break; }
+        }
+        var cls = isBusy ? 'taken' : 'free';
+        html += '<div class="slot ' + cls + '" data-slot="' + s + '">' + s + '–' + e + '</div>';
+      }
+      document.getElementById('slotGrid').innerHTML = html;
+      document.getElementById('availabilitySection').style.display = 'block';
+    }
+
+    function highlightSlots() {
+      var start = document.getElementById('startTime').value;
+      var end = document.getElementById('endTime').value;
+      var slotsAll = document.querySelectorAll('.slot');
+      slotsAll.forEach(function(sl) { sl.classList.remove('selected'); });
+      if (!start || !end) return;
+      var startIdx = timeSlots.indexOf(start);
+      var endIdx = timeSlots.indexOf(end);
+      if (startIdx === -1 || endIdx === -1) return;
+      for (var i = startIdx; i < endIdx && i < timeSlots.length; i++) {
+        var s = document.querySelector('.slot[data-slot="' + timeSlots[i] + '"]');
+        if (s) s.classList.add('selected');
+      }
+    }
+
+    function handleSubmit(e) {
+      e.preventDefault();
+      var form = {
+        name: document.getElementById('name').value.trim(),
+        office: document.getElementById('office').value.trim(),
+        phone: document.getElementById('tel').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        room: document.getElementById('room').value,
+        date: document.getElementById('date').value,
+        startTime: document.getElementById('startTime').value,
+        endTime: document.getElementById('endTime').value,
+        purpose: document.getElementById('purpose').value.trim()
+      };
+
+      if (!form.name || !form.email || !form.phone || !form.room || !form.date || !form.startTime || !form.endTime || !form.purpose) {
+        showToast('Please fill in all required fields.', 'error'); return false;
+      }
+      var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!re.test(form.email)) { showToast('Please enter a valid email address.', 'error'); return false; }
+      if (form.startTime >= form.endTime) { showToast('End time must be after start time.', 'error'); return false; }
+      var day = new Date(form.date + 'T00:00:00+08:00').getDay();
+      if ([0,1,2,3,4].indexOf(day) === -1) { showToast('Bookings only available Sunday–Thursday.', 'error'); return false; }
+
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Submitting...';
+
+      google.script.run
+        .withSuccessHandler(function(r) {
+          btn.disabled = false;
+          btn.textContent = 'Submit Booking';
+          if (r.success) {
+            showToast('Booking submitted! ID: ' + r.bookingId + '. Check your email.', 'success');
+            document.getElementById('form').reset();
+            renderSlots({ busySlots: [] });
+            document.getElementById('availabilitySection').style.display = 'none';
+          } else {
+            showToast(r.message, 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          btn.disabled = false;
+          btn.textContent = 'Submit Booking';
+          showToast('Error: ' + err.message, 'error');
+        })
+        .submitBooking(form);
+
+      return false;
+    }
+
+    function showToast(msg, type) {
+      var t = document.createElement('div');
+      t.className = 'toast ' + type;
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 300); }, 5000);
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

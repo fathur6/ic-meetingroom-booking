@@ -141,3 +141,10 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# macOS
+.DS_Store
+
+# Apps Script sensitive config (contains real sheet IDs, emails, script IDs)
+src/Config.js
+.clasp.json

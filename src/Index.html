@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <?!= include('pages/_styles') ?>
+  <style>
+    .nav-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+    .nav-card { display: block; padding: 28px 24px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); text-decoration: none; color: var(--text); transition: .22s; text-align: center; cursor: pointer; }
+    .nav-card:hover { border-color: var(--cyan); box-shadow: 0 0 24px rgba(0,240,255,.2); transform: translateY(-2px); }
+    .nav-card .icon { font-size: 36px; margin-bottom: 10px; }
+    .nav-card .label { font-weight: 700; font-size: 16px; letter-spacing: .3px; }
+    .nav-card .desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <?!= include('pages/_header') ?>
+
+    <div class="card">
+      <h2>Welcome — <span>IC Meeting Room</span></h2>
+      <p class="text-muted mb-20">Select a page below:</p>
+      <div class="nav-links">
+        <div class="nav-card" onclick="navigateTo('booking')">
+          <div class="icon">&#x1F4C5;</div>
+          <div class="label">Book a Room</div>
+          <div class="desc">Submit a new meeting room booking request</div>
+        </div>
+        <div class="nav-card" onclick="navigateTo('my')">
+          <div class="icon">&#x1F50D;</div>
+          <div class="label">My Bookings</div>
+          <div class="desc">Look up or cancel your booking</div>
+        </div>
+        <div class="nav-card" onclick="navigateTo('admin')">
+          <div class="icon">&#x2699;&#xFE0F;</div>
+          <div class="label">Admin Panel</div>
+          <div class="desc">Manage approvals (admin key required)</div>
+        </div>
+      </div>
+      <p class="text-muted text-center mt-20" style="font-size:11px">Sunday – Thursday · 08:00 – 17:00 · Book up to 60 days ahead</p>
+    </div>
+  </div>
+
+  <script>
+    function navigateTo(page) {
+      window.top.location.href = window.location.origin + window.location.pathname + '?page=' + page;
+    }
+  </script>
+</body>
+</html>

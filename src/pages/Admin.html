@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <?!= include('pages/_styles') ?>
+</head>
+<body>
+  <div class="container" id="loginContainer">
+    <div class="hero">
+      <div class="logos">
+        <img src="https://i.postimg.cc/bYkKDFc0/Uni-SZA-Logo-(Plain).png" alt="UniSZA" style="height:48px">
+        <img src="https://i.postimg.cc/4xtbXPdh/IC-Logo-Transparent.png" alt="IC" style="height:48px">
+      </div>
+      <h1 class="title">Admin Panel</h1>
+      <p class="subtitle">International Centre · Meeting Room Booking</p>
+    </div>
+
+    <div class="card admin-login" id="loginCard">
+      <h2><span>Admin</span> Login</h2>
+      <label for="adminKey">Admin Key</label>
+      <input type="password" id="adminKey" placeholder="Enter admin key..." onkeydown="if(event.key==='Enter')doLogin()">
+      <div id="loginStatus" class="text-muted mt-12" style="display:none"></div>
+      <button class="btn btn-primary mt-12" onclick="doLogin()" style="width:100%" id="loginBtn">Enter</button>
+    </div>
+  </div>
+
+  <div class="container" id="dashboardContainer" style="display:none">
+    <div class="hero">
+      <div class="logos">
+        <img src="https://i.postimg.cc/bYkKDFc0/Uni-SZA-Logo-(Plain).png" alt="UniSZA" style="height:48px">
+        <img src="https://i.postimg.cc/4xtbXPdh/IC-Logo-Transparent.png" alt="IC" style="height:48px">
+      </div>
+      <h1 class="title">Admin Panel</h1>
+      <p class="subtitle">Manage bookings · Approve or Reject</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('pending')">Pending Bookings <span id="pendingCount" style="margin-left:4px;color:var(--amber)"></span></button>
+      <button class="tab" onclick="switchTab('history')">History</button>
+    </div>
+
+    <div class="card" id="pendingCard">
+      <div class="row mb-12">
+        <h2 style="margin:0">Pending <span>Approvals</span></h2>
+        <span class="spacer"></span>
+        <button class="btn btn-ghost btn-sm" onclick="refreshDashboard()">Refresh</button>
+      </div>
+      <div id="pendingTable"></div>
+    </div>
+
+    <div class="card" id="historyCard" style="display:none">
+      <h2>Booking <span>History</span></h2>
+      <div id="historyTable"></div>
+    </div>
+
+    <div id="rejectModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center">
+      <div class="card" style="max-width:400px;width:90%">
+        <h2>Reject <span>Booking</span></h2>
+        <label for="rejectReason">Reason (optional)</label>
+        <textarea id="rejectReason" placeholder="Why is this booking rejected?"></textarea>
+        <div class="row row-end mt-20">
+          <button class="btn btn-ghost btn-sm" onclick="closeRejectModal()">Cancel</button>
+          <button class="btn btn-danger btn-sm" id="confirmRejectBtn" onclick="confirmReject()">Reject</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var adminKey = '';
+    var pending = [];
+    var recent = [];
+    var rejectTarget = null;
+    var currentTab = 'pending';
+
+    function doLogin() {
+      var key = document.getElementById('adminKey').value.trim();
+      if (!key) { showToast('Enter admin key.', 'error'); return; }
+      var btn = document.getElementById('loginBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Verifying...';
+      document.getElementById('loginStatus').style.display = 'none';
+
+      google.script.run
+        .withSuccessHandler(function(r) {
+          btn.disabled = false;
+          btn.textContent = 'Enter';
+          if (r.authorized) {
+            adminKey = key;
+            pending = r.pending || [];
+            recent = r.recent || [];
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('dashboardContainer').style.display = 'block';
+            renderPending();
+            renderHistory();
+          } else {
+            showToast(r.message || 'Invalid admin key.', 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          btn.disabled = false;
+          btn.textContent = 'Enter';
+          showToast('Error: ' + err.message, 'error');
+        })
+        .getDashboard(key);
+    }
+
+    function refreshDashboard() {
+      google.script.run
+        .withSuccessHandler(function(r) {
+          if (!r.authorized) { showToast('Session expired.', 'error'); return; }
+          pending = r.pending || [];
+          recent = r.recent || [];
+          if (currentTab === 'pending') renderPending(); else renderHistory();
+        })
+        .withFailureHandler(function(err) { showToast('Refresh error: ' + err.message, 'error'); })
+        .getDashboard(adminKey);
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+      document.getElementById('pendingCard').style.display = tab === 'pending' ? '' : 'none';
+      document.getElementById('historyCard').style.display = tab === 'history' ? '' : 'none';
+      if (tab === 'pending') document.querySelector('.tab:nth-child(1)').classList.add('active');
+      else document.querySelector('.tab:nth-child(2)').classList.add('active');
+    }
+
+    function renderPending() {
+      var ct = document.getElementById('pendingCount');
+      ct.textContent = pending.length > 0 ? '(' + pending.length + ')' : '';
+      if (pending.length === 0) {
+        document.getElementById('pendingTable').innerHTML = '<div class="empty-state"><div class="icon">✓</div><p>No pending bookings.</p></div>';
+        return;
+      }
+      var html = '<table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Room</th><th>Date</th><th>Time</th><th>Purpose</th><th>Actions</th></tr></thead><tbody>';
+      for (var i = 0; i < pending.length; i++) {
+        var b = pending[i];
+        html += '<tr>' +
+          '<td class="mono">' + esc(b.bookingId) + '</td>' +
+          '<td>' + esc(b.name) + '</td>' +
+          '<td style="font-size:12px">' + esc(b.email) + '</td>' +
+          '<td>' + esc(b.room) + '</td>' +
+          '<td>' + esc(b.date) + '</td>' +
+          '<td class="mono" style="white-space:nowrap">' + esc(b.startTime) + '–' + esc(b.endTime) + '</td>' +
+          '<td>' + esc(trunc(b.purpose, 40)) + '</td>' +
+          '<td class="actions">' +
+            '<button class="btn btn-primary btn-sm" onclick="approve(\'' + esc(b.bookingId) + '\')">Approve</button>' +
+            '<button class="btn btn-danger btn-sm" onclick="reject(\'' + esc(b.bookingId) + '\')">Reject</button>' +
+          '</td>' +
+        '</tr>';
+      }
+      html += '</tbody></table>';
+      document.getElementById('pendingTable').innerHTML = html;
+    }
+
+    function renderHistory() {
+      if (recent.length === 0) {
+        document.getElementById('historyTable').innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No bookings yet.</p></div>';
+        return;
+      }
+      var html = '<table><thead><tr><th>ID</th><th>Name</th><th>Room</th><th>Date</th><th>Time</th><th>Status</th><th>Decided</th></tr></thead><tbody>';
+      for (var i = 0; i < recent.length; i++) {
+        var b = recent[i];
+        html += '<tr>' +
+          '<td class="mono">' + esc(b.bookingId) + '</td>' +
+          '<td>' + esc(b.name) + '</td>' +
+          '<td>' + esc(b.room) + '</td>' +
+          '<td>' + esc(b.date) + '</td>' +
+          '<td class="mono">' + esc(b.startTime) + '–' + esc(b.endTime) + '</td>' +
+          '<td><span class="pill ' + b.status.toLowerCase() + '">' + esc(b.status) + '</span></td>' +
+          '<td style="font-size:11px;color:var(--muted)">' + esc(b.decisionBy) + (b.decisionAt ? ' · ' + fmtDateShort(b.decisionAt) : '') + '</td>' +
+        '</tr>';
+      }
+      html += '</tbody></table>';
+      document.getElementById('historyTable').innerHTML = html;
+    }
+
+    function approve(bookingId) {
+      if (!confirm('Approve booking ' + bookingId + '?')) return;
+      google.script.run
+        .withSuccessHandler(function(r) {
+          if (r.success) {
+            showToast('Approved: ' + bookingId + '. Email sent & calendar event created.', 'success');
+            refreshDashboard();
+          } else { showToast(r.message, 'error'); }
+        })
+        .withFailureHandler(function(err) { showToast('Error: ' + err.message, 'error'); })
+        .approveBooking(bookingId, adminKey, '');
+    }
+
+    function reject(bookingId) {
+      rejectTarget = bookingId;
+      document.getElementById('rejectReason').value = '';
+      document.getElementById('rejectModal').style.display = 'flex';
+    }
+
+    function confirmReject() {
+      var reason = document.getElementById('rejectReason').value.trim() || 'Slot unavailable';
+      var btn = document.getElementById('confirmRejectBtn');
+      btn.disabled = true;
+      btn.textContent = 'Rejecting...';
+      google.script.run
+        .withSuccessHandler(function(r) {
+          btn.disabled = false;
+          btn.textContent = 'Reject';
+          closeRejectModal();
+          if (r.success) {
+            showToast('Rejected: ' + rejectTarget + '. Email sent.', 'info');
+            refreshDashboard();
+          } else { showToast(r.message, 'error'); }
+        })
+        .withFailureHandler(function(err) {
+          btn.disabled = false;
+          btn.textContent = 'Reject';
+          showToast('Error: ' + err.message, 'error');
+        })
+        .rejectBooking(rejectTarget, adminKey, reason);
+    }
+
+    function closeRejectModal() {
+      document.getElementById('rejectModal').style.display = 'none';
+      rejectTarget = null;
+    }
+
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function trunc(s, n) { return s.length > n ? s.slice(0,n) + '…' : s; }
+    function fmtDateShort(ts) { if (!ts) return ''; var d = new Date(ts); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+    function showToast(msg, type) {
+      var t = document.createElement('div');
+      t.className = 'toast ' + type;
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 300); }, 5000);
+    }
+  </script>
+</body>
+</html>
