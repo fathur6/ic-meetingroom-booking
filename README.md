@@ -15,7 +15,7 @@ Web app for UniSZA International Centre meeting room bookings — built on Googl
 - Google Apps Script (V8 runtime)
 - Google Sheets (backend database)
 - Google Calendar (approved bookings)
-- Gmail (email notifications via nasarudinsaleh@unisza.edu.my alias)
+- Gmail (email notifications via APPROVAL_EMAIL alias)
 - [clasp](https://github.com/google/clasp) for local dev & versioning
 
 ## Setup

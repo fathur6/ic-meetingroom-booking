@@ -58,7 +58,7 @@ var SheetService = {
 
   seedSettings: function () {
     var defaults = {
-      'adminKey': 'ic-admin-2026',
+      'adminKey': 'change-me-on-first-run',
       'timezone': CONFIG.TIMEZONE,
       'startHour': CONFIG.START_HOUR,
       'endHour': CONFIG.END_HOUR,
@@ -90,8 +90,8 @@ var SheetService = {
     var sheet = this._getSheet(CONFIG.SHEET_ADMINS);
     var data = sheet.getDataRange().getValues();
     if (data.length > 1) return;
-    sheet.appendRow(['fathurrahman@unisza.edu.my', 'Owner']);
-    sheet.appendRow(['nasarudinsalleh@unisza.edu.my', 'Admin']);
+    sheet.appendRow(['admin1@example.com', 'Owner']);
+    sheet.appendRow(['admin2@example.com', 'Admin']);
   },
 
   getRooms: function () {

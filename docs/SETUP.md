@@ -2,11 +2,11 @@
 
 ## Prerequisites
 
-- Google Account: `fathurrahman@unisza.edu.my` (script owner)
+- Google Account: `YOUR_SCRIPT_OWNER_EMAIL` (script owner)
 - Node.js (for clasp CLI)
-- Google Sheets backend: https://docs.google.com/spreadsheets/d/1uHAoStcJRcItncRHjro8eWDj4wZBTwitSy1lUx2DhPE/edit
-- Existing Apps Script project: `1XXBAnI3jyKTTVBkTtWvlAfBjnbSjC_PAg9GWIEajN_BaJ3A_hwSdWNjA`
-- Existing web app deployment: `AKfycbzxMaFsVw31onceNdX1Xi2UuWGK579VwVtW35mxMyrDrpFL5Dq8AAHbEHmLw-Y0ykeUUw`
+- Google Sheets backend: https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit
+- Existing Apps Script project: `YOUR_SCRIPT_ID`
+- Existing web app deployment: `YOUR_DEPLOYMENT_ID`
 
 ---
 
@@ -22,7 +22,7 @@ npm install -g @google/clasp
 clasp login
 ```
 
-Sign in as `fathurrahman@unisza.edu.my`.
+Sign in as the owner Google account.
 
 ## 3. Push code to Apps Script
 
@@ -53,22 +53,22 @@ In the Apps Script editor:
 3. Grant permissions when prompted (Sheets, Calendar, Gmail).
 4. You should see a success log in View → Logs:
    ```
-   Setup complete. Calendar ID: xxxxx@group.calendar.google.com. Calendar shared with nasarudinsalleh@unisza.edu.my
+    Setup complete. Calendar ID: xxxxx@group.calendar.google.com. Calendar shared with APPROVAL_EMAIL
    ```
 
 This will:
 - Create/verify the 4 sheet tabs: `Bookings`, `Rooms`, `Settings`, `Admins`
 - Seed `Rooms` with 3 starter rooms
-- Seed `Settings` with defaults (admin key: `ic-admin-2026`)
-- Seed `Admins` with `fathurrahman@unisza.edu.my` and `nasarudinsalleh@unisza.edu.my`
+- Seed `Settings` with defaults (admin key: `change-me-on-first-run`)
+- Seed `Admins` with placeholder emails (update them in the sheet after setup)
 - Find or create the Google Calendar **"IC Booking Schedule"**
-- Share the calendar with `nasarudinsalleh@unisza.edu.my` (writer access)
+- Share the calendar with `APPROVAL_EMAIL` (writer access)
 
 ## 6. Set Gmail "Send mail as" alias
 
 This is **critical** — without it, emails will fail or come from the wrong address.
 
-On `fathurrahman@unisza.edu.my`'s Gmail account:
+On the script owner's Gmail account:
 
 1. Open [Gmail](https://mail.google.com).
 2. Click the gear icon (top-right) → **See all settings**.
@@ -76,28 +76,28 @@ On `fathurrahman@unisza.edu.my`'s Gmail account:
 4. In the **Send mail as** section, click **Add another email address**.
 5. A popup will appear. Fill in:
    - **Name**: `IC Meeting Room`
-   - **Email address**: `nasarudinsalleh@unisza.edu.my`
+   - **Email address**: `APPROVAL_EMAIL`
    - Leave "Treat as an alias" checked.
-6. Click **Next Step**.
-7. Gmail will send a verification code to `nasarudinsalleh@unisza.edu.my`.
- 8. Go to nasarudinsalleh's inbox, find the verification email, copy the code.
-9. Enter the code in the popup, click **Verify**.
-10. Done — `fathurrahman@unisza.edu.my` can now send emails **as** `nasarudinsalleh@unisza.edu.my`.
+ 6. Click **Next Step**.
+ 7. Gmail will send a verification code to `APPROVAL_EMAIL`.
+ 8. Go to the approval email inbox, find the verification email, copy the code.
+ 9. Enter the code in the popup, click **Verify**.
+ 10. Done — the script owner can now send emails **as** `APPROVAL_EMAIL`.
 
-This allows `EmailService` to use `GmailApp.sendEmail({from: 'nasarudinsalleh@unisza.edu.my'})` — all booking notifications will appear to come from nasarudinsalleh.
+This allows `EmailService` to use `GmailApp.sendEmail({from: 'APPROVAL_EMAIL'})` — all booking notifications will appear to come from APPROVAL_EMAIL.
 
 ## 7. Update web app deployment
 
 ```bash
-clasp deploy -i AKfycbzxMaFsVw31onceNdX1Xi2UuWGK579VwVtW35mxMyrDrpFL5Dq8AAHbEHmLw-Y0ykeUUw
+clasp deploy -i YOUR_DEPLOYMENT_ID
 ```
 
-This updates the **existing** deployment (same URL, new version). No new deployment is created.
+This updates the **existing** deployment (same URL, no new deployment is created).
 
 If you want a version description:
 
 ```bash
-clasp deploy -i AKfycbzxMaFsVw31onceNdX1Xi2UuWGK579VwVtW35mxMyrDrpFL5Dq8AAHbEHmLw-Y0ykeUUw -d "v1.0 dark theme"
+clasp deploy -i YOUR_DEPLOYMENT_ID -d "v1.0 theme"
 ```
 
 ## 8. Access the app
@@ -126,7 +126,7 @@ Add `?page=booking` / `?page=my` / `?page=admin` as needed.
 
 1. Edit files in `src/`.
 2. `clasp push`
-3. `clasp deploy -i AKfycbzxMaFsVw31onceNdX1Xi2UuWGK579VwVtW35mxMyrDrpFL5Dq8AAHbEHmLw-Y0ykeUUw`
+3. `clasp deploy -i YOUR_DEPLOYMENT_ID`
 
 ---
 
@@ -134,9 +134,9 @@ Add `?page=booking` / `?page=my` / `?page=admin` as needed.
 
 If the automatic sharing in `setup()` doesn't work (e.g. permissions issue with Calendar API), share manually:
 
-1. Open Google Calendar as `fathurrahman@unisza.edu.my`.
+1. Open Google Calendar as the script owner.
 2. Find **IC Booking Schedule**.
-3. Settings → Share with specific people → Add `nasarudinsalleh@unisza.edu.my` with **Make changes to events** permission.
+3. Settings → Share with specific people → Add `APPROVAL_EMAIL` with **Make changes to events** permission.
 
 ---
 

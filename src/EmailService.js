@@ -1,4 +1,6 @@
-var DEPLOYMENT_URL = 'https://script.google.com/a/macros/unisza.edu.my/s/AKfycbzxMaFsVw31onceNdX1Xi2UuWGK579VwVtW35mxMyrDrpFL5Dq8AAHbEHmLw-Y0ykeUUw/exec';
+function _adminPanelUrl() {
+  return getDeploymentUrl() + '?page=admin';
+}
 
 var EmailService = {
   sendReceipt: function (booking) {
@@ -133,7 +135,7 @@ var EmailService = {
   },
 
   _adminBtn: function () {
-    var url = DEPLOYMENT_URL + '?page=admin';
+    var url = _adminPanelUrl();
     return '<table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 16px"><tr><td style="border-radius:8px;background:#00f0ff;padding:10px 22px;text-align:center">' +
       '<a href="' + url + '" style="color:#001216;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.3px;display:inline-block">Go to Admin Panel</a>' +
       '</td></tr></table>';
