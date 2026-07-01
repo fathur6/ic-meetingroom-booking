@@ -57,5 +57,20 @@ var AdminService = {
     }
     var pending = SheetService.getPendingBookings();
     return { authorized: true, pending: pending };
+  },
+
+  getAdmins: function (adminKey) {
+    if (!Auth.validateKey(adminKey)) return [];
+    return SheetService.getAdminList();
+  },
+
+  addAdmin: function (adminKey, email) {
+    if (!Auth.validateKey(adminKey)) return { success: false, message: 'Invalid admin key.' };
+    return SheetService.addAdmin(email, 'Admin');
+  },
+
+  removeAdmin: function (adminKey, email) {
+    if (!Auth.validateKey(adminKey)) return { success: false, message: 'Invalid admin key.' };
+    return SheetService.removeAdmin(email);
   }
 };

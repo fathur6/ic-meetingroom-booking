@@ -3,6 +3,15 @@ function _adminPanelUrl() {
 }
 
 var EmailService = {
+  _getAdminEmails: function () {
+    var admins = SheetService.getAdminList();
+    var emails = [];
+    for (var i = 0; i < admins.length; i++) {
+      if (admins[i].email) emails.push(admins[i].email.trim());
+    }
+    return emails;
+  },
+
   sendReceipt: function (booking) {
     var subject = 'Booking Received: ' + booking.bookingId + ' — IC Meeting Room';
     var body = [
@@ -25,7 +34,8 @@ var EmailService = {
   },
 
   sendAdminNotice: function (booking) {
-    var adminEmail = CONFIG.APPROVAL_EMAIL;
+    var adminEmails = this._getAdminEmails();
+    if (!adminEmails.length) return;
     var subject = 'New Booking: ' + booking.bookingId + ' — Needs Approval';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
@@ -46,7 +56,7 @@ var EmailService = {
       '<p style="font-size:11px;color:#555">UniSZA International Centre · Meeting Room Booking System</p>',
       '</div>'
     ].join('');
-    this._send(adminEmail, subject, body);
+    this._send(adminEmails[0], subject, body, adminEmails.slice(1).join(','));
   },
 
   sendApproval: function (booking) {
@@ -92,7 +102,8 @@ var EmailService = {
   },
 
   sendCancellationNotice: function (booking) {
-    var adminEmail = CONFIG.APPROVAL_EMAIL;
+    var adminEmails = this._getAdminEmails();
+    if (!adminEmails.length) return;
     var subject = 'Booking Cancelled by User: ' + booking.bookingId;
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
@@ -111,7 +122,7 @@ var EmailService = {
       '<p style="font-size:11px;color:#555">UniSZA International Centre · Meeting Room Booking System</p>',
       '</div>'
     ].join('');
-    this._send(adminEmail, subject, body);
+    this._send(adminEmails[0], subject, body, adminEmails.slice(1).join(','));
   },
 
   sendCancellationToUser: function (booking) {
@@ -141,20 +152,20 @@ var EmailService = {
       '</td></tr></table>';
   },
 
-  _send: function (to, subject, htmlBody) {
+  _send: function (to, subject, htmlBody, bcc) {
     var from = CONFIG.APPROVAL_EMAIL;
+    var opts = {
+      htmlBody: htmlBody,
+      name: 'IC Meeting Room'
+    };
+    if (bcc) opts.bcc = bcc;
     try {
-      GmailApp.sendEmail(to, subject, '', {
-        from: from,
-        htmlBody: htmlBody,
-        name: 'IC Meeting Room'
-      });
+      opts.from = from;
+      GmailApp.sendEmail(to, subject, '', opts);
     } catch (e) {
       Logger.log('Email send failed from ' + from + ': ' + e.toString());
-      GmailApp.sendEmail(to, subject, '', {
-        htmlBody: htmlBody,
-        name: 'IC Meeting Room'
-      });
+      delete opts.from;
+      GmailApp.sendEmail(to, subject, '', opts);
     }
   }
 };

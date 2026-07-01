@@ -94,6 +94,43 @@ var SheetService = {
     sheet.appendRow(['admin2@example.com', 'Admin']);
   },
 
+  getAdminList: function () {
+    var sheet = this._getSheet(CONFIG.SHEET_ADMINS);
+    if (!sheet) return [];
+    var data = sheet.getDataRange().getValues();
+    var admins = [];
+    for (var i = 1; i < data.length; i++) {
+      if (data[i][0]) admins.push({ email: String(data[i][0]).trim(), role: String(data[i][1] || '').trim() || 'Admin' });
+    }
+    return admins;
+  },
+
+  addAdmin: function (email, role) {
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return { success: false, message: 'Invalid email address.' };
+    var clean = email.trim().toLowerCase();
+    var existing = this.getAdminList();
+    for (var i = 0; i < existing.length; i++) {
+      if (existing[i].email.toLowerCase() === clean) return { success: false, message: 'Admin already exists.' };
+    }
+    var sheet = this._getSheet(CONFIG.SHEET_ADMINS);
+    sheet.appendRow([clean, role || 'Admin']);
+    return { success: true, message: 'Admin added: ' + clean };
+  },
+
+  removeAdmin: function (email) {
+    var clean = email.trim().toLowerCase();
+    var sheet = this._getSheet(CONFIG.SHEET_ADMINS);
+    var data = sheet.getDataRange().getValues();
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][0]).trim().toLowerCase() === clean) {
+        sheet.deleteRow(i + 1);
+        return { success: true, message: 'Admin removed: ' + clean };
+      }
+    }
+    return { success: false, message: 'Admin not found: ' + clean };
+  },
+
   getRooms: function () {
     var sheet = this._getSheet(CONFIG.SHEET_ROOMS);
     if (!sheet) return [];
@@ -112,6 +149,18 @@ var SheetService = {
     return rooms;
   },
 
+  _cellToDateStr: function (val) {
+    if (typeof val === 'string') return val;
+    if (val instanceof Date) return Utilities.formatDate(val, CONFIG.TIMEZONE, 'yyyy-MM-dd');
+    return String(val || '');
+  },
+
+  _cellToTimeStr: function (val) {
+    if (typeof val === 'string') return val;
+    if (val instanceof Date) return Utilities.formatDate(val, CONFIG.TIMEZONE, 'HH:mm');
+    return String(val || '');
+  },
+
   addBooking: function (booking) {
     var sheet = this._getSheet(CONFIG.SHEET_BOOKINGS);
     sheet.appendRow([
@@ -128,15 +177,15 @@ var SheetService = {
     var data = sheet.getDataRange().getValues();
     var bookings = [];
     for (var i = 1; i < data.length; i++) {
-      var rowDate = String(data[i][7]);
+      var rowDate = this._cellToDateStr(data[i][7]);
       var rowRoom = String(data[i][6]);
       var status = String(data[i][11]);
       if (rowDate === date && rowRoom === room && (status === 'Pending' || status === 'Approved')) {
         bookings.push({
           row: i + 1,
           bookingId: String(data[i][0]),
-          startTime: String(data[i][8]),
-          endTime: String(data[i][9]),
+          startTime: this._cellToTimeStr(data[i][8]),
+          endTime: this._cellToTimeStr(data[i][9]),
           status: status
         });
       }
@@ -207,11 +256,11 @@ var SheetService = {
       if (filter && filter.status && rowStatus !== filter.status) continue;
       if (filter && filter.room && String(data[i][6]) !== filter.room) continue;
       if (filter && filter.dateFrom) {
-        var rowDateStr = String(data[i][7]);
+        var rowDateStr = this._cellToDateStr(data[i][7]);
         if (rowDateStr < filter.dateFrom) continue;
       }
       if (filter && filter.dateTo) {
-        var rowDateStr2 = String(data[i][7]);
+        var rowDateStr2 = this._cellToDateStr(data[i][7]);
         if (rowDateStr2 > filter.dateTo) continue;
       }
       bookings.push(this._rowToBooking(i + 1, data[i]));
@@ -252,9 +301,9 @@ var SheetService = {
       tel: String(data[4] || ''),
       email: String(data[5] || ''),
       room: String(data[6] || ''),
-      date: String(data[7] || ''),
-      startTime: String(data[8] || ''),
-      endTime: String(data[9] || ''),
+      date: this._cellToDateStr(data[7]),
+      startTime: this._cellToTimeStr(data[8]),
+      endTime: this._cellToTimeStr(data[9]),
       purpose: String(data[10] || ''),
       status: String(data[11] || ''),
       decisionBy: String(data[12] || ''),

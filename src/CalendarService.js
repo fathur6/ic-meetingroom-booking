@@ -84,7 +84,7 @@ var CalendarService = {
     desc = desc.join('\n');
 
     var event = cal.createEvent(title, startDate, endDate, { description: desc });
-    event.setColor(CalendarApp.EventColor.PALE_GRAY);
+    event.setColor(CalendarApp.EventColor.GRAY);
     return event.getId();
   },
 
@@ -97,7 +97,7 @@ var CalendarService = {
       if (!event) return;
       switch (status) {
         case 'Approved':  event.setColor(CalendarApp.EventColor.GREEN); break;
-        default:          event.setColor(CalendarApp.EventColor.PALE_GRAY); break;
+        default:          event.setColor(CalendarApp.EventColor.GRAY); break;
       }
     } catch (e) {
       Logger.log('updateEventColor error: ' + e.toString());

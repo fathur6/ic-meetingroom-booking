@@ -57,8 +57,9 @@
     <a class="back-link" href="javascript:void(0)" onclick="goBack()">← Back</a>
 
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('pending')">Pending Bookings <span id="pendingCount" style="margin-left:4px;color:var(--amber)"></span></button>
+      <button class="tab active" onclick="switchTab('pending')">Pending <span id="pendingCount" style="margin-left:4px;color:var(--amber)"></span></button>
       <button class="tab" onclick="switchTab('history')">History</button>
+      <button class="tab" onclick="switchTab('admins')">Admins</button>
     </div>
 
     <div class="card" id="pendingCard">
@@ -73,6 +74,15 @@
     <div class="card" id="historyCard" style="display:none">
       <h2>Booking <span>History</span></h2>
       <div id="historyTable"></div>
+    </div>
+
+    <div class="card" id="adminsCard" style="display:none">
+      <h2>Admin <span>Management</span></h2>
+      <div class="add-admin-form" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <input type="email" id="newAdminEmail" placeholder="admin@unisza.edu.my" style="flex:1;min-width:200px">
+        <button class="btn btn-primary btn-sm" onclick="doAddAdmin()" id="addAdminBtn">Add Admin</button>
+      </div>
+      <div id="adminListContainer"></div>
     </div>
 
     <div id="rejectModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center">
@@ -141,8 +151,11 @@
       document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
       document.getElementById('pendingCard').style.display = tab === 'pending' ? '' : 'none';
       document.getElementById('historyCard').style.display = tab === 'history' ? '' : 'none';
+      document.getElementById('adminsCard').style.display = tab === 'admins' ? '' : 'none';
       if (tab === 'pending') document.querySelector('.tab:nth-child(1)').classList.add('active');
-      else document.querySelector('.tab:nth-child(2)').classList.add('active');
+      else if (tab === 'history') document.querySelector('.tab:nth-child(2)').classList.add('active');
+      else document.querySelector('.tab:nth-child(3)').classList.add('active');
+      if (tab === 'admins') loadAdmins();
     }
 
     function renderPending() {
@@ -228,6 +241,53 @@
     }
 
     function closeRejectModal() { document.getElementById('rejectModal').style.display = 'none'; rejectTarget = null; }
+
+    function loadAdmins() {
+      google.script.run
+        .withSuccessHandler(function(admins) {
+          var ct = document.getElementById('adminListContainer');
+          if (!admins || admins.length === 0) {
+            ct.innerHTML = '<div class="empty-state"><p>No admins configured.</p></div>'; return;
+          }
+          var html = '<table><thead><tr><th>Email</th><th>Role</th><th></th></tr></thead><tbody>';
+          for (var i = 0; i < admins.length; i++) {
+            html += '<tr><td>' + esc(admins[i].email) + '</td><td>' + esc(admins[i].role) + '</td>' +
+              '<td class="actions"><button class="btn btn-danger btn-sm" onclick="doRemoveAdmin(\'' + esc(admins[i].email) + '\')">Remove</button></td></tr>';
+          }
+          html += '</tbody></table>';
+          ct.innerHTML = html;
+        })
+        .withFailureHandler(function(err) { showToast('Error loading admins: ' + err.message, 'error'); })
+        .getAdminListFn(adminKey);
+    }
+
+    function doAddAdmin() {
+      var email = document.getElementById('newAdminEmail').value.trim();
+      if (!email) { showToast('Enter an email address.', 'error'); return; }
+      var btn = document.getElementById('addAdminBtn');
+      btn.disabled = true; btn.textContent = 'Adding...';
+      google.script.run
+        .withSuccessHandler(function(r) {
+          btn.disabled = false; btn.textContent = 'Add Admin';
+          document.getElementById('newAdminEmail').value = '';
+          if (r.success) { showToast(r.message, 'success'); loadAdmins(); }
+          else { showToast(r.message, 'error'); }
+        })
+        .withFailureHandler(function(err) { btn.disabled = false; btn.textContent = 'Add Admin'; showToast('Error: ' + err.message, 'error'); })
+        .addAdmin(adminKey, email);
+    }
+
+    function doRemoveAdmin(email) {
+      if (!confirm('Remove admin ' + email + '?')) return;
+      google.script.run
+        .withSuccessHandler(function(r) {
+          if (r.success) { showToast(r.message, 'info'); loadAdmins(); }
+          else { showToast(r.message, 'error'); }
+        })
+        .withFailureHandler(function(err) { showToast('Error: ' + err.message, 'error'); })
+        .removeAdminFn(adminKey, email);
+    }
+
     function goBack() { window.top.location.href = '<?!= getDeploymentUrl() ?>'; }
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     function trunc(s, n) { return s.length > n ? s.slice(0,n) + '…' : s; }
