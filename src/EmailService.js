@@ -1,3 +1,29 @@
+var _roomDisplay = {
+  'UGS-MR': 'UGS Meeting Room (UGS-MR)',
+  'UGS-DR': 'UGS Discussion Room (UGS-DR)',
+  'UGS-VR1': 'Viva Room 1 (UGS-VR1)',
+  'UGS-VR2': 'Viva Room 2 (UGS-VR2)',
+  'UGS Meeting Room': 'UGS Meeting Room (UGS-MR)',
+  'UGS Discussion Room': 'UGS Discussion Room (UGS-DR)',
+  'Viva Room 1': 'Viva Room 1 (UGS-VR1)',
+  'Viva Room 2': 'Viva Room 2 (UGS-VR2)'
+};
+
+function _fmtRoom(r) {
+  if (_roomDisplay[r]) return _roomDisplay[r];
+  return String(r || '');
+}
+
+function _fmtDate(ds) {
+  if (!ds) return '';
+  var p = ds.split('-');
+  if (p.length !== 3) return ds;
+  var dt = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return days[dt.getDay()] + ', ' + parseInt(p[2], 10) + ' ' + months[dt.getMonth()] + ' ' + p[0];
+}
+
 function _adminPanelUrl() {
   return getDeploymentUrl() + '?page=admin';
 }
@@ -29,8 +55,8 @@ var EmailService = {
       '<p>Your booking request has been <strong style="color:#ffb020">received</strong>.</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
       '<tr><td style="color:#8892b0;white-space:nowrap">Booking ID</td><td style="color:#e6f1ff;font-family:monospace">' + booking.bookingId + '</td></tr>',
-      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + booking.room + '</td></tr>',
-      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + booking.date + '</td></tr>',
+      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + _fmtRoom(booking.room) + '</td></tr>',
+      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + _fmtDate(booking.date) + '</td></tr>',
       '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + booking.startTime + ' – ' + booking.endTime + '</td></tr>',
       '<tr><td style="color:#8892b0">Purpose</td><td style="color:#e6f1ff">' + (booking.purpose || '—') + '</td></tr>',
       '</table>',
@@ -55,8 +81,8 @@ var EmailService = {
       '<tr><td style="color:#8892b0">Name</td><td style="color:#e6f1ff">' + booking.name + '</td></tr>',
       '<tr><td style="color:#8892b0">Office</td><td style="color:#e6f1ff">' + booking.office + '</td></tr>',
       '<tr><td style="color:#8892b0">Email</td><td style="color:#e6f1ff">' + booking.email + '</td></tr>',
-      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + booking.room + '</td></tr>',
-      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + booking.date + '</td></tr>',
+      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + _fmtRoom(booking.room) + '</td></tr>',
+      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + _fmtDate(booking.date) + '</td></tr>',
       '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + booking.startTime + ' – ' + booking.endTime + '</td></tr>',
       '<tr><td style="color:#8892b0">Purpose</td><td style="color:#e6f1ff">' + (booking.purpose || '—') + '</td></tr>',
       '</table>',
@@ -78,8 +104,8 @@ var EmailService = {
       '<p>Your booking has been <strong style="color:#39ff14">approved</strong> and added to the UGS Booking Schedule calendar.</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
       '<tr><td style="color:#8892b0">Booking ID</td><td style="color:#e6f1ff;font-family:monospace">' + booking.bookingId + '</td></tr>',
-      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + booking.room + '</td></tr>',
-      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + booking.date + '</td></tr>',
+      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + _fmtRoom(booking.room) + '</td></tr>',
+      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + _fmtDate(booking.date) + '</td></tr>',
       '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + booking.startTime + ' – ' + booking.endTime + '</td></tr>',
       '<tr><td style="color:#8892b0">Notes</td><td style="color:#e6f1ff">' + (booking.notes || '—') + '</td></tr>',
       '</table>',
@@ -100,8 +126,8 @@ var EmailService = {
       '<p>Unfortunately your booking could not be accommodated.</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
       '<tr><td style="color:#8892b0">Booking ID</td><td style="color:#e6f1ff;font-family:monospace">' + booking.bookingId + '</td></tr>',
-      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + booking.room + '</td></tr>',
-      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + booking.date + '</td></tr>',
+      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + _fmtRoom(booking.room) + '</td></tr>',
+      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + _fmtDate(booking.date) + '</td></tr>',
       '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + booking.startTime + ' – ' + booking.endTime + '</td></tr>',
       '<tr><td style="color:#8892b0">Reason</td><td style="color:#ffadb6">' + (booking.notes || 'Slot unavailable') + '</td></tr>',
       '</table>',
@@ -125,8 +151,8 @@ var EmailService = {
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
       '<tr><td style="color:#8892b0">Name</td><td style="color:#e6f1ff">' + (booking.name || '—') + '</td></tr>',
       '<tr><td style="color:#8892b0">Email</td><td style="color:#e6f1ff">' + (booking.email || '—') + '</td></tr>',
-      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + (booking.room || '—') + '</td></tr>',
-      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + (booking.date || '—') + '</td></tr>',
+      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + (_fmtRoom(booking.room) || '—') + '</td></tr>',
+      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + (_fmtDate(booking.date) || '—') + '</td></tr>',
       '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + (booking.startTime || '—') + ' – ' + (booking.endTime || '—') + '</td></tr>',
       '</table>',
       '<p style="color:#8892b0;margin-bottom:16px">The slot is now available. Check the Admin Panel for details.</p>',
@@ -146,8 +172,8 @@ var EmailService = {
       '<h2 style="color:#8892b0">Booking Cancelled</h2>',
       '<p>Your booking <strong style="color:#e6f1ff">' + booking.bookingId + '</strong> has been cancelled as requested.</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
-      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + (booking.room || '—') + '</td></tr>',
-      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + (booking.date || '—') + '</td></tr>',
+      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + (_fmtRoom(booking.room) || '—') + '</td></tr>',
+      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + (_fmtDate(booking.date) || '—') + '</td></tr>',
       '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + (booking.startTime || '—') + ' – ' + (booking.endTime || '—') + '</td></tr>',
       '<tr><td style="color:#8892b0">Purpose</td><td style="color:#e6f1ff">' + (booking.purpose || '—') + '</td></tr>',
       '</table>',
@@ -160,7 +186,7 @@ var EmailService = {
   },
 
   sendReminder24h: function (booking) {
-    var room = booking.roomName || booking.room || 'a room';
+    var room = _fmtRoom(booking.roomName || booking.room) || 'a room';
     var subject = 'Reminder: ' + booking.bookingId + ' tomorrow — UGS Meeting Room';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
@@ -170,7 +196,7 @@ var EmailService = {
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
       '<tr><td style="color:#8892b0">Booking ID</td><td style="color:#e6f1ff;font-family:monospace">' + booking.bookingId + '</td></tr>',
       '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + room + '</td></tr>',
-      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + booking.date + '</td></tr>',
+      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + _fmtDate(booking.date) + '</td></tr>',
       '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + booking.startTime + ' – ' + booking.endTime + '</td></tr>',
       '</table>',
       '<p style="color:#8892b0">Please arrive on time. You may view your booking details below.</p>',
@@ -185,7 +211,7 @@ var EmailService = {
   },
 
   sendReminder1hUser: function (booking) {
-    var room = booking.roomName || booking.room || 'a room';
+    var room = _fmtRoom(booking.roomName || booking.room) || 'a room';
     var subject = 'Reminder: ' + booking.bookingId + ' starts in 1 hour — UGS Meeting Room';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
@@ -207,7 +233,7 @@ var EmailService = {
   },
 
   sendReminder1hAdmin: function (booking) {
-    var room = booking.roomName || booking.room || 'a room';
+    var room = _fmtRoom(booking.roomName || booking.room) || 'a room';
     var adminEmails = this._getAdminEmails();
     if (!adminEmails.length) return;
     var subject = 'Room Prep: ' + booking.bookingId + ' starts in 1 hour — ' + room;
@@ -215,7 +241,7 @@ var EmailService = {
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
       '<div style="text-align:center;margin-bottom:16px"><img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UGS" style="height:48px"></div>',
       '<h2 style="color:#ffb020;text-shadow:0 0 12px rgba(255,176,32,.4)">Room Preparation Needed</h2>',
-      '<p><strong>' + (booking.name || 'A user') + '</strong> has booked <strong>' + room + '</strong> starting at <strong>' + booking.startTime + '</strong> today (' + booking.date + ').</p>',
+      '<p><strong>' + (booking.name || 'A user') + '</strong> has booked <strong>' + room + '</strong> starting at <strong>' + booking.startTime + '</strong> today (' + _fmtDate(booking.date) + ').</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
       '<tr><td style="color:#8892b0">Booking ID</td><td style="color:#e6f1ff;font-family:monospace">' + booking.bookingId + '</td></tr>',
       '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + room + '</td></tr>',
@@ -237,7 +263,7 @@ var EmailService = {
   },
 
   sendReminder15min: function (booking) {
-    var room = booking.roomName || booking.room || 'a room';
+    var room = _fmtRoom(booking.roomName || booking.room) || 'a room';
     var adminEmails = this._getAdminEmails();
     if (!adminEmails.length) return;
     var subject = 'Room Closing: ' + booking.bookingId + ' ends in 15 min — ' + room;
@@ -245,7 +271,7 @@ var EmailService = {
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
       '<div style="text-align:center;margin-bottom:16px"><img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UGS" style="height:48px"></div>',
       '<h2 style="color:#ffb020;text-shadow:0 0 12px rgba(255,176,32,.4)">Room Closing Reminder</h2>',
-      '<p>The booking for <strong>' + room + '</strong> ends at <strong>' + booking.endTime + '</strong> today (' + booking.date + ').</p>',
+      '<p>The booking for <strong>' + room + '</strong> ends at <strong>' + booking.endTime + '</strong> today (' + _fmtDate(booking.date) + ').</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
       '<tr><td style="color:#8892b0">Booking ID</td><td style="color:#e6f1ff;font-family:monospace">' + booking.bookingId + '</td></tr>',
       '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + room + '</td></tr>',
@@ -266,7 +292,7 @@ var EmailService = {
   },
 
   sendEndThankYou: function (booking) {
-    var room = booking.roomName || booking.room || 'a room';
+    var room = _fmtRoom(booking.roomName || booking.room) || 'a room';
     var subject = 'Thank you for using the meeting room — UGS Meeting Room';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
@@ -276,7 +302,7 @@ var EmailService = {
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
       '<tr><td style="color:#8892b0">Booking ID</td><td style="color:#e6f1ff;font-family:monospace">' + booking.bookingId + '</td></tr>',
       '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + room + '</td></tr>',
-      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + booking.date + '</td></tr>',
+      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + _fmtDate(booking.date) + '</td></tr>',
       '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + booking.startTime + ' – ' + booking.endTime + '</td></tr>',
       '</table>',
       '<p style="color:#8892b0">We value your feedback — please take a moment to rate your experience.</p>',

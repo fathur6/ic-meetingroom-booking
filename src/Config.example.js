@@ -1,12 +1,13 @@
 var CONFIG = (function () {
   var sp = PropertiesService.getScriptProperties();
   return {
-    SHEET_ID: sp.getProperty('SHEET_ID') || '1PSdfrQN1xnCtPx_dGKoj7v_ttIFO1u1zN3P4-nEQQ_8',
+    GOOGLE_CLIENT_ID: sp.getProperty('GOOGLE_CLIENT_ID') || 'YOUR_CLIENT_ID.apps.googleusercontent.com',
+    SHEET_ID: sp.getProperty('SHEET_ID') || 'YOUR_SHEET_ID',
     DEPLOYMENT_ID: sp.getProperty('DEPLOYMENT_ID') || '',
     CALENDAR_NAME: 'UGS Booking Schedule',
-    CALENDAR_ID: sp.getProperty('CALENDAR_ID') || 'c_9efcafb3465e76b522ec27e40c57def79acd2fb31e8ab78fa08813b960d942f9@group.calendar.google.com',
+    CALENDAR_ID: sp.getProperty('CALENDAR_ID') || 'YOUR_CALENDAR_ID',
     SCRIPT_OWNER: sp.getProperty('SCRIPT_OWNER') || '',
-    APPROVAL_EMAIL: sp.getProperty('APPROVAL_EMAIL') || 'pps@unisza.edu.my',
+    APPROVAL_EMAIL: sp.getProperty('APPROVAL_EMAIL') || 'YOUR_EMAIL',
     ADMIN_EMAILS: sp.getProperty('ADMIN_EMAILS') || '',
     TIMEZONE: 'Asia/Kuala_Lumpur',
     WORKDAY_NUMBERS: [0, 1, 2, 3, 4],
@@ -17,7 +18,6 @@ var CONFIG = (function () {
     SHEET_BOOKINGS: 'Bookings',
     SHEET_ROOMS: 'Rooms',
     SHEET_SETTINGS: 'Settings',
-    SHEET_ADMINS: 'Admins',
-    GOOGLE_CLIENT_ID: sp.getProperty('GOOGLE_CLIENT_ID') || ''
+    SHEET_ADMINS: 'Admins'
   };
 })();

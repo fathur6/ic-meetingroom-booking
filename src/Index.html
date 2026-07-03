@@ -10,20 +10,90 @@
     .nav-card .icon { font-size: 36px; margin-bottom: 10px; }
     .nav-card .label { font-weight: 700; font-size: 16px; letter-spacing: .3px; }
     .nav-card .desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
-    .cal-embed-wrap { width: 100%; height: 520px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); position: relative; }
-    .cal-embed { width: 100%; height: 570px; border: none; margin-top: -50px; filter: invert(.92) hue-rotate(180deg); }
-    .cal-label { font-size: 10px; color: var(--muted); letter-spacing: .6px; text-transform: uppercase; margin-bottom: 6px; }
+    .day-tabs { display:flex;gap:4px;flex-wrap:wrap }
+    .day-tab { padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;color:var(--muted);transition:.18s }
+    .day-tab:hover { border-color:var(--cyan);color:var(--text) }
+    .day-tab.active { background:rgba(0,240,255,.12);border-color:var(--cyan);color:var(--cyan) }
+    .day-tab.today { border-color:var(--magenta);color:var(--magenta) }
+    .day-tab.today.active { background:rgba(255,64,129,.12);color:var(--magenta) }
+    #calGrid { display:grid;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden }
+    .cal-cell { background:var(--surface);padding:4px 6px;font-size:11px;min-height:28px;display:flex;align-items:center;justify-content:center }
+    .cal-cell.time-label { color:var(--muted);font-weight:600;font-size:10px;justify-content:flex-end;padding-right:10px }
+    .cal-cell.header { font-weight:700;font-size:12px;color:var(--text);justify-content:center;padding:8px 6px }
+    .cal-cell.booking { background:rgba(0,240,255,.1);border-left:3px solid var(--cyan);justify-content:flex-start;padding:3px 8px;font-weight:600;font-size:11px;color:var(--cyan) }
+    .cal-cell.empty { color:var(--muted-dark);font-size:10px }
   </style>
 </head>
 <body>
   <div class="container">
     <?!= include('pages/_header') ?>
 
+    <? var u = getCurrentUser(); ?>
+    <div id="userBannerWrap" style="text-align:right;margin-top:-14px;margin-bottom:20px;padding-right:8px">
+      <span class="user-banner">
+        <span class="u-dot"></span>
+        <span class="u-email"><?= u || 'Not signed in' ?></span>
+        <button class="u-change" onclick="changeGoogleUser()">Change user</button>
+      </span>
+    </div>
+
+    <div id="domainModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,6,13,.88);z-index:9999;align-items:center;justify-content:center">
+      <div style="max-width:440px;width:90%;padding:36px 28px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);text-align:center;box-shadow:0 0 48px rgba(0,240,255,.12)">
+        <h2 style="font-size:22px;font-weight:700;margin-bottom:10px"><span style="background:linear-gradient(90deg,var(--cyan),var(--magenta));-webkit-background-clip:text;color:transparent">Access Restricted</span></h2>
+        <p style="color:var(--muted);margin-bottom:8px;line-height:1.6;font-size:14px">
+          You must sign in with your <strong style="color:#fff">@unisza.edu.my</strong> account to access the
+        </p>
+        <p style="color:var(--muted);margin-bottom:20px;font-weight:600;font-size:15px">UniSZA Graduate School<br>Room Booking Module</p>
+        <div id="modalCurrentEmail" style="display:none;margin:0 0 18px;padding:8px 18px;border-radius:999px;background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.22);color:var(--cyan);font-weight:700;font-size:14px"></div>
+        <button onclick="changeGoogleUser()" style="padding:12px 32px;background:linear-gradient(135deg,rgba(0,240,255,.15),rgba(0,240,255,.05));border:1px solid var(--cyan);border-radius:8px;color:var(--cyan);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:.18s" onmouseover="this.style.boxShadow='0 0 22px rgba(0,240,255,.3)'" onmouseout="this.style.boxShadow='none'">
+          Sign in with @unisza.edu.my
+        </button>
+      </div>
+    </div>
+
+    <div id="bookingConfirmModal" class="modal-overlay" style="display:none;z-index:9998">
+      <div class="modal-box">
+        <h2 style="font-size:18px;font-weight:700;margin-bottom:6px">Your Google Account</h2>
+        <p style="color:var(--muted);margin-bottom:18px;font-size:13px">This account will be used for your booking.</p>
+        <div style="margin-bottom:16px;padding:10px 18px;border-radius:999px;background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.22);color:var(--cyan);font-weight:700;font-size:15px" id="bookingConfirmEmail"></div>
+        <p style="color:var(--muted-dark);font-size:11px;margin-bottom:20px;line-height:1.5">Bookings can be checked or modified only with this same Google account.</p>
+        <div style="display:flex;gap:10px;justify-content:center">
+          <button onclick="proceedToBooking()" class="btn btn-primary" style="padding:10px 28px;font-size:13px">I understand</button>
+          <button onclick="changeGoogleUser()" class="btn btn-ghost">Change user</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      ;(function() {
+        var userEmail = <?!= JSON.stringify(u) ?>;
+        window._ugsUserEmail = userEmail;
+        if (!userEmail || !userEmail.endsWith('@unisza.edu.my')) {
+          document.getElementById('domainModal').style.display = 'flex';
+          if (userEmail) {
+            var el = document.getElementById('modalCurrentEmail');
+            el.textContent = userEmail;
+            el.style.display = 'inline-block';
+          }
+        }
+      })();
+
+      function confirmBooking() {
+        var emailEl = document.getElementById('bookingConfirmEmail');
+        if (emailEl && window._ugsUserEmail) emailEl.textContent = window._ugsUserEmail;
+        document.getElementById('bookingConfirmModal').style.display = 'flex';
+      }
+
+      function proceedToBooking() {
+        navigateTo('booking');
+      }
+    </script>
+
     <div class="card">
       <h2>Welcome — <span>UGS Meeting Room</span></h2>
       <p class="text-muted mb-20">Select a page below:</p>
       <div class="nav-links">
-        <div class="nav-card" onclick="navigateTo('booking')">
+        <div class="nav-card" onclick="confirmBooking()">
           <div class="icon">&#x1F4C5;</div>
           <div class="label">Book a Room</div>
           <div class="desc">Submit a new meeting room booking request</div>
@@ -51,14 +121,213 @@
       </div>
     </div>
 
-    <div class="cal-label">UGS Booking Schedule · Calendar</div>
-    <div class="cal-embed-wrap"><iframe class="cal-embed" src="https://calendar.google.com/calendar/embed?src=c_9efcafb3465e76b522ec27e40c57def79acd2fb31e8ab78fa08813b960d942f9%40group.calendar.google.com&mode=MONTH&showTitle=0&showNav=0&showPrint=0&showTabs=0&showCalendars=0&showTz=0" scrolling="no"></iframe></div>
+    <div class="card" style="border-color:rgba(0,240,255,.08)">
+      <div class="row mb-12">
+        <h2><span>Weekly</span> Schedule</h2>
+        <span class="spacer"></span>
+        <div class="week-nav">
+          <button class="btn btn-ghost btn-sm" onclick="weekPrev()">&larr; Prev</button>
+          <span id="weekLabel" style="font-size:13px;font-weight:600;min-width:200px;text-align:center;display:inline-block"></span>
+          <button class="btn btn-ghost btn-sm" onclick="weekNext()">Next &rarr;</button>
+        </div>
+      </div>
+      <div class="day-tabs" id="dayTabs"></div>
+      <div id="weeklyCalendar" style="overflow-x:auto;margin-top:12px">
+        <div class="cal-grid-wrap" style="min-width:640px">
+          <div id="calGrid" style="display:grid;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
     function navigateTo(page) {
       window.top.location.href = '<?!= getDeploymentUrl() ?>?page=' + page;
     }
+
+    var ROOMS = ['UGS Meeting Room', 'UGS Discussion Room', 'Viva Room 1', 'Viva Room 2'];
+    var DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var HOUR_START = 7;
+    var HOUR_END = 18;
+    var timeSlots = [];
+    var dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    for (var h = HOUR_START; h < HOUR_END; h++) {
+      for (var m = 0; m < 60; m += 30) {
+        timeSlots.push(String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0'));
+      }
+    }
+
+    var _weekBookings = {};
+    var _weekOffset = 0;
+    var _selectedDay = -1;
+    var _weekStart = null;
+
+    function getSunday(d) {
+      var dt = new Date(d);
+      dt.setHours(0,0,0,0);
+      var day = dt.getDay();
+      dt.setDate(dt.getDate() - day);
+      return dt;
+    }
+
+    function fmtYMD(d) {
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+
+    function fmtLabel(d) {
+      return dayNames[d.getDay()] + ', ' + d.getDate() + ' ' +
+        ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()] + ' ' + d.getFullYear();
+    }
+
+    function fmtShort(d) {
+      return DAYS[d.getDay()] + ' ' + d.getDate();
+    }
+
+    function isToday(d) {
+      var t = new Date();
+      return d.getFullYear() === t.getFullYear() && d.getMonth() === t.getMonth() && d.getDate() === t.getDate();
+    }
+
+    function loadWeek() {
+      var sd = new Date(_weekStart);
+      _weekBookings = {};
+      _selectedDay = -1;
+
+      var startStr = fmtYMD(sd);
+      google.script.run
+        .withSuccessHandler(function(bookings) {
+          if (!bookings) bookings = [];
+          for (var i = 0; i < bookings.length; i++) {
+            var b = bookings[i];
+            if (!_weekBookings[b.date]) _weekBookings[b.date] = [];
+            _weekBookings[b.date].push(b);
+          }
+          renderWeekUI();
+        })
+        .withFailureHandler(function(err) {
+          document.getElementById('calGrid').innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger)">Error loading: ' + err.message + '</div>';
+        })
+        .getWeekBookings(startStr);
+    }
+
+    function renderWeekUI() {
+      var sd = new Date(_weekStart);
+      var ed = new Date(sd);
+      ed.setDate(ed.getDate() + 6);
+
+      document.getElementById('weekLabel').textContent =
+        fmtLabel(sd) + '  \u2013  ' + fmtLabel(ed);
+
+      var tabsHtml = '';
+      for (var i = 0; i < 7; i++) {
+        var d = new Date(sd);
+        d.setDate(d.getDate() + i);
+        var cls = 'day-tab';
+        if (isToday(d)) cls += ' today';
+        if (_selectedDay === i) cls += ' active';
+        tabsHtml += '<button class="' + cls + '" onclick="selectDay(' + i + ')">' + fmtShort(d) + '</button>';
+      }
+      document.getElementById('dayTabs').innerHTML = tabsHtml;
+
+      if (_selectedDay < 0) {
+        var today = new Date();
+        today.setHours(0,0,0,0);
+        var todayTs = today.getTime();
+        for (var i = 0; i < 7; i++) {
+          var d = new Date(sd);
+          d.setDate(d.getDate() + i);
+          if (d.getTime() >= todayTs) { _selectedDay = i; break; }
+        }
+        if (_selectedDay < 0) _selectedDay = 0;
+      }
+      selectDay(_selectedDay);
+    }
+
+    function selectDay(idx) {
+      _selectedDay = idx;
+      var sd = new Date(_weekStart);
+      sd.setDate(sd.getDate() + idx);
+      var dateStr = fmtYMD(sd);
+
+      var allTabs = document.querySelectorAll('.day-tab');
+      for (var i = 0; i < allTabs.length; i++) {
+        allTabs[i].classList.toggle('active', i === idx);
+      }
+
+      var dayBookings = _weekBookings[dateStr] || [];
+
+      var grid = document.getElementById('calGrid');
+      var cols = '70px repeat(4,1fr)';
+      var html = '';
+
+      html += '<div class="cal-cell header" style="grid-column:1">Time</div>';
+      for (var r = 0; r < ROOMS.length; r++) {
+        html += '<div class="cal-cell header" style="font-size:11px">' + ROOMS[r] + '</div>';
+      }
+
+      for (var ti = 0; ti < timeSlots.length; ti++) {
+        var ts = timeSlots[ti];
+        html += '<div class="cal-cell time-label">' + ts + '</div>';
+
+        for (var ri = 0; ri < ROOMS.length; ri++) {
+          var booking = null;
+          for (var bi = 0; bi < dayBookings.length; bi++) {
+            var b = dayBookings[bi];
+            if (b.room === ROOMS[ri] && !b._placed) {
+              if (b.startTime <= ts && b.endTime > ts) {
+                booking = b;
+                break;
+              }
+            }
+          }
+          if (booking) {
+            var startIdx = timeSlots.indexOf(booking.startTime);
+            var endIdx = timeSlots.indexOf(booking.endTime);
+            if (endIdx < 0) {
+              for (var ei = 0; ei < timeSlots.length; ei++) {
+                if (timeSlots[ei] >= booking.endTime) { endIdx = ei; break; }
+              }
+            }
+            var span = endIdx - startIdx;
+            if (span < 1) span = 1;
+            if (ti === startIdx) {
+              html += '<div class="cal-cell booking" style="grid-row:span ' + span + ';align-self:stretch">' +
+                esc(booking.name) + '<span style="opacity:.6;font-weight:400;margin-left:4px;font-size:10px">' + booking.startTime + '</span></div>';
+              booking._placed = true;
+            }
+          } else {
+            html += '<div class="cal-cell empty"></div>';
+          }
+        }
+      }
+
+      // Clear _placed flags
+      for (var bi2 = 0; bi2 < dayBookings.length; bi2++) {
+        delete dayBookings[bi2]._placed;
+      }
+
+      grid.style.gridTemplateColumns = cols;
+      grid.innerHTML = html;
+    }
+
+    function weekPrev() {
+      _weekOffset--;
+      _weekStart.setDate(_weekStart.getDate() - 7);
+      loadWeek();
+    }
+
+    function weekNext() {
+      _weekOffset++;
+      _weekStart.setDate(_weekStart.getDate() + 7);
+      loadWeek();
+    }
+
+    (function initCalendar() {
+      _weekStart = getSunday(new Date());
+      loadWeek();
+    })();
+
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   </script>
 </body>
 </html>

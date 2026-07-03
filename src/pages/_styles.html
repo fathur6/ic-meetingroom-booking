@@ -87,6 +87,16 @@
   .btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 6px; }
   .btn:disabled { opacity: .45; pointer-events: none; animation: none; }
 
+  .btn-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); cursor: pointer;
+    font-size: 16px; transition: .18s; font-family: inherit;
+  }
+  .btn-icon:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 10px rgba(0,240,255,.15); }
+  .btn-icon-danger:hover { border-color: var(--red); color: var(--red); box-shadow: 0 0 10px var(--red-glow); }
+  .tab-count { margin-left:4px;color:var(--amber);font-size:11px;font-weight:400 }
+
   .pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; font-weight: 700; font-size: 11px; letter-spacing: .5px; text-transform: uppercase; }
   .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; }
   .pill.pending { color: var(--amber); background: rgba(255,176,32,.1); box-shadow: 0 0 10px rgba(255,176,32,.25); }

@@ -92,9 +92,8 @@ var SheetService = {
     var sheet = this._getSheet(CONFIG.SHEET_ADMINS);
     var data = sheet.getDataRange().getValues();
     if (data.length > 1) return;
-    sheet.appendRow(['pps_tdakademik@unisza.edu.my', 'Owner', 'TD Akademik PPS']);
-    sheet.appendRow(['fathurrahman@unisza.edu.my', 'Admin', 'Fathurrahman Lananan']);
-    sheet.appendRow(['atiqqusyeri@unisza.edu.my', 'Admin', 'Atiq Qusyeri A Rashid']);
+    sheet.appendRow(['admin@unisza.edu.my', 'Owner', 'Admin Name']);
+    sheet.appendRow(['admin2@unisza.edu.my', 'Admin', 'Admin Name 2']);
   },
 
   getAdminList: function () {
@@ -194,6 +193,11 @@ var SheetService = {
       }
     }
     return bookings;
+  },
+
+  getApprovedBookingsForWeek: function (weekStart) {
+    var endDate = Utilities.formatDate(new Date(new Date(weekStart).getTime() + 6 * 86400000), CONFIG.TIMEZONE, 'yyyy-MM-dd');
+    return this.getAllBookings({ status: 'Approved', dateFrom: weekStart, dateTo: endDate });
   },
 
   getBookingById: function (bookingId) {
@@ -353,6 +357,37 @@ var SheetService = {
       feedback.readiness, feedback.cleanliness, feedback.staff, feedback.comments
     ]);
     return { success: true, message: 'Feedback submitted. Thank you.' };
+  },
+
+  getBookingsByStatus: function (status) {
+    var sheet = this._getSheet(CONFIG.SHEET_BOOKINGS);
+    if (!sheet) return [];
+    var data = sheet.getDataRange().getValues();
+    var result = [];
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][11]) === status) {
+        result.push(this._rowToBooking(i + 1, data[i]));
+      }
+    }
+    result.sort(function (a, b) { return a.timestamp.localeCompare(b.timestamp); });
+    return result;
+  },
+
+  updateBookingFields: function (bookingId, updates) {
+    var booking = this.getBookingById(bookingId);
+    if (!booking) return false;
+    var sheet = this._getSheet(CONFIG.SHEET_BOOKINGS);
+    var row = booking.row;
+    if (updates.name !== undefined) sheet.getRange(row, 3).setValue(updates.name);
+    if (updates.office !== undefined) sheet.getRange(row, 4).setValue(updates.office);
+    if (updates.tel !== undefined) sheet.getRange(row, 5).setValue(updates.tel);
+    if (updates.room !== undefined) sheet.getRange(row, 7).setValue(updates.room);
+    if (updates.date !== undefined) sheet.getRange(row, 8).setValue(updates.date);
+    if (updates.startTime !== undefined) sheet.getRange(row, 9).setValue(updates.startTime);
+    if (updates.endTime !== undefined) sheet.getRange(row, 10).setValue(updates.endTime);
+    if (updates.purpose !== undefined) sheet.getRange(row, 11).setValue(updates.purpose);
+    SpreadsheetApp.flush();
+    return true;
   },
 
   getFeedbackByBookingId: function (bookingId) {

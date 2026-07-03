@@ -20,21 +20,74 @@
             <input type="text" id="name" placeholder="Your full name" required>
           </div>
           <div>
-            <label for="office">Office / Department</label>
-            <input type="text" id="office" placeholder="E.g. Faculty of Science">
-          </div>
-          <div>
-            <label for="tel">Telephone *</label>
+            <label for="tel">Mobile No. *</label>
             <input type="tel" id="tel" placeholder="01X-XXXXXXX" required>
           </div>
-          <div>
-             <label for="email">Email *</label>
-            <input type="email" id="email" placeholder="your@email.com" value="<?!= getCurrentUser() ?>">
+          <div class="full">
+            <label for="office">Faculty / Institute / Office *</label>
+            <select id="office" required>
+              <option value="">Select PTj...</option>
+              <option value="FBK | Fakulti Bahasa dan Komunikasi">FBK | Fakulti Bahasa dan Komunikasi</option>
+              <option value="FBIM | Fakulti Biosumber &amp; Industri Makanan">FBIM | Fakulti Biosumber &amp; Industri Makanan</option>
+              <option value="FF | Fakulti Farmasi">FF | Fakulti Farmasi</option>
+              <option value="FIK | Fakulti Informatik &amp; Komputeran">FIK | Fakulti Informatik &amp; Komputeran</option>
+              <option value="FKI | Fakulti Pengajian Kontemporari Islam">FKI | Fakulti Pengajian Kontemporari Islam</option>
+              <option value="FUPL | Fakulti Pengajian Umum dan Pendidikan Lanjutan">FUPL | Fakulti Pengajian Umum dan Pendidikan Lanjutan</option>
+              <option value="FPP | Fakulti Perniagaan dan Pengurusan">FPP | Fakulti Perniagaan dan Pengurusan</option>
+              <option value="FP | Fakulti Perubatan">FP | Fakulti Perubatan</option>
+              <option value="FPV | Fakulti Perubatan Veterinar">FPV | Fakulti Perubatan Veterinar</option>
+              <option value="FRIT | Fakulti Reka Bentuk Inovatif dan Teknologi">FRIT | Fakulti Reka Bentuk Inovatif dan Teknologi</option>
+              <option value="FSK | Fakulti Sains Kesihatan">FSK | Fakulti Sains Kesihatan</option>
+              <option value="FSSG | Fakulti Sains Sosial Gunaan">FSSG | Fakulti Sains Sosial Gunaan</option>
+              <option value="FUHA | Fakulti Undang-undang &amp; Hubungan Antarabangsa">FUHA | Fakulti Undang-undang &amp; Hubungan Antarabangsa</option>
+              <option value="HoSZA | Hospital Sultan Zainal Abidin">HoSZA | Hospital Sultan Zainal Abidin</option>
+              <option value="ESERI | Institut Penyelidikan Alam Sekitar Pantai Timur">ESERI | Institut Penyelidikan Alam Sekitar Pantai Timur</option>
+              <option value="INSPIRE | Institut Penyelidikan Produk &amp; Ketamadunan Melayu Islam">INSPIRE | Institut Penyelidikan Produk &amp; Ketamadunan Melayu Islam</option>
+              <option value="JKKP | Jabatan Keselamatan dan Kesihatan Pekerjaan">JKKP | Jabatan Keselamatan dan Kesihatan Pekerjaan</option>
+              <option value="KKP | Kolej Kediaman Pelajar">KKP | Kolej Kediaman Pelajar</option>
+              <option value="PB | Pejabat Bendahari">PB | Pejabat Bendahari</option>
+              <option value="PNC | Pejabat Naib Canselor">PNC | Pejabat Naib Canselor</option>
+              <option value="PPUU | Pejabat Penasihat Undang-undang">PPUU | Pejabat Penasihat Undang-undang</option>
+              <option value="PP | Pejabat Pendaftar">PP | Pejabat Pendaftar</option>
+              <option value="PPKB | Pejabat Pengarah Kampus Besut">PPKB | Pejabat Pengarah Kampus Besut</option>
+              <option value="PTNC (A&amp;A) | Pejabat Timbalan Naib Canselor (Akademik dan Antarabangsa)">PTNC (A&amp;A) | Pejabat Timbalan Naib Canselor (Akademik dan Antarabangsa)</option>
+              <option value="PTNC (HEPA) | Pejabat Timbalan Naib Canselor (Hal Ehwal Pelajar dan Alumni)">PTNC (HEPA) | Pejabat Timbalan Naib Canselor (Hal Ehwal Pelajar dan Alumni)</option>
+              <option value="PTNC (P&amp;I) | Pejabat Timbalan Naib Canselor (Penyelidikan dan Inovasi)">PTNC (P&amp;I) | Pejabat Timbalan Naib Canselor (Penyelidikan dan Inovasi)</option>
+              <option value="WAKAF | Pejabat Wakaf &amp; Endowmen">WAKAF | Pejabat Wakaf &amp; Endowmen</option>
+              <option value="PU | Penerbit UniSZA">PU | Penerbit UniSZA</option>
+              <option value="PWB | Perpustakaan Al-wathiqu Billah">PWB | Perpustakaan Al-wathiqu Billah</option>
+              <option value="PA | Pusat Alumni">PA | Pusat Alumni</option>
+              <option value="IC | Pusat Antarabangsa">IC | Pusat Antarabangsa</option>
+              <option value="PUSPA | Pusat Asasi Sains &amp; Perubatan UniSZA">PUSPA | Pusat Asasi Sains &amp; Perubatan UniSZA</option>
+              <option value="PI | Pusat Islam UniSZA">PI | Pusat Islam UniSZA</option>
+              <option value="PaKaT | Pusat Kerjaya, Teknousahawan dan Jaringan Pintar">PaKaT | Pusat Kerjaya, Teknousahawan dan Jaringan Pintar</option>
+              <option value="PKW | Pusat Kesenian dan Warisan">PKW | Pusat Kesenian dan Warisan</option>
+              <option value="CCORM | Pusat Komunikasi Korporat &amp; Pengurusan Perhubungan">CCORM | Pusat Komunikasi Korporat &amp; Pengurusan Perhubungan</option>
+              <option value="PPHP | Pusat Pembangunan Holistik Pelajar">PPHP | Pusat Pembangunan Holistik Pelajar</option>
+              <option value="P2P | Pusat Pemindahan Ilmu dan Pendidikan Berterusan">P2P | Pusat Pemindahan Ilmu dan Pendidikan Berterusan</option>
+              <option value="PPS | Pusat Pengajian Siswazah">PPS | Pusat Pengajian Siswazah</option>
+              <option value="CENTTM | Pusat Pengurusan Bakat &amp; Latihan UniSZA">CENTTM | Pusat Pengurusan Bakat &amp; Latihan UniSZA</option>
+              <option value="PPHB | Pusat Pengurusan Harta Benda">PPHB | Pusat Pengurusan Harta Benda</option>
+              <option value="PPIR | Pusat Pengurusan Infostruktur &amp; Rangkaian">PPIR | Pusat Pengurusan Infostruktur &amp; Rangkaian</option>
+              <option value="CREIM | Pusat Pengurusan Kecemerlangan &amp; Inkubator Penyelidikan">CREIM | Pusat Pengurusan Kecemerlangan &amp; Inkubator Penyelidikan</option>
+              <option value="COMAE-I | Pusat Pengurusan Kecemerlangan &amp; Inovasi Akademik">COMAE-I | Pusat Pengurusan Kecemerlangan &amp; Inovasi Akademik</option>
+              <option value="CLMC | Pusat Pengurusan Makmal Berpusat">CLMC | Pusat Pengurusan Makmal Berpusat</option>
+              <option value="HRC | Pusat Penyelidikan Halal">HRC | Pusat Penyelidikan Halal</option>
+              <option value="AIRIS | Pusat Penyelidikan Kecerdasan Buatan (Ai) Islam dan Kelestarian">AIRIS | Pusat Penyelidikan Kecerdasan Buatan (Ai) Islam dan Kelestarian</option>
+              <option value="ISF | Pusat Penyelidikan Kewangan Sosial Islam">ISF | Pusat Penyelidikan Kewangan Sosial Islam</option>
+              <option value="SPaRQM | Pusat Perancangan Strategik, Risiko dan Pengurusan Kualiti">SPaRQM | Pusat Perancangan Strategik, Risiko dan Pengurusan Kualiti</option>
+              <option value="PSR | Pusat Sukan &amp; Rekreasi">PSR | Pusat Sukan &amp; Rekreasi</option>
+              <option value="UAD | Unit Audit Dalam">UAD | Unit Audit Dalam</option>
+            </select>
           </div>
           <div>
             <label for="room">Room *</label>
             <select id="room" required onchange="checkAvailability()">
-              <option value="">Loading rooms...</option>
+              <option value="">Select room...</option>
+              <option value="UGS Meeting Room">UGS Meeting Room | 15 persons max.</option>
+              <option value="UGS Discussion Room">UGS Discussion Room | 8 persons max.</option>
+              <option value="Viva Room 1">Viva Room 1 | 10 persons max.</option>
+              <option value="Viva Room 2">Viva Room 2 | 10 persons max.</option>
             </select>
           </div>
           <div>
@@ -72,7 +125,8 @@
     </div>
   </div>
 
-  <? var uIntro = getCurrentUser(); if (uIntro) { ?>
+  <? var uIntro = getCurrentUser(); ?>
+  <? if (uIntro) { ?>
   <div class="modal-overlay" id="firstVisitModal">
     <div class="modal-box">
       <h2>Your <span>Google Account</span></h2>
@@ -86,6 +140,25 @@
     </div>
   </div>
   <? } ?>
+
+  <div class="modal-overlay" id="confirmModal" style="display:none">
+    <div class="modal-box">
+      <h2>Confirm <span>Booking</span></h2>
+      <div id="confirmDetails">
+        <p><strong>Room:</strong> <span id="cfRoom"></span></p>
+        <p><strong>Date:</strong> <span id="cfDate"></span></p>
+        <p><strong>Time:</strong> <span id="cfTime"></span></p>
+        <p><strong>Name:</strong> <span id="cfName"></span></p>
+        <p><strong>Office:</strong> <span id="cfOffice"></span></p>
+        <p><strong>Purpose:</strong> <span id="cfPurpose"></span></p>
+      </div>
+      <p style="color:var(--muted);font-size:12px;margin-bottom:16px">You will be notified via email within 1 working day.</p>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="confirmBtn" onclick="doActualSubmit()">Confirm</button>
+        <button class="btn btn-ghost" onclick="closeConfirmModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
 
   <div class="modal-overlay" id="authModal" style="display:none">
     <div class="modal-box">
@@ -141,25 +214,6 @@
     }
 
     function loadRooms() {
-      google.script.run
-        .withSuccessHandler(function(rooms) {
-          var sel = document.getElementById('room');
-          sel.innerHTML = '<option value="">Select room...</option>';
-          if (rooms.length === 0) {
-            sel.innerHTML += '<option value="" disabled>No rooms — admin must run setup()</option>';
-          }
-          for (var i = 0; i < rooms.length; i++) {
-            var opt = document.createElement('option');
-            opt.value = rooms[i].roomId;
-            opt.textContent = rooms[i].roomName;
-            sel.appendChild(opt);
-          }
-        })
-        .withFailureHandler(function(err) {
-          document.getElementById('room').innerHTML = '<option value="">Error loading rooms</option>';
-          showToast('Failed to load rooms. Admin must run setup(). ' + err.message, 'error');
-        })
-        .getRooms();
     }
 
     function closeIntroModal() { document.getElementById('firstVisitModal').style.display = 'none'; }
@@ -168,10 +222,6 @@
     }
 
     function onUserIdentified(email) {
-      var emailField = document.getElementById('email');
-      if (emailField && email && !emailField.value) {
-        emailField.value = email;
-      }
     }
 
     function setDateConstraints() {
@@ -263,27 +313,47 @@
       }
     }
 
+    var _pendingForm = null;
+
     function handleSubmit(e) {
       e.preventDefault();
       var form = {
         name: document.getElementById('name').value.trim(),
         office: document.getElementById('office').value.trim(),
         phone: document.getElementById('tel').value.trim(),
-        email: document.getElementById('email').value.trim(),
         room: document.getElementById('room').value,
         date: document.getElementById('date').value,
         startTime: document.getElementById('startTime').value,
         endTime: document.getElementById('endTime').value,
         purpose: document.getElementById('purpose').value.trim()
       };
-      if (!form.name || !form.email || !form.phone || !form.room || !form.date || !form.startTime || !form.endTime || !form.purpose) {
+      if (!form.name || !form.phone || !form.room || !form.date || !form.startTime || !form.endTime || !form.purpose) {
         showToast('Please fill in all required fields.', 'error'); return false;
       }
-      var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!re.test(form.email)) { showToast('Please enter a valid email address.', 'error'); return false; }
       if (form.startTime >= form.endTime) { showToast('End time must be after start time.', 'error'); return false; }
       var day = new Date(form.date + 'T00:00:00+08:00').getDay();
       if ([0,1,2,3,4].indexOf(day) === -1) { showToast('Bookings only available Sunday–Thursday.', 'error'); return false; }
+
+      _pendingForm = form;
+      document.getElementById('cfRoom').textContent = document.getElementById('room').options[document.getElementById('room').selectedIndex].text;
+      document.getElementById('cfDate').textContent = form.date;
+      document.getElementById('cfTime').textContent = form.startTime + ' - ' + form.endTime;
+      document.getElementById('cfName').textContent = form.name;
+      document.getElementById('cfOffice').textContent = document.getElementById('office').options[document.getElementById('office').selectedIndex].text;
+      document.getElementById('cfPurpose').textContent = form.purpose;
+      document.getElementById('confirmModal').style.display = 'flex';
+      return false;
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmModal').style.display = 'none';
+      _pendingForm = null;
+    }
+
+    function doActualSubmit() {
+      var form = _pendingForm;
+      if (!form) return;
+      document.getElementById('confirmModal').style.display = 'none';
 
       var btn = document.getElementById('submitBtn');
       btn.disabled = true;
@@ -306,7 +376,7 @@
           showToast('Error: ' + err.message, 'error');
         })
         .submitBooking(form);
-      return false;
+      _pendingForm = null;
     }
 
     function showToast(msg, type) {

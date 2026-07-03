@@ -8,18 +8,31 @@
   <div class="container">
     <?!= include('pages/_header') ?>
 
-    <div id="manualLookupCard" class="card" style="margin-bottom:20px;background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.18);<?!= getCurrentUser() ? 'style=display:none' : '' ?>">
-      <p style="color:var(--cyan);text-align:center;margin:0;font-weight:600">Enter your booking email to view your bookings.</p>
-      <div style="text-align:center;margin-top:10px;display:flex;gap:8px;justify-content:center">
-        <input type="email" id="manualEmail" placeholder="your@email.com" style="flex:1;max-width:280px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)">
-        <button class="btn btn-primary btn-sm" onclick="manualLookup()">Look Up</button>
+    <? var u = getCurrentUser(); ?>
+    <div id="userBannerWrap" style="text-align:right;margin-top:-14px;margin-bottom:20px;padding-right:8px">
+      <span class="user-banner">
+        <span class="u-dot"></span>
+        <span class="u-email"><?= u || 'Not signed in' ?></span>
+        <button class="u-change" onclick="changeGoogleUser()">Change user</button>
+      </span>
+    </div>
+
+    <div id="domainModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,6,13,.88);z-index:9999;align-items:center;justify-content:center">
+      <div style="max-width:440px;width:90%;padding:36px 28px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);text-align:center;box-shadow:0 0 48px rgba(0,240,255,.12)">
+        <h2 style="font-size:22px;font-weight:700;margin-bottom:10px"><span style="background:linear-gradient(90deg,var(--cyan),var(--magenta));-webkit-background-clip:text;color:transparent">Sign In Required</span></h2>
+        <p style="color:var(--muted);margin-bottom:18px;line-height:1.6;font-size:14px">
+          Sign in with your <strong style="color:#fff">@unisza.edu.my</strong> account to view your bookings.
+        </p>
+        <button onclick="changeGoogleUser()" style="padding:12px 32px;background:linear-gradient(135deg,rgba(0,240,255,.15),rgba(0,240,255,.05));border:1px solid var(--cyan);border-radius:8px;color:var(--cyan);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:.18s" onmouseover="this.style.boxShadow='0 0 22px rgba(0,240,255,.3)'" onmouseout="this.style.boxShadow='none'">
+          Sign in with @unisza.edu.my
+        </button>
       </div>
     </div>
 
-    <a class="back-link" href="javascript:void(0)" onclick="goBack()">← Back</a>
+    <a class="back-link" href="javascript:void(0)" onclick="goBack()">&larr; Back</a>
 
     <div class="card" id="bookingList">
-      <h2>My <span>Bookings</span> · UGS</h2>
+      <h2>My <span>Bookings</span> &middot; UGS</h2>
       <div id="loadingMsg" class="text-center" style="padding:24px">
         <span class="spinner"></span> <span class="text-muted">Loading your bookings...</span>
       </div>
@@ -46,30 +59,18 @@
   <script>
     var allBookings = [];
     var selectedId = null;
-    var currentEmail = '<?!= getCurrentUser() ?>';
+    var currentEmail = <?!= JSON.stringify(u) ?>;
 
     function init() {
-      if (currentEmail) {
-        loadBookings('');
-      } else {
+      if (!currentEmail || !currentEmail.endsWith('@unisza.edu.my')) {
         document.getElementById('loadingMsg').style.display = 'none';
+        document.getElementById('domainModal').style.display = 'flex';
+        return;
       }
+      loadBookings();
     }
 
-    function manualLookup() {
-      var email = document.getElementById('manualEmail').value.trim();
-      if (!email) { showToast('Please enter your email address.', 'error'); return; }
-      var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!re.test(email)) { showToast('Please enter a valid email.', 'error'); return; }
-      currentEmail = email;
-      document.getElementById('loadingMsg').style.display = 'block';
-      document.getElementById('loadingMsg').innerHTML = '<span class="spinner"></span> <span class="text-muted">Loading your bookings...</span>';
-      document.getElementById('bookingContainer').style.display = 'none';
-      document.getElementById('emptyMsg').style.display = 'none';
-      loadBookings(email);
-    }
-
-    function loadBookings(email) {
+    function loadBookings() {
       google.script.run
         .withSuccessHandler(function(bookings) {
           document.getElementById('loadingMsg').style.display = 'none';
@@ -84,7 +85,7 @@
         .withFailureHandler(function(err) {
           document.getElementById('loadingMsg').innerHTML = '<span class="text-muted">Error: ' + err.message + '</span>';
         })
-        .getMyBookings(email);
+        .getMyBookings('');
     }
 
     function renderList() {
@@ -92,7 +93,7 @@
       var html = '<table><thead><tr><th>ID</th><th>Room</th><th>Date</th><th>Time</th><th>Status</th><th>Action</th></tr></thead><tbody>';
       for (var i = 0; i < allBookings.length; i++) {
         var b = allBookings[i];
-        var actionBtn = '—';
+        var actionBtn = '&mdash;';
         if (b.status === 'Approved') {
           var fbUrl = deployUrl + '?page=feedback&bid=' + encodeURIComponent(b.bookingId);
           actionBtn = '<a class="btn btn-ghost btn-sm" style="color:var(--green);border-color:rgba(57,255,20,.25)" href="' + fbUrl + '">Feedback</a>';
@@ -104,7 +105,7 @@
           '<td class="mono">' + esc(b.bookingId) + '</td>' +
           '<td>' + esc(b.room) + '</td>' +
           '<td>' + esc(b.date) + '</td>' +
-          '<td class="mono">' + esc(b.startTime) + '–' + esc(b.endTime) + '</td>' +
+          '<td class="mono">' + esc(b.startTime) + '&ndash;' + esc(b.endTime) + '</td>' +
           '<td><span class="pill ' + b.status.toLowerCase() + '">' + esc(b.status) + '</span></td>' +
           '<td>' + actionBtn + '</td>' +
         '</tr>';
@@ -137,7 +138,7 @@
           closeCancelModal();
           if (r.success) {
             showToast('Booking cancelled. Email sent to you and admin.', 'success');
-            loadBookings(currentEmail);
+            loadBookings();
           } else { showToast(r.message, 'error'); }
         })
         .withFailureHandler(function(err) {
@@ -148,16 +149,7 @@
         .cancelMyBooking(selectedId, currentEmail);
     }
 
-    function onUserIdentified(email) {
-      currentEmail = email;
-      document.getElementById('manualLookupCard').style.display = 'none';
-      loadBookings(email);
-    }
-
-    function goBack() {
-      window.top.location.href = '<?!= getDeploymentUrl() ?>';
-    }
-
+    function goBack() { window.top.location.href = '<?!= getDeploymentUrl() ?>'; }
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     function showToast(msg, type) {
       var t = document.createElement('div');

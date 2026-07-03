@@ -11,14 +11,16 @@
         <img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UniSZA Graduate School" style="height:48px">
       </div>
       <h1 class="title">Admin Panel</h1>
-      <p class="subtitle">Manage bookings · Approve or Reject</p>
+      <p class="subtitle">Manage bookings · Approve / Reject / Edit / Delete</p>
     </div>
 
-    <a class="back-link" href="javascript:void(0)" onclick="goBack()">← Back</a>
+    <a class="back-link" href="javascript:void(0)" onclick="goBack()">&larr; Back</a>
 
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('pending')">Pending <span id="pendingCount" style="margin-left:4px;color:var(--amber)"></span></button>
-      <button class="tab" onclick="switchTab('history')">History</button>
+      <button class="tab active" onclick="switchTab('pending')">Pending <span id="pendingCount" class="tab-count"></span></button>
+      <button class="tab" onclick="switchTab('approved')">Approved <span id="approvedCount" class="tab-count"></span></button>
+      <button class="tab" onclick="switchTab('rejected')">Rejected <span id="rejectedCount" class="tab-count"></span></button>
+      <button class="tab" onclick="switchTab('deleted')">Deleted <span id="deletedCount" class="tab-count"></span></button>
       <button class="tab" onclick="switchTab('admins')">Admins</button>
     </div>
 
@@ -31,9 +33,23 @@
       <div id="pendingTable"></div>
     </div>
 
-    <div class="card" id="historyCard" style="display:none">
-      <h2>Booking <span>History</span></h2>
-      <div id="historyTable"></div>
+    <div class="card" id="approvedCard" style="display:none">
+      <div class="row mb-12">
+        <h2><span>Approved</span> Bookings</h2>
+        <span class="spacer"></span>
+        <button class="btn btn-ghost btn-sm" onclick="refreshDashboard()">Refresh</button>
+      </div>
+      <div id="approvedTable"></div>
+    </div>
+
+    <div class="card" id="rejectedCard" style="display:none">
+      <h2><span>Rejected</span> Bookings</h2>
+      <div id="rejectedTable"></div>
+    </div>
+
+    <div class="card" id="deletedCard" style="display:none">
+      <h2><span>Deleted</span> Bookings</h2>
+      <div id="deletedTable"></div>
     </div>
 
     <div class="card" id="adminsCard" style="display:none">
@@ -70,24 +86,98 @@
         </div>
       </div>
     </div>
+
+    <div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center">
+      <div class="card" style="max-width:460px;width:90%">
+        <h2>Edit <span>Booking</span></h2>
+        <p class="text-muted" style="margin-bottom:14px;font-size:13px">Booking ID: <strong id="editBookingId"></strong></p>
+        <form id="editForm" onsubmit="return saveEdit(event)">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <label for="editRoom">Room</label>
+              <select id="editRoom" required>
+                <option value="UGS Meeting Room">UGS Meeting Room</option>
+                <option value="UGS Discussion Room">UGS Discussion Room</option>
+                <option value="Viva Room 1">Viva Room 1</option>
+                <option value="Viva Room 2">Viva Room 2</option>
+              </select>
+            </div>
+            <div>
+              <label for="editDate">Date</label>
+              <input type="date" id="editDate" required>
+            </div>
+            <div>
+              <label for="editStartTime">Start Time</label>
+              <select id="editStartTime" required></select>
+            </div>
+            <div>
+              <label for="editEndTime">End Time</label>
+              <select id="editEndTime" required></select>
+            </div>
+          </div>
+          <div class="full" style="margin-top:12px">
+            <label for="editPurpose">Meeting Purpose</label>
+            <textarea id="editPurpose" required></textarea>
+          </div>
+          <div class="row row-end mt-20">
+            <button class="btn btn-ghost btn-sm" onclick="closeEditModal()" type="button">Cancel</button>
+            <button class="btn btn-primary btn-sm" id="saveEditBtn">Save Changes</button>
+          </div>
+        </form>
+        <p id="editResult" style="font-size:12px;margin-top:8px"></p>
+      </div>
+    </div>
   </div>
 
   <script>
     var pending = [];
-    var recent = [];
+    var approved = [];
+    var rejected = [];
+    var deleted = [];
     var rejectTarget = null;
+    var editTarget = null;
     var currentTab = 'pending';
+
+    var timeSlots = [];
+    (function() {
+      for (var h = 8; h < 17; h++) {
+        for (var m = 0; m < 60; m += 30) {
+          if (h === 16 && m === 30) break;
+          var t = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+          timeSlots.push(t);
+        }
+      }
+    })();
+
+    function populateTimeSelects() {
+      var startSel = document.getElementById('editStartTime');
+      var endSel = document.getElementById('editEndTime');
+      startSel.innerHTML = '<option value="">Start time...</option>';
+      endSel.innerHTML = '<option value="">End time...</option>';
+      for (var i = 0; i < timeSlots.length; i++) {
+        var o1 = document.createElement('option');
+        o1.value = timeSlots[i]; o1.textContent = timeSlots[i];
+        startSel.appendChild(o1);
+        var o2 = document.createElement('option');
+        o2.value = timeSlots[i]; o2.textContent = timeSlots[i];
+        endSel.appendChild(o2);
+      }
+    }
 
     function loadDashboard() {
       google.script.run
         .withSuccessHandler(function(r) {
           pending = r.pending || [];
-          recent = r.recent || [];
+          approved = r.approved || [];
+          rejected = r.rejected || [];
+          deleted = r.deleted || [];
           renderPending();
-          renderHistory();
+          renderApproved();
+          renderRejected();
+          renderDeleted();
         })
-        .withFailureHandler(function(err) {})
-        .getDashboard('');
+        .withFailureHandler(function(err) { showToast('Error loading dashboard: ' + err.message, 'error'); })
+        .getDashboard();
     }
 
     loadDashboard();
@@ -96,22 +186,34 @@
       google.script.run
         .withSuccessHandler(function(r) {
           pending = r.pending || [];
-          recent = r.recent || [];
-          if (currentTab === 'pending') renderPending(); else renderHistory();
+          approved = r.approved || [];
+          rejected = r.rejected || [];
+          deleted = r.deleted || [];
+          renderPending();
+          renderApproved();
+          renderRejected();
+          renderDeleted();
+          showToast('Dashboard refreshed.', 'info');
         })
         .withFailureHandler(function(err) { showToast('Refresh error: ' + err.message, 'error'); })
-        .getDashboard('');
+        .getDashboard();
     }
 
     function switchTab(tab) {
       currentTab = tab;
       document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
       document.getElementById('pendingCard').style.display = tab === 'pending' ? '' : 'none';
-      document.getElementById('historyCard').style.display = tab === 'history' ? '' : 'none';
+      document.getElementById('approvedCard').style.display = tab === 'approved' ? '' : 'none';
+      document.getElementById('rejectedCard').style.display = tab === 'rejected' ? '' : 'none';
+      document.getElementById('deletedCard').style.display = tab === 'deleted' ? '' : 'none';
       document.getElementById('adminsCard').style.display = tab === 'admins' ? '' : 'none';
-      if (tab === 'pending') document.querySelector('.tab:nth-child(1)').classList.add('active');
-      else if (tab === 'history') document.querySelector('.tab:nth-child(2)').classList.add('active');
-      else document.querySelector('.tab:nth-child(3)').classList.add('active');
+      var tabs = document.querySelectorAll('.tab');
+      for (var i = 0; i < tabs.length; i++) {
+        if (tabs[i].textContent.trim().toLowerCase().indexOf(tab) === 0 ||
+            (tab === 'admins' && tabs[i].textContent.trim() === 'Admins')) {
+          tabs[i].classList.add('active'); break;
+        }
+      }
       if (tab === 'admins') loadAdmins();
     }
 
@@ -119,7 +221,7 @@
       var ct = document.getElementById('pendingCount');
       ct.textContent = pending.length > 0 ? '(' + pending.length + ')' : '';
       if (pending.length === 0) {
-        document.getElementById('pendingTable').innerHTML = '<div class="empty-state"><div class="icon">✓</div><p>No pending bookings.</p></div>';
+        document.getElementById('pendingTable').innerHTML = '<div class="empty-state"><div class="icon">&#10003;</div><p>No pending bookings.</p></div>';
         return;
       }
       var html = '<table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Room</th><th>Date</th><th>Time</th><th>Purpose</th><th>Actions</th></tr></thead><tbody>';
@@ -131,7 +233,7 @@
           '<td style="font-size:12px">' + esc(b.email) + '</td>' +
           '<td>' + esc(b.room) + '</td>' +
           '<td>' + esc(b.date) + '</td>' +
-          '<td class="mono" style="white-space:nowrap">' + esc(b.startTime) + '–' + esc(b.endTime) + '</td>' +
+          '<td class="mono" style="white-space:nowrap">' + esc(b.startTime) + '&ndash;' + esc(b.endTime) + '</td>' +
           '<td>' + esc(trunc(b.purpose, 40)) + '</td>' +
           '<td class="actions">' +
             '<button class="btn btn-primary btn-sm" onclick="approve(\'' + esc(b.bookingId) + '\')">Approve</button>' +
@@ -143,26 +245,80 @@
       document.getElementById('pendingTable').innerHTML = html;
     }
 
-    function renderHistory() {
-      if (recent.length === 0) {
-        document.getElementById('historyTable').innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No bookings yet.</p></div>';
+    function renderApproved() {
+      var ct = document.getElementById('approvedCount');
+      ct.textContent = approved.length > 0 ? '(' + approved.length + ')' : '';
+      if (approved.length === 0) {
+        document.getElementById('approvedTable').innerHTML = '<div class="empty-state"><div class="icon">&#10003;</div><p>No approved bookings.</p></div>';
         return;
       }
-      var html = '<table><thead><tr><th>ID</th><th>Name</th><th>Room</th><th>Date</th><th>Time</th><th>Status</th><th>Decided</th></tr></thead><tbody>';
-      for (var i = 0; i < recent.length; i++) {
-        var b = recent[i];
+      var html = '<table><thead><tr><th>ID</th><th>Name</th><th>Room</th><th>Date</th><th>Time</th><th>Purpose</th><th>Actions</th></tr></thead><tbody>';
+      for (var i = 0; i < approved.length; i++) {
+        var b = approved[i];
         html += '<tr>' +
           '<td class="mono">' + esc(b.bookingId) + '</td>' +
           '<td>' + esc(b.name) + '</td>' +
           '<td>' + esc(b.room) + '</td>' +
           '<td>' + esc(b.date) + '</td>' +
-          '<td class="mono">' + esc(b.startTime) + '–' + esc(b.endTime) + '</td>' +
-          '<td><span class="pill ' + b.status.toLowerCase() + '">' + esc(b.status) + '</span></td>' +
-          '<td style="font-size:11px;color:var(--muted)">' + esc(b.decisionBy) + (b.decisionAt ? ' · ' + fmtDateShort(b.decisionAt) : '') + '</td>' +
+          '<td class="mono" style="white-space:nowrap">' + esc(b.startTime) + '&ndash;' + esc(b.endTime) + '</td>' +
+          '<td>' + esc(trunc(b.purpose, 40)) + '</td>' +
+          '<td class="actions">' +
+            '<button class="btn-icon" title="Edit" onclick="openEdit(\'' + esc(b.bookingId) + '\')">&#9998;</button>' +
+            '<button class="btn-icon btn-icon-danger" title="Delete" onclick="deleteBooking(\'' + esc(b.bookingId) + '\')">&#128465;</button>' +
+          '</td>' +
         '</tr>';
       }
       html += '</tbody></table>';
-      document.getElementById('historyTable').innerHTML = html;
+      document.getElementById('approvedTable').innerHTML = html;
+    }
+
+    function renderRejected() {
+      var ct = document.getElementById('rejectedCount');
+      ct.textContent = rejected.length > 0 ? '(' + rejected.length + ')' : '';
+      if (rejected.length === 0) {
+        document.getElementById('rejectedTable').innerHTML = '<div class="empty-state"><div class="icon">&#10003;</div><p>No rejected bookings.</p></div>';
+        return;
+      }
+      var html = '<table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Room</th><th>Date</th><th>Time</th><th>Reason</th><th>Decided</th></tr></thead><tbody>';
+      for (var i = 0; i < rejected.length; i++) {
+        var b = rejected[i];
+        html += '<tr>' +
+          '<td class="mono">' + esc(b.bookingId) + '</td>' +
+          '<td>' + esc(b.name) + '</td>' +
+          '<td style="font-size:12px">' + esc(b.email) + '</td>' +
+          '<td>' + esc(b.room) + '</td>' +
+          '<td>' + esc(b.date) + '</td>' +
+          '<td class="mono">' + esc(b.startTime) + '&ndash;' + esc(b.endTime) + '</td>' +
+          '<td style="font-size:12px">' + esc(trunc(b.notes, 30)) + '</td>' +
+          '<td style="font-size:11px;color:var(--muted)">' + esc(b.decisionBy) + (b.decisionAt ? ' &middot; ' + fmtDateShort(b.decisionAt) : '') + '</td>' +
+        '</tr>';
+      }
+      html += '</tbody></table>';
+      document.getElementById('rejectedTable').innerHTML = html;
+    }
+
+    function renderDeleted() {
+      var ct = document.getElementById('deletedCount');
+      ct.textContent = deleted.length > 0 ? '(' + deleted.length + ')' : '';
+      if (deleted.length === 0) {
+        document.getElementById('deletedTable').innerHTML = '<div class="empty-state"><div class="icon">&#10003;</div><p>No deleted bookings.</p></div>';
+        return;
+      }
+      var html = '<table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Room</th><th>Date</th><th>Time</th><th>Deleted</th></tr></thead><tbody>';
+      for (var i = 0; i < deleted.length; i++) {
+        var b = deleted[i];
+        html += '<tr>' +
+          '<td class="mono">' + esc(b.bookingId) + '</td>' +
+          '<td>' + esc(b.name) + '</td>' +
+          '<td style="font-size:12px">' + esc(b.email) + '</td>' +
+          '<td>' + esc(b.room) + '</td>' +
+          '<td>' + esc(b.date) + '</td>' +
+          '<td class="mono">' + esc(b.startTime) + '&ndash;' + esc(b.endTime) + '</td>' +
+          '<td style="font-size:11px;color:var(--muted)">' + esc(b.decisionBy) + (b.decisionAt ? ' &middot; ' + fmtDateShort(b.decisionAt) : '') + '</td>' +
+        '</tr>';
+      }
+      html += '</tbody></table>';
+      document.getElementById('deletedTable').innerHTML = html;
     }
 
     function approve(bookingId) {
@@ -199,6 +355,100 @@
 
     function closeRejectModal() { document.getElementById('rejectModal').style.display = 'none'; rejectTarget = null; }
 
+    function deleteBooking(bookingId) {
+      if (!confirm('Delete booking ' + bookingId + '? It will be moved to the Deleted panel.')) return;
+      google.script.run
+        .withSuccessHandler(function(r) {
+          if (r.success) { showToast(r.message, 'info'); refreshDashboard(); }
+          else { showToast(r.message, 'error'); }
+        })
+        .withFailureHandler(function(err) { showToast('Error: ' + err.message, 'error'); })
+        .deleteBooking(bookingId);
+    }
+
+    function openEdit(bookingId) {
+      editTarget = bookingId;
+      populateTimeSelects();
+      var booking = null;
+      for (var i = 0; i < approved.length; i++) {
+        if (approved[i].bookingId === bookingId) { booking = approved[i]; break; }
+      }
+      if (!booking) { showToast('Booking not found.', 'error'); return; }
+
+      document.getElementById('editBookingId').textContent = booking.bookingId;
+      document.getElementById('editRoom').value = booking.room;
+      document.getElementById('editDate').value = booking.date;
+      document.getElementById('editStartTime').value = booking.startTime;
+
+      var endSel = document.getElementById('editEndTime');
+      endSel.innerHTML = '<option value="">End time...</option>';
+      for (var j = 0; j < timeSlots.length; j++) {
+        if (timeSlots[j] > booking.startTime) {
+          var o = document.createElement('option');
+          o.value = timeSlots[j]; o.textContent = timeSlots[j];
+          endSel.appendChild(o);
+        }
+      }
+      document.getElementById('editEndTime').value = booking.endTime;
+      document.getElementById('editPurpose').value = booking.purpose;
+      document.getElementById('editResult').textContent = '';
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+      editTarget = null;
+    }
+
+    function saveEdit(e) {
+      e.preventDefault();
+      var room = document.getElementById('editRoom').value;
+      var date = document.getElementById('editDate').value;
+      var startTime = document.getElementById('editStartTime').value;
+      var endTime = document.getElementById('editEndTime').value;
+      var purpose = document.getElementById('editPurpose').value.trim();
+
+      if (!room || !date || !startTime || !endTime || !purpose) {
+        document.getElementById('editResult').textContent = 'All fields required.';
+        document.getElementById('editResult').style.color = 'var(--danger)';
+        return false;
+      }
+      if (startTime >= endTime) {
+        document.getElementById('editResult').textContent = 'End time must be after start time.';
+        document.getElementById('editResult').style.color = 'var(--danger)';
+        return false;
+      }
+
+      var btn = document.getElementById('saveEditBtn');
+      btn.disabled = true; btn.textContent = 'Saving...';
+
+      google.script.run
+        .withSuccessHandler(function(r) {
+          btn.disabled = false; btn.textContent = 'Save Changes';
+          if (r.success) {
+            document.getElementById('editResult').textContent = 'Booking updated successfully.';
+            document.getElementById('editResult').style.color = 'var(--cyan)';
+            setTimeout(function() { closeEditModal(); refreshDashboard(); }, 800);
+          } else {
+            document.getElementById('editResult').textContent = r.message;
+            document.getElementById('editResult').style.color = 'var(--danger)';
+          }
+        })
+        .withFailureHandler(function(err) {
+          btn.disabled = false; btn.textContent = 'Save Changes';
+          document.getElementById('editResult').textContent = 'Error: ' + err.message;
+          document.getElementById('editResult').style.color = 'var(--danger)';
+        })
+        .updateBooking(editTarget, {
+          room: room,
+          date: date,
+          startTime: startTime,
+          endTime: endTime,
+          purpose: purpose
+        });
+      return false;
+    }
+
     function loadAdmins() {
       google.script.run
         .withSuccessHandler(function(admins) {
@@ -227,9 +477,7 @@
       document.getElementById('addAdminName').focus();
     }
 
-    function closeAddAdminModal() {
-      document.getElementById('addAdminModal').style.display = 'none';
-    }
+    function closeAddAdminModal() { document.getElementById('addAdminModal').style.display = 'none'; }
 
     function confirmAddAdmin() {
       var email = document.getElementById('newAdminEmail').value.trim();
@@ -262,7 +510,7 @@
 
     function goBack() { window.top.location.href = '<?!= getDeploymentUrl() ?>'; }
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-    function trunc(s, n) { return s.length > n ? s.slice(0,n) + '…' : s; }
+    function trunc(s, n) { return s.length > n ? s.slice(0,n) + '&#8230;' : s; }
     function fmtDateShort(ts) { if (!ts) return ''; var d = new Date(ts); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
     function showToast(msg, type) {
       var t = document.createElement('div');

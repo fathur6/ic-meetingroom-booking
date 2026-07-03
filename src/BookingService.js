@@ -27,6 +27,15 @@ var BookingService = {
       try { email = Session.getActiveUser().getEmail(); } catch (ex) {}
     }
     if (!email) return [];
+
+    var admins = SheetService.getAdminList();
+    var cleanEmail = email.toLowerCase();
+    for (var i = 0; i < admins.length; i++) {
+      if (admins[i].email.toLowerCase() === cleanEmail) {
+        return SheetService.getAllBookings(null);
+      }
+    }
+
     return SheetService.getBookingsByEmail(email);
   },
 
@@ -34,17 +43,12 @@ var BookingService = {
     var currentUser = '';
     try { currentUser = Session.getActiveUser().getEmail().toLowerCase(); } catch (ex) {}
 
-    if (currentUser && String(form.email).toLowerCase() !== currentUser) {
-      return { success: false, message: 'Email must match your signed-in Google account (' + currentUser + ').' };
+    if (!currentUser) {
+      return { success: false, message: 'Could not identify your Google account. Please sign in.' };
     }
 
-    if (!form.name || !form.email || !form.phone || !form.room || !form.date || !form.startTime || !form.endTime || !form.purpose) {
+    if (!form.name || !form.phone || !form.room || !form.date || !form.startTime || !form.endTime || !form.purpose) {
       return { success: false, message: 'All fields are required.' };
-    }
-
-    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(form.email)) {
-      return { success: false, message: 'Invalid email address.' };
     }
 
     if (CalendarService.timeToMinutes(form.startTime) >= CalendarService.timeToMinutes(form.endTime)) {

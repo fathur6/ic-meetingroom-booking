@@ -1,7 +1,23 @@
 var APP_TITLE = 'UGS Meeting Room Booking';
 
+function __log(msg) {
+  Logger.log('[UGS] ' + msg);
+}
+
 function doGet(e) {
   var page = e && e.parameter && e.parameter.page ? e.parameter.page : 'index';
+  __log('doGet() called — page=' + page + ' — params=' + JSON.stringify(e && e.parameter));
+
+  var sessionEmail = '';
+  try { sessionEmail = Session.getActiveUser().getEmail(); } catch (ex) { sessionEmail = 'ERROR:' + ex.toString(); }
+  __log('doGet() Session.getActiveUser().getEmail() = "' + sessionEmail + '"');
+
+  try {
+    __log('doGet() Session.getEffectiveUser() = "' + Session.getEffectiveUser().getEmail() + '"');
+  } catch (ex) {
+    __log('doGet() Session.getEffectiveUser() ERROR: ' + ex.toString());
+  }
+
   var fileMap = {
     'index': 'Index',
     'booking': 'pages/Booking',
@@ -24,43 +40,75 @@ function doGet(e) {
   tmpl.param_bid = (e && e.parameter && e.parameter.bid) ? e.parameter.bid : '';
 
   return tmpl.evaluate()
+    .setSandboxMode(HtmlService.SandboxMode.NATIVE)
     .setTitle(title)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+  return HtmlService.createTemplateFromFile(filename).evaluate().getContent();
+}
+
+function getDebugInfo() {
+  var diag = diagnose();
+  return {
+    diag: diag,
+    user: getCurrentUser(),
+    auth: checkAuth(),
+    clientId: getGoogleClientId(),
+    deployUrl: getDeploymentUrl()
+  };
 }
 
 function getDeploymentUrl() {
   var id = CONFIG.DEPLOYMENT_ID || PropertiesService.getScriptProperties().getProperty('DEPLOYMENT_ID') || '';
-  if (!id || id.indexOf('YOUR_') === 0) return 'https://script.google.com/macros/s/AKfycbw9nthz4zYsknIVcQWAoke45peeYWzTzljaUu1UZ4dumHOoxSItbSOfWzocRUq81mI/exec';
+  if (!id || id.indexOf('YOUR_') === 0) return 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
   return 'https://script.google.com/macros/s/' + id + '/exec';
+}
+
+function getCurrentUser() {
+  var email = '';
+  try { email = Session.getActiveUser().getEmail(); } catch (ex) {
+    __log('getCurrentUser() Session.getActiveUser().getEmail() EXCEPTION: ' + ex.toString());
+  }
+  __log('getCurrentUser() returns "' + email + '"');
+  return email || '';
 }
 
 function getGoogleClientId() {
   return CONFIG.GOOGLE_CLIENT_ID || '';
 }
 
-function getCurrentUser() {
-  var email = '';
-  try { email = Session.getActiveUser().getEmail(); } catch (ex) {}
-  return email || '';
+function getWeekBookings(weekStart) {
+  return SheetService.getApprovedBookingsForWeek(weekStart);
 }
 
 function checkAuth() {
+  __log('checkAuth() called');
   var email = '';
-  try { email = Session.getActiveUser().getEmail(); } catch (ex) {}
-  if (!email) return { authorized: false, user: '', needsAuth: true, authUrl: '' };
+  try { email = Session.getActiveUser().getEmail(); } catch (ex) {
+    __log('checkAuth() Session.getActiveUser() EXCEPTION: ' + ex.toString());
+  }
+  __log('checkAuth() email = "' + email + '"');
+  if (!email) {
+    __log('checkAuth() NO EMAIL → returning needsAuth');
+    return { authorized: false, user: '', needsAuth: true, authUrl: '' };
+  }
 
   try {
     var info = ScriptApp.getAuthorizationInfo(ScriptApp.AuthMode.FULL);
-    if (info.getAuthorizationStatus() === ScriptApp.AuthorizationStatus.REQUIRED) {
+    var status = info.getAuthorizationStatus();
+    __log('checkAuth() authStatus = ' + status);
+    if (status === ScriptApp.AuthorizationStatus.REQUIRED) {
+      __log('checkAuth() AUTHORIZATION REQUIRED → returning authUrl');
       return { authorized: false, user: email, needsAuth: true, authUrl: info.getAuthorizationUrl() };
     }
-  } catch (e) {}
+  } catch (e) {
+    __log('checkAuth() ScriptApp.getAuthorizationInfo ERROR: ' + e.toString());
+  }
 
+  __log('checkAuth() authorized OK → user=' + email);
   return { authorized: true, user: email, needsAuth: false, authUrl: '' };
 }
 
@@ -88,8 +136,8 @@ function getAuthUrl() {
 }
 
 function setup(sheetId, approvalEmail) {
-  if (!sheetId) sheetId = '1PSdfrQN1xnCtPx_dGKoj7v_ttIFO1u1zN3P4-nEQQ_8';
-  if (!approvalEmail) approvalEmail = 'pps@unisza.edu.my';
+  if (!sheetId) sheetId = 'YOUR_SHEET_ID';
+  if (!approvalEmail) approvalEmail = 'YOUR_EMAIL';
 
   var adminEmails = '';
   try { adminEmails = Session.getActiveUser().getEmail() + ',' + approvalEmail; } catch (ex) {}
@@ -97,7 +145,7 @@ function setup(sheetId, approvalEmail) {
     'SHEET_ID': sheetId,
     'APPROVAL_EMAIL': approvalEmail,
     'ADMIN_EMAILS': adminEmails,
-    'CALENDAR_ID': 'c_9efcafb3465e76b522ec27e40c57def79acd2fb31e8ab78fa08813b960d942f9@group.calendar.google.com',
+    'CALENDAR_ID': 'YOUR_CALENDAR_ID',
     'SCRIPT_OWNER': Session.getActiveUser().getEmail() || 'YOUR_EMAIL',
     'DEPLOYMENT_ID': 'YOUR_DEPLOYMENT_ID'
   }, true);
@@ -168,6 +216,14 @@ function rejectBooking(bookingId, adminKey, reason) {
 
 function getBookingById(bookingId) {
   return SheetService.getBookingById(bookingId);
+}
+
+function deleteBooking(bookingId) {
+  return AdminService.deleteBooking(bookingId);
+}
+
+function updateBooking(bookingId, updates) {
+  return AdminService.updateBooking(bookingId, updates);
 }
 
 function getAdminListFn(adminKey) {
