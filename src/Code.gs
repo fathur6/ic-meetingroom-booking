@@ -58,13 +58,16 @@ function checkAuth() {
 
 function forceOAuth() {
   var token = ScriptApp.getOAuthToken();
-  var count = GmailApp.getInboxUnreadCount();
   var user = Session.getActiveUser().getEmail();
+  var count = GmailApp.getInboxUnreadCount();
+  var calId = CalendarService.getCalendarId();
+  var calName = CalendarApp.getCalendarById(calId).getName();
   return {
     authorized: true,
     tokenPrefix: token.substring(0, 10) + '...',
-    inboxUnread: count,
     user: user,
+    inboxUnread: count,
+    calendar: calName,
   };
 }
 
