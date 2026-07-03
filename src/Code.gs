@@ -63,7 +63,7 @@ function getDebugInfo() {
 
 function getDeploymentUrl() {
   var id = CONFIG.DEPLOYMENT_ID || PropertiesService.getScriptProperties().getProperty('DEPLOYMENT_ID') || '';
-  if (!id || id.indexOf('YOUR_') === 0) return 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+  if (!id || id.indexOf('YOUR_') === 0) return 'https://script.google.com/macros/s/AKfycbw9nthz4zYsknIVcQWAoke45peeYWzTzljaUu1UZ4dumHOoxSItbSOfWzocRUq81mI/exec';
   return 'https://script.google.com/macros/s/' + id + '/exec';
 }
 

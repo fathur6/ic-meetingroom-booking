@@ -282,7 +282,7 @@
           var colNum = ri + 2;
           if (booking) {
             html += '<div class="cal-cell booking" style="grid-column:' + colNum + ';grid-row:' + rowNum + '">' +
-              esc(booking.name) + '<span style="opacity:.6;font-weight:400;margin-left:4px;font-size:10px">' + booking.startTime + '</span></div>';
+              esc(booking.name) + '<span style="opacity:.6;font-weight:400;margin-left:4px;font-size:10px">' + esc(booking.office) + '</span></div>';
           } else {
             html += '<div class="cal-cell empty" style="grid-column:' + colNum + ';grid-row:' + rowNum + '"></div>';
           }
