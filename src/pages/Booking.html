@@ -8,16 +8,6 @@
   <div class="container">
     <?!= include('pages/_header') ?>
 
-    <? var u = getCurrentUser(); if (u) { ?>
-    <div style="text-align:right;margin-top:-14px;margin-bottom:20px;padding-right:8px">
-      <span class="user-banner">
-        <span class="u-dot"></span>
-        <span class="u-email"><?= u ?></span>
-        <button class="u-change" onclick="changeUser()">Change user</button>
-      </span>
-    </div>
-    <? } ?>
-
     <a class="back-link" href="javascript:void(0)" onclick="goBack()">← Back</a>
 
     <div class="card" id="bookingForm">
@@ -92,7 +82,7 @@
         Bookings can be checked or modified <strong style="color:var(--text)">only</strong> with this same Google account.
       </p>
       <button class="btn btn-primary" onclick="closeIntroModal()">I understand</button>
-      <button class="btn btn-ghost" onclick="changeUser()">Change user</button>
+      <button class="btn btn-ghost" onclick="changeGoogleUser()">Change user</button>
     </div>
   </div>
   <? } ?>
@@ -177,23 +167,11 @@
       window.top.location.href = '<?!= getDeploymentUrl() ?>';
     }
 
-    function changeUser() {
-      doSignIn();
-    }
-
-    function doSignIn() {
-      google.script.run
-        .withSuccessHandler(function(authUrl) {
-          if (authUrl) {
-            window.top.location.href = authUrl;
-          } else {
-            window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>?page=booking');
-          }
-        })
-        .withFailureHandler(function() {
-          window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>?page=booking');
-        })
-        .getAuthUrl();
+    function onUserIdentified(email) {
+      var emailField = document.getElementById('email');
+      if (emailField && email && !emailField.value) {
+        emailField.value = email;
+      }
     }
 
     function setDateConstraints() {

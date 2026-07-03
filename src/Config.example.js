@@ -17,6 +17,7 @@ var CONFIG = (function () {
     SHEET_BOOKINGS: 'Bookings',
     SHEET_ROOMS: 'Rooms',
     SHEET_SETTINGS: 'Settings',
-    SHEET_ADMINS: 'Admins'
+    SHEET_ADMINS: 'Admins',
+    GOOGLE_CLIENT_ID: sp.getProperty('GOOGLE_CLIENT_ID') || ''
   };
 })();

@@ -39,6 +39,10 @@ function getDeploymentUrl() {
   return 'https://script.google.com/macros/s/' + id + '/exec';
 }
 
+function getGoogleClientId() {
+  return CONFIG.GOOGLE_CLIENT_ID || '';
+}
+
 function getCurrentUser() {
   var email = '';
   try { email = Session.getActiveUser().getEmail(); } catch (ex) {}
