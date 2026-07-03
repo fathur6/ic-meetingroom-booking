@@ -218,6 +218,7 @@ var SheetService = {
     sheet.getRange(row, 14).setValue(new Date());
     if (calendarEventId != null) sheet.getRange(row, 15).setValue(calendarEventId);
     if (notes != null) sheet.getRange(row, 16).setValue(notes);
+    SpreadsheetApp.flush();
     return true;
   },
 
