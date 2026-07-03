@@ -24,6 +24,7 @@ var EmailService = {
     var subject = 'Booking Received: ' + booking.bookingId + ' — UGS Meeting Room';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<div style="text-align:center;margin-bottom:16px"><img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UGS" style="height:48px"></div>',
       '<h2 style="color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.4)">UniSZA Graduate School · Meeting Room</h2>',
       '<p>Your booking request has been <strong style="color:#ffb020">received</strong>.</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
@@ -47,6 +48,7 @@ var EmailService = {
     var subject = 'New Booking: ' + booking.bookingId + ' — Needs Approval';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<div style="text-align:center;margin-bottom:16px"><img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UGS" style="height:48px"></div>',
       '<h2 style="color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.4)">New Booking · Needs Review</h2>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
       '<tr><td style="color:#8892b0">Booking ID</td><td style="color:#e6f1ff;font-family:monospace">' + booking.bookingId + '</td></tr>',
@@ -71,6 +73,7 @@ var EmailService = {
     var subject = 'Booking Approved: ' + booking.bookingId + ' — UGS Meeting Room';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<div style="text-align:center;margin-bottom:16px"><img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UGS" style="height:48px"></div>',
       '<h2 style="color:#39ff14;text-shadow:0 0 12px rgba(57,255,20,.4)">Booking Approved</h2>',
       '<p>Your booking has been <strong style="color:#39ff14">approved</strong> and added to the UGS Booking Schedule calendar.</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
@@ -92,6 +95,7 @@ var EmailService = {
     var subject = 'Booking Update: ' + booking.bookingId + ' — UGS Meeting Room';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<div style="text-align:center;margin-bottom:16px"><img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UGS" style="height:48px"></div>',
       '<h2 style="color:#ff3860;text-shadow:0 0 12px rgba(255,56,96,.4)">Booking Not Approved</h2>',
       '<p>Unfortunately your booking could not be accommodated.</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
@@ -115,6 +119,7 @@ var EmailService = {
     var subject = 'Booking Cancelled by User: ' + booking.bookingId;
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<div style="text-align:center;margin-bottom:16px"><img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UGS" style="height:48px"></div>',
       '<h2 style="color:#8892b0">Booking Cancelled by User</h2>',
       '<p><strong>' + booking.bookingId + '</strong> has been cancelled by the user.</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
@@ -137,6 +142,7 @@ var EmailService = {
     var subject = 'Booking Cancelled: ' + booking.bookingId + ' — UGS Meeting Room';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<div style="text-align:center;margin-bottom:16px"><img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UGS" style="height:48px"></div>',
       '<h2 style="color:#8892b0">Booking Cancelled</h2>',
       '<p>Your booking <strong style="color:#e6f1ff">' + booking.bookingId + '</strong> has been cancelled as requested.</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
@@ -158,6 +164,7 @@ var EmailService = {
     var subject = 'Reminder: ' + booking.bookingId + ' tomorrow — UGS Meeting Room';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<div style="text-align:center;margin-bottom:16px"><img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UGS" style="height:48px"></div>',
       '<h2 style="color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.4)">Booking Reminder</h2>',
       '<p>Your meeting room booking is scheduled for <strong>tomorrow</strong>.</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
@@ -182,6 +189,7 @@ var EmailService = {
     var subject = 'Reminder: ' + booking.bookingId + ' starts in 1 hour — UGS Meeting Room';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<div style="text-align:center;margin-bottom:16px"><img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UGS" style="height:48px"></div>',
       '<h2 style="color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.4)">Your Booking Starts in 1 Hour</h2>',
       '<p>Your meeting room booking begins at <strong>' + booking.startTime + '</strong> today.</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
@@ -205,6 +213,7 @@ var EmailService = {
     var subject = 'Room Prep: ' + booking.bookingId + ' starts in 1 hour — ' + room;
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<div style="text-align:center;margin-bottom:16px"><img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UGS" style="height:48px"></div>',
       '<h2 style="color:#ffb020;text-shadow:0 0 12px rgba(255,176,32,.4)">Room Preparation Needed</h2>',
       '<p><strong>' + (booking.name || 'A user') + '</strong> has booked <strong>' + room + '</strong> starting at <strong>' + booking.startTime + '</strong> today (' + booking.date + ').</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
@@ -234,6 +243,7 @@ var EmailService = {
     var subject = 'Room Closing: ' + booking.bookingId + ' ends in 15 min — ' + room;
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<div style="text-align:center;margin-bottom:16px"><img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UGS" style="height:48px"></div>',
       '<h2 style="color:#ffb020;text-shadow:0 0 12px rgba(255,176,32,.4)">Room Closing Reminder</h2>',
       '<p>The booking for <strong>' + room + '</strong> ends at <strong>' + booking.endTime + '</strong> today (' + booking.date + ').</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
@@ -260,6 +270,7 @@ var EmailService = {
     var subject = 'Thank you for using the meeting room — UGS Meeting Room';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<div style="text-align:center;margin-bottom:16px"><img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UGS" style="height:48px"></div>',
       '<h2 style="color:#39ff14;text-shadow:0 0 12px rgba(57,255,20,.4)">Thank You</h2>',
       '<p>Your booking at <strong>' + room + '</strong> has ended. We hope the room served your needs well.</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
