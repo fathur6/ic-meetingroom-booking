@@ -19,7 +19,7 @@ var AdminService = {
     if (booking.status !== 'Pending') return { success: false, message: 'Booking is not pending. Current status: ' + booking.status + '.' };
 
     if (booking.calendarEventId) {
-      CalendarService.updateEventColor(booking.calendarEventId, 'Approved');
+      CalendarService.updateEventColor(booking.calendarEventId, 'Approved', booking.room);
     }
 
     SheetService.updateBookingStatus(bookingId, 'Approved', 'Admin', notes, booking.calendarEventId);

@@ -240,7 +240,7 @@ function backfillCalendarEvents() {
       var eventId = CalendarService.createEvent(booking);
       if (eventId) {
         if (b.status === 'Approved') {
-          CalendarService.updateEventColor(eventId, 'Approved');
+          CalendarService.updateEventColor(eventId, 'Approved', b.room);
         }
         var sheet = SpreadsheetApp.openById(CONFIG.SHEET_ID).getSheetByName(CONFIG.SHEET_BOOKINGS);
         sheet.getRange(b.row, 15).setValue(eventId);
