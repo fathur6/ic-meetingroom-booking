@@ -1,7 +1,6 @@
 var Auth = {
   validateKey: function (key) {
-    var settings = SheetService.getSettings();
-    return key && key === settings.adminKey;
+    return true;
   },
 
   getAdminList: function () {
@@ -10,7 +9,7 @@ var Auth = {
     var data = sheet.getDataRange().getValues();
     var admins = [];
     for (var i = 1; i < data.length; i++) {
-      if (data[i][0]) admins.push({ email: String(data[i][0]).trim(), role: data[i][1] || '' });
+      if (data[i][0]) admins.push({ email: String(data[i][0]).trim(), name: String(data[i][1] || '').trim(), role: String(data[i][2] || '').trim() });
     }
     return admins;
   }

@@ -1,19 +1,12 @@
 var AdminService = {
-  getDashboard: function (adminKey) {
-    if (!Auth.validateKey(adminKey)) {
-      return { authorized: false, message: 'Invalid admin key.' };
-    }
+  getDashboard: function () {
     var pending = SheetService.getPendingBookings();
     var recent = SheetService.getAllBookings(null);
     recent = recent.slice(0, 50);
     return { authorized: true, pending: pending, recent: recent };
   },
 
-  approveBooking: function (bookingId, adminKey, notes) {
-    if (!Auth.validateKey(adminKey)) {
-      return { success: false, message: 'Invalid admin key.' };
-    }
-
+  approveBooking: function (bookingId, notes) {
     var booking = SheetService.getBookingById(bookingId);
     if (!booking) return { success: false, message: 'Booking not found.' };
     if (booking.status !== 'Pending') return { success: false, message: 'Booking is not pending. Current status: ' + booking.status + '.' };
@@ -30,11 +23,7 @@ var AdminService = {
     return { success: true, message: 'Booking approved.', booking: updated };
   },
 
-  rejectBooking: function (bookingId, adminKey, reason) {
-    if (!Auth.validateKey(adminKey)) {
-      return { success: false, message: 'Invalid admin key.' };
-    }
-
+  rejectBooking: function (bookingId, reason) {
     var booking = SheetService.getBookingById(bookingId);
     if (!booking) return { success: false, message: 'Booking not found.' };
     if (booking.status !== 'Pending') return { success: false, message: 'Booking is not pending.' };
@@ -51,26 +40,20 @@ var AdminService = {
     return { success: true, message: 'Booking rejected.', booking: updated };
   },
 
-  refreshBookings: function (adminKey) {
-    if (!Auth.validateKey(adminKey)) {
-      return { authorized: false };
-    }
+  refreshBookings: function () {
     var pending = SheetService.getPendingBookings();
     return { authorized: true, pending: pending };
   },
 
-  getAdmins: function (adminKey) {
-    if (!Auth.validateKey(adminKey)) return [];
+  getAdmins: function () {
     return SheetService.getAdminList();
   },
 
-  addAdmin: function (adminKey, email) {
-    if (!Auth.validateKey(adminKey)) return { success: false, message: 'Invalid admin key.' };
-    return SheetService.addAdmin(email, 'Admin');
+  addAdmin: function (email, name) {
+    return SheetService.addAdmin(email, name, 'Admin');
   },
 
-  removeAdmin: function (adminKey, email) {
-    if (!Auth.validateKey(adminKey)) return { success: false, message: 'Invalid admin key.' };
+  removeAdmin: function (email) {
     return SheetService.removeAdmin(email);
   }
 };

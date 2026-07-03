@@ -146,15 +146,15 @@ function cancelMyBooking(bookingId, email) {
 }
 
 function getDashboard(adminKey) {
-  return AdminService.getDashboard(adminKey);
+  return AdminService.getDashboard();
 }
 
 function approveBooking(bookingId, adminKey, notes) {
-  return AdminService.approveBooking(bookingId, adminKey, notes);
+  return AdminService.approveBooking(bookingId, notes);
 }
 
 function rejectBooking(bookingId, adminKey, reason) {
-  return AdminService.rejectBooking(bookingId, adminKey, reason);
+  return AdminService.rejectBooking(bookingId, reason);
 }
 
 function getBookingById(bookingId) {
@@ -162,15 +162,15 @@ function getBookingById(bookingId) {
 }
 
 function getAdminListFn(adminKey) {
-  return AdminService.getAdmins(adminKey);
+  return AdminService.getAdmins();
 }
 
-function addAdmin(adminKey, email) {
-  return AdminService.addAdmin(adminKey, email);
+function addAdmin(adminKey, email, name) {
+  return AdminService.addAdmin(email, name);
 }
 
 function removeAdminFn(adminKey, email) {
-  return AdminService.removeAdmin(adminKey, email);
+  return AdminService.removeAdmin(email);
 }
 
 function diagnose() {

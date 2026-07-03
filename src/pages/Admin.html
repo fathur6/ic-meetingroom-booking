@@ -5,36 +5,7 @@
   <?!= include('pages/_styles') ?>
 </head>
 <body>
-  <div class="container" id="loginContainer">
-    <div class="hero">
-      <div class="logos">
-        <img src="https://i.postimg.cc/bYkKDFc0/Uni-SZA-Logo-(Plain).png" alt="UniSZA" style="height:48px">
-      </div>
-      <h1 class="title">Admin Panel</h1>
-      <p class="subtitle">UniSZA Graduate School · Meeting Room Booking</p>
-    </div>
-
-    <? var u = getCurrentUser(); if (u) { ?>
-    <div style="text-align:right;margin-top:-14px;margin-bottom:20px;padding-right:8px">
-      <span class="user-banner">
-        <span class="u-dot"></span>
-        <span class="u-email"><?= u ?></span>
-      </span>
-    </div>
-    <? } ?>
-
-    <a class="back-link" href="javascript:void(0)" onclick="goBack()">← Back</a>
-
-    <div class="card admin-login" id="loginCard">
-      <h2><span>Admin</span> Login</h2>
-      <label for="adminKey">Admin Key</label>
-      <input type="password" id="adminKey" placeholder="Enter admin key..." onkeydown="if(event.key==='Enter')doLogin()">
-      <div id="loginStatus" class="text-muted mt-12" style="display:none"></div>
-      <button class="btn btn-primary mt-12" onclick="doLogin()" style="width:100%" id="loginBtn">Enter</button>
-    </div>
-  </div>
-
-  <div class="container" id="dashboardContainer" style="display:none">
+  <div class="container" id="dashboardContainer">
     <div class="hero">
       <div class="logos">
         <img src="https://i.postimg.cc/bYkKDFc0/Uni-SZA-Logo-(Plain).png" alt="UniSZA" style="height:48px">
@@ -97,51 +68,34 @@
   </div>
 
   <script>
-    var adminKey = '';
     var pending = [];
     var recent = [];
     var rejectTarget = null;
     var currentTab = 'pending';
 
-    function doLogin() {
-      var key = document.getElementById('adminKey').value.trim();
-      if (!key) { showToast('Enter admin key.', 'error'); return; }
-      var btn = document.getElementById('loginBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> Verifying...';
-      document.getElementById('loginStatus').style.display = 'none';
+    function loadDashboard() {
       google.script.run
         .withSuccessHandler(function(r) {
-          btn.disabled = false;
-          btn.textContent = 'Enter';
-          if (r.authorized) {
-            adminKey = key;
-            pending = r.pending || [];
-            recent = r.recent || [];
-            document.getElementById('loginContainer').style.display = 'none';
-            document.getElementById('dashboardContainer').style.display = 'block';
-            renderPending();
-            renderHistory();
-          } else { showToast(r.message || 'Invalid admin key.', 'error'); }
+          pending = r.pending || [];
+          recent = r.recent || [];
+          renderPending();
+          renderHistory();
         })
-        .withFailureHandler(function(err) {
-          btn.disabled = false;
-          btn.textContent = 'Enter';
-          showToast('Error: ' + err.message, 'error');
-        })
-        .getDashboard(key);
+        .withFailureHandler(function(err) {})
+        .getDashboard('');
     }
+
+    loadDashboard();
 
     function refreshDashboard() {
       google.script.run
         .withSuccessHandler(function(r) {
-          if (!r.authorized) { showToast('Session expired.', 'error'); return; }
           pending = r.pending || [];
           recent = r.recent || [];
           if (currentTab === 'pending') renderPending(); else renderHistory();
         })
         .withFailureHandler(function(err) { showToast('Refresh error: ' + err.message, 'error'); })
-        .getDashboard(adminKey);
+        .getDashboard('');
     }
 
     function switchTab(tab) {
@@ -214,7 +168,7 @@
           else { showToast(r.message, 'error'); }
         })
         .withFailureHandler(function(err) { showToast('Error: ' + err.message, 'error'); })
-        .approveBooking(bookingId, adminKey, '');
+        .approveBooking(bookingId, '', '');
     }
 
     function reject(bookingId) {
@@ -235,7 +189,7 @@
           else { showToast(r.message, 'error'); }
         })
         .withFailureHandler(function(err) { btn.disabled = false; btn.textContent = 'Reject'; showToast('Error: ' + err.message, 'error'); })
-        .rejectBooking(rejectTarget, adminKey, reason);
+        .rejectBooking(rejectTarget, '', reason);
     }
 
     function closeRejectModal() { document.getElementById('rejectModal').style.display = 'none'; rejectTarget = null; }
@@ -247,16 +201,16 @@
           if (!admins || admins.length === 0) {
             ct.innerHTML = '<div class="empty-state"><p>No admins configured.</p></div>'; return;
           }
-          var html = '<table><thead><tr><th>Email</th><th>Role</th><th></th></tr></thead><tbody>';
+          var html = '<table><thead><tr><th>Email</th><th>Name</th><th>Role</th><th></th></tr></thead><tbody>';
           for (var i = 0; i < admins.length; i++) {
-            html += '<tr><td>' + esc(admins[i].email) + '</td><td>' + esc(admins[i].role) + '</td>' +
+            html += '<tr><td>' + esc(admins[i].email) + '</td><td>' + esc(admins[i].name) + '</td><td>' + esc(admins[i].role) + '</td>' +
               '<td class="actions"><button class="btn btn-danger btn-sm" onclick="doRemoveAdmin(\'' + esc(admins[i].email) + '\')">Remove</button></td></tr>';
           }
           html += '</tbody></table>';
           ct.innerHTML = html;
         })
         .withFailureHandler(function(err) { showToast('Error loading admins: ' + err.message, 'error'); })
-        .getAdminListFn(adminKey);
+        .getAdminListFn('');
     }
 
     function doAddAdmin() {
@@ -272,7 +226,7 @@
           else { showToast(r.message, 'error'); }
         })
         .withFailureHandler(function(err) { btn.disabled = false; btn.textContent = 'Add Admin'; showToast('Error: ' + err.message, 'error'); })
-        .addAdmin(adminKey, email);
+        .addAdmin('', email, '');
     }
 
     function doRemoveAdmin(email) {
@@ -283,7 +237,7 @@
           else { showToast(r.message, 'error'); }
         })
         .withFailureHandler(function(err) { showToast('Error: ' + err.message, 'error'); })
-        .removeAdminFn(adminKey, email);
+        .removeAdminFn('', email);
     }
 
     function goBack() { window.top.location.href = '<?!= getDeploymentUrl() ?>'; }

@@ -8,7 +8,7 @@ var SheetService = {
     ]);
     this._ensureSheet(ss, CONFIG.SHEET_ROOMS, ['RoomID', 'RoomName', 'Active', 'Description']);
     this._ensureSheet(ss, CONFIG.SHEET_SETTINGS, ['Key', 'Value']);
-    this._ensureSheet(ss, CONFIG.SHEET_ADMINS, ['Email', 'Role']);
+    this._ensureSheet(ss, CONFIG.SHEET_ADMINS, ['Email', 'Name', 'Role']);
   },
 
   _ensureSheet: function (ss, name, headers) {
@@ -58,7 +58,6 @@ var SheetService = {
 
   seedSettings: function () {
     var defaults = {
-      'adminKey': 'change-me-on-first-run',
       'timezone': CONFIG.TIMEZONE,
       'startHour': CONFIG.START_HOUR,
       'endHour': CONFIG.END_HOUR,
@@ -91,7 +90,9 @@ var SheetService = {
     var sheet = this._getSheet(CONFIG.SHEET_ADMINS);
     var data = sheet.getDataRange().getValues();
     if (data.length > 1) return;
-    sheet.appendRow(['pps_tdakademik@unisza.edu.my', 'Owner']);
+    sheet.appendRow(['pps_tdakademik@unisza.edu.my', 'TD Akademik PPS', 'Owner']);
+    sheet.appendRow(['fathurrahman@unisza.edu.my', 'Fathurrahman Lananan', 'Admin']);
+    sheet.appendRow(['atiqqusyeri@unisza.edu.my', 'Atiq Qusyeri A Rashid', 'Admin']);
   },
 
   getAdminList: function () {
@@ -100,12 +101,12 @@ var SheetService = {
     var data = sheet.getDataRange().getValues();
     var admins = [];
     for (var i = 1; i < data.length; i++) {
-      if (data[i][0]) admins.push({ email: String(data[i][0]).trim(), role: String(data[i][1] || '').trim() || 'Admin' });
+      if (data[i][0]) admins.push({ email: String(data[i][0]).trim(), name: String(data[i][1] || '').trim(), role: String(data[i][2] || '').trim() || 'Admin' });
     }
     return admins;
   },
 
-  addAdmin: function (email, role) {
+  addAdmin: function (email, name, role) {
     var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) return { success: false, message: 'Invalid email address.' };
     var clean = email.trim().toLowerCase();
@@ -114,7 +115,7 @@ var SheetService = {
       if (existing[i].email.toLowerCase() === clean) return { success: false, message: 'Admin already exists.' };
     }
     var sheet = this._getSheet(CONFIG.SHEET_ADMINS);
-    sheet.appendRow([clean, role || 'Admin']);
+    sheet.appendRow([clean, name || '', role || 'Admin']);
     return { success: true, message: 'Admin added: ' + clean };
   },
 
