@@ -9,6 +9,8 @@ var SheetService = {
     this._ensureSheet(ss, CONFIG.SHEET_ROOMS, ['RoomID', 'RoomName', 'Active', 'Description']);
     this._ensureSheet(ss, CONFIG.SHEET_SETTINGS, ['Key', 'Value']);
     this._ensureSheet(ss, CONFIG.SHEET_ADMINS, ['Email', 'Role', 'Name']);
+    this._ensureSheet(ss, 'Reminders', ['BookingID', 'ReminderType', 'SentAt']);
+    this._ensureSheet(ss, 'Feedback', ['BookingID', 'Timestamp', 'Name', 'Office', 'Room', 'EventDate', 'StartTime', 'EndTime', 'Readiness', 'Cleanliness', 'Staff', 'Comments']);
   },
 
   _ensureSheet: function (ss, name, headers) {
@@ -312,5 +314,68 @@ var SheetService = {
       calendarEventId: String(data[14] || ''),
       notes: String(data[15] || '')
     };
+  },
+
+  hasReminderSent: function (bookingId, type) {
+    var sheet = this._getSheet('Reminders');
+    if (!sheet) return false;
+    var data = sheet.getDataRange().getValues();
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][0]).trim() === String(bookingId).trim() && String(data[i][1]).trim() === type) return true;
+    }
+    return false;
+  },
+
+  markReminderSent: function (bookingId, type) {
+    var sheet = this._getSheet('Reminders');
+    sheet.appendRow([bookingId, type, new Date()]);
+  },
+
+  getApprovedBookings: function () {
+    var sheet = this._getSheet(CONFIG.SHEET_BOOKINGS);
+    if (!sheet) return [];
+    var data = sheet.getDataRange().getValues();
+    var approved = [];
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][11]) === 'Approved') {
+        approved.push(this._rowToBooking(i + 1, data[i]));
+      }
+    }
+    return approved;
+  },
+
+  submitFeedback: function (feedback) {
+    var sheet = this._getSheet('Feedback');
+    sheet.appendRow([
+      feedback.bookingId, new Date(), feedback.name, feedback.office,
+      feedback.room, feedback.date, feedback.startTime, feedback.endTime,
+      feedback.readiness, feedback.cleanliness, feedback.staff, feedback.comments
+    ]);
+    return { success: true, message: 'Feedback submitted. Thank you.' };
+  },
+
+  getFeedbackByBookingId: function (bookingId) {
+    var sheet = this._getSheet('Feedback');
+    if (!sheet) return null;
+    var data = sheet.getDataRange().getValues();
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][0]).trim() === String(bookingId).trim()) {
+        return {
+          bookingId: String(data[i][0]),
+          timestamp: data[i][1] ? new Date(data[i][1]).toISOString() : '',
+          name: String(data[i][2] || ''),
+          office: String(data[i][3] || ''),
+          room: String(data[i][4] || ''),
+          date: this._cellToDateStr(data[i][5]),
+          startTime: this._cellToTimeStr(data[i][6]),
+          endTime: this._cellToTimeStr(data[i][7]),
+          readiness: parseInt(data[i][8], 10) || 0,
+          cleanliness: parseInt(data[i][9], 10) || 0,
+          staff: parseInt(data[i][10], 10) || 0,
+          comments: String(data[i][11] || '')
+        };
+      }
+    }
+    return null;
   }
 };

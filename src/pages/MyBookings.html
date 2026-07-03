@@ -72,12 +72,17 @@
     }
 
     function renderList() {
+      var deployUrl = '<?!= getDeploymentUrl() ?>';
       var html = '<table><thead><tr><th>ID</th><th>Room</th><th>Date</th><th>Time</th><th>Status</th><th>Action</th></tr></thead><tbody>';
       for (var i = 0; i < allBookings.length; i++) {
         var b = allBookings[i];
-        var cancelBtn = '';
+        var actionBtn = '—';
+        if (b.status === 'Approved') {
+          var fbUrl = deployUrl + '?page=feedback&bid=' + encodeURIComponent(b.bookingId);
+          actionBtn = '<a class="btn btn-ghost btn-sm" style="color:var(--green);border-color:rgba(57,255,20,.25)" href="' + fbUrl + '">Feedback</a>';
+        }
         if (b.status === 'Pending' || b.status === 'Approved') {
-          cancelBtn = '<button class="btn btn-danger btn-sm" onclick="openCancelModal(\'' + esc(b.bookingId) + '\',\'' + esc(b.status) + '\')">Cancel</button>';
+          actionBtn += ' <button class="btn btn-danger btn-sm" onclick="openCancelModal(\'' + esc(b.bookingId) + '\',\'' + esc(b.status) + '\')">Cancel</button>';
         }
         html += '<tr>' +
           '<td class="mono">' + esc(b.bookingId) + '</td>' +
@@ -85,7 +90,7 @@
           '<td>' + esc(b.date) + '</td>' +
           '<td class="mono">' + esc(b.startTime) + '–' + esc(b.endTime) + '</td>' +
           '<td><span class="pill ' + b.status.toLowerCase() + '">' + esc(b.status) + '</span></td>' +
-          '<td>' + (cancelBtn || '—') + '</td>' +
+          '<td>' + actionBtn + '</td>' +
         '</tr>';
       }
       html += '</tbody></table>';

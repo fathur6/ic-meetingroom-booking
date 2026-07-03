@@ -6,20 +6,24 @@ function doGet(e) {
     'index': 'Index',
     'booking': 'pages/Booking',
     'my': 'pages/MyBookings',
-    'admin': 'pages/Admin'
+    'admin': 'pages/Admin',
+    'feedback': 'pages/Feedback'
   };
   var titleMap = {
     'index': APP_TITLE,
     'booking': APP_TITLE,
     'my': 'My Bookings — ' + APP_TITLE,
-    'admin': 'Admin — ' + APP_TITLE
+    'admin': 'Admin — ' + APP_TITLE,
+    'feedback': 'Feedback — ' + APP_TITLE
   };
 
   var file = fileMap[page] || fileMap['index'];
   var title = titleMap[page] || APP_TITLE;
 
-  return HtmlService.createTemplateFromFile(file)
-    .evaluate()
+  var tmpl = HtmlService.createTemplateFromFile(file);
+  tmpl.param_bid = (e && e.parameter && e.parameter.bid) ? e.parameter.bid : '';
+
+  return tmpl.evaluate()
     .setTitle(title)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
@@ -101,9 +105,10 @@ function setup(sheetId, approvalEmail) {
     SheetService.seedAdmins();
     var calId = CalendarService.ensureCalendar();
     var shareResult = CalendarService.shareCalendar();
+    var triggerResult = setupReminderTrigger();
     return {
       success: true,
-      message: 'Setup complete. Calendar: ' + calId + '. ' + shareResult,
+      message: 'Setup complete. Calendar: ' + calId + '. ' + shareResult + ' ' + triggerResult,
       calendarId: calId,
       shareResult: shareResult
     };
@@ -171,6 +176,47 @@ function addAdmin(adminKey, email, name) {
 
 function removeAdminFn(adminKey, email) {
   return AdminService.removeAdmin(email);
+}
+
+function getBookingForFeedback(bookingId) {
+  var booking = SheetService.getBookingById(bookingId);
+  if (!booking) return null;
+  var existing = SheetService.getFeedbackByBookingId(bookingId);
+  if (existing) return { alreadySubmitted: true };
+  return {
+    bookingId: booking.bookingId,
+    name: booking.name,
+    office: booking.office,
+    room: booking.room,
+    date: booking.date,
+    startTime: booking.startTime,
+    endTime: booking.endTime,
+    alreadySubmitted: false
+  };
+}
+
+function submitFeedback(feedback) {
+  var existing = SheetService.getFeedbackByBookingId(feedback.bookingId);
+  if (existing) return { success: false, message: 'Feedback already submitted for this booking.' };
+  return SheetService.submitFeedback(feedback);
+}
+
+function processReminders() {
+  return ReminderService.checkAndSendReminders();
+}
+
+function setupReminderTrigger() {
+  var triggers = ScriptApp.getProjectTriggers();
+  for (var i = 0; i < triggers.length; i++) {
+    if (triggers[i].getHandlerFunction() === 'processReminders') {
+      ScriptApp.deleteTrigger(triggers[i]);
+    }
+  }
+  ScriptApp.newTrigger('processReminders')
+    .timeBased()
+    .everyMinutes(5)
+    .create();
+  return 'Reminder trigger created. Runs every 5 minutes.';
 }
 
 function diagnose() {

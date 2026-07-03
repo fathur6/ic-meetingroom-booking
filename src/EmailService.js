@@ -2,6 +2,14 @@ function _adminPanelUrl() {
   return getDeploymentUrl() + '?page=admin';
 }
 
+function _myBookingsUrl() {
+  return getDeploymentUrl() + '?page=my';
+}
+
+function _feedbackUrl(bookingId) {
+  return getDeploymentUrl() + '?page=feedback&bid=' + encodeURIComponent(bookingId);
+}
+
 var EmailService = {
   _getAdminEmails: function () {
     var admins = SheetService.getAdminList();
@@ -143,6 +151,144 @@ var EmailService = {
       '</div>'
     ].join('');
     if (booking.email) this._send(booking.email, subject, body);
+  },
+
+  sendReminder24h: function (booking) {
+    var room = booking.roomName || booking.room || 'a room';
+    var subject = 'Reminder: ' + booking.bookingId + ' tomorrow — UGS Meeting Room';
+    var body = [
+      '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<h2 style="color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.4)">Booking Reminder</h2>',
+      '<p>Your meeting room booking is scheduled for <strong>tomorrow</strong>.</p>',
+      '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
+      '<tr><td style="color:#8892b0">Booking ID</td><td style="color:#e6f1ff;font-family:monospace">' + booking.bookingId + '</td></tr>',
+      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + room + '</td></tr>',
+      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + booking.date + '</td></tr>',
+      '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + booking.startTime + ' – ' + booking.endTime + '</td></tr>',
+      '</table>',
+      '<p style="color:#8892b0">Please arrive on time. You may view your booking details below.</p>',
+      this._myBookingsBtn(),
+      '<hr style="border-color:rgba(0,240,255,.12)">',
+      '<p style="font-size:11px;color:#555">UniSZA Graduate School · Meeting Room Booking System</p>',
+      '</div>'
+    ].join('');
+    var adminEmails = this._getAdminEmails();
+    this._send(booking.email, subject, body);
+    if (adminEmails.length) this._send(adminEmails[0], subject, body, adminEmails.slice(1).join(','));
+  },
+
+  sendReminder1hUser: function (booking) {
+    var room = booking.roomName || booking.room || 'a room';
+    var subject = 'Reminder: ' + booking.bookingId + ' starts in 1 hour — UGS Meeting Room';
+    var body = [
+      '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<h2 style="color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.4)">Your Booking Starts in 1 Hour</h2>',
+      '<p>Your meeting room booking begins at <strong>' + booking.startTime + '</strong> today.</p>',
+      '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
+      '<tr><td style="color:#8892b0">Booking ID</td><td style="color:#e6f1ff;font-family:monospace">' + booking.bookingId + '</td></tr>',
+      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + room + '</td></tr>',
+      '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + booking.startTime + ' – ' + booking.endTime + '</td></tr>',
+      '</table>',
+      '<p style="color:#8892b0">Please proceed to the room. View your booking details below.</p>',
+      this._myBookingsBtn(),
+      '<hr style="border-color:rgba(0,240,255,.12)">',
+      '<p style="font-size:11px;color:#555">UniSZA Graduate School · Meeting Room Booking System</p>',
+      '</div>'
+    ].join('');
+    this._send(booking.email, subject, body);
+  },
+
+  sendReminder1hAdmin: function (booking) {
+    var room = booking.roomName || booking.room || 'a room';
+    var adminEmails = this._getAdminEmails();
+    if (!adminEmails.length) return;
+    var subject = 'Room Prep: ' + booking.bookingId + ' starts in 1 hour — ' + room;
+    var body = [
+      '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<h2 style="color:#ffb020;text-shadow:0 0 12px rgba(255,176,32,.4)">Room Preparation Needed</h2>',
+      '<p><strong>' + (booking.name || 'A user') + '</strong> has booked <strong>' + room + '</strong> starting at <strong>' + booking.startTime + '</strong> today (' + booking.date + ').</p>',
+      '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
+      '<tr><td style="color:#8892b0">Booking ID</td><td style="color:#e6f1ff;font-family:monospace">' + booking.bookingId + '</td></tr>',
+      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + room + '</td></tr>',
+      '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + booking.startTime + ' – ' + booking.endTime + '</td></tr>',
+      '<tr><td style="color:#8892b0">Purpose</td><td style="color:#e6f1ff">' + (booking.purpose || '—') + '</td></tr>',
+      '</table>',
+      '<p style="color:#e6f1ff;font-weight:600">Please ensure:</p>',
+      '<ul style="color:#8892b0;padding-left:18px;line-height:1.8">',
+      '<li>The air-conditioner and lights are turned on</li>',
+      '<li>All equipment and appliances are in working order</li>',
+      '<li>The room is clean and ready for use</li>',
+      '</ul>',
+      this._adminBtn(),
+      '<hr style="border-color:rgba(255,176,32,.12)">',
+      '<p style="font-size:11px;color:#555">UniSZA Graduate School · Meeting Room Booking System</p>',
+      '</div>'
+    ].join('');
+    this._send(adminEmails[0], subject, body, adminEmails.slice(1).join(','));
+  },
+
+  sendReminder15min: function (booking) {
+    var room = booking.roomName || booking.room || 'a room';
+    var adminEmails = this._getAdminEmails();
+    if (!adminEmails.length) return;
+    var subject = 'Room Closing: ' + booking.bookingId + ' ends in 15 min — ' + room;
+    var body = [
+      '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<h2 style="color:#ffb020;text-shadow:0 0 12px rgba(255,176,32,.4)">Room Closing Reminder</h2>',
+      '<p>The booking for <strong>' + room + '</strong> ends at <strong>' + booking.endTime + '</strong> today (' + booking.date + ').</p>',
+      '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
+      '<tr><td style="color:#8892b0">Booking ID</td><td style="color:#e6f1ff;font-family:monospace">' + booking.bookingId + '</td></tr>',
+      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + room + '</td></tr>',
+      '<tr><td style="color:#8892b0">Name</td><td style="color:#e6f1ff">' + (booking.name || '—') + '</td></tr>',
+      '</table>',
+      '<p style="color:#e6f1ff;font-weight:600">Please ensure after use:</p>',
+      '<ul style="color:#8892b0;padding-left:18px;line-height:1.8">',
+      '<li>Turn off the air-conditioner and lights</li>',
+      '<li>Switch off all equipment and appliances</li>',
+      '<li>The room is left clean and tidy</li>',
+      '</ul>',
+      this._adminBtn(),
+      '<hr style="border-color:rgba(255,176,32,.12)">',
+      '<p style="font-size:11px;color:#555">UniSZA Graduate School · Meeting Room Booking System</p>',
+      '</div>'
+    ].join('');
+    this._send(adminEmails[0], subject, body, adminEmails.slice(1).join(','));
+  },
+
+  sendEndThankYou: function (booking) {
+    var room = booking.roomName || booking.room || 'a room';
+    var subject = 'Thank you for using the meeting room — UGS Meeting Room';
+    var body = [
+      '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
+      '<h2 style="color:#39ff14;text-shadow:0 0 12px rgba(57,255,20,.4)">Thank You</h2>',
+      '<p>Your booking at <strong>' + room + '</strong> has ended. We hope the room served your needs well.</p>',
+      '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
+      '<tr><td style="color:#8892b0">Booking ID</td><td style="color:#e6f1ff;font-family:monospace">' + booking.bookingId + '</td></tr>',
+      '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + room + '</td></tr>',
+      '<tr><td style="color:#8892b0">Date</td><td style="color:#e6f1ff">' + booking.date + '</td></tr>',
+      '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + booking.startTime + ' – ' + booking.endTime + '</td></tr>',
+      '</table>',
+      '<p style="color:#8892b0">We value your feedback — please take a moment to rate your experience.</p>',
+      this._feedbackBtn(booking.bookingId),
+      '<hr style="border-color:rgba(57,255,20,.12)">',
+      '<p style="font-size:11px;color:#555">UniSZA Graduate School · Meeting Room Booking System</p>',
+      '</div>'
+    ].join('');
+    this._send(booking.email, subject, body);
+  },
+
+  _myBookingsBtn: function () {
+    var url = _myBookingsUrl();
+    return '<table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 16px"><tr><td style="border-radius:8px;background:#00f0ff;padding:10px 22px;text-align:center">' +
+      '<a href="' + url + '" style="color:#001216;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.3px;display:inline-block">My Bookings</a>' +
+      '</td></tr></table>';
+  },
+
+  _feedbackBtn: function (bookingId) {
+    var url = _feedbackUrl(bookingId);
+    return '<table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 16px"><tr><td style="border-radius:8px;background:#39ff14;padding:10px 22px;text-align:center">' +
+      '<a href="' + url + '" style="color:#001216;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.3px;display:inline-block">Give Feedback</a>' +
+      '</td></tr></table>';
   },
 
   _adminBtn: function () {
