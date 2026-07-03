@@ -16,13 +16,6 @@
         <button class="u-change" onclick="changeUser()">Change user</button>
       </span>
     </div>
-    <? } else { ?>
-    <div class="card" style="margin-bottom:20px;background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.18)">
-      <p style="color:var(--cyan);text-align:center;margin:0;font-weight:600">Sign in for faster booking — your email will be pre-filled.</p>
-      <div style="text-align:center;margin-top:10px">
-        <button class="btn btn-primary btn-sm" onclick="signIn()">Sign in with Google</button>
-      </div>
-    </div>
     <? } ?>
 
     <a class="back-link" href="javascript:void(0)" onclick="goBack()">← Back</a>
@@ -185,10 +178,6 @@
     }
 
     function changeUser() {
-      doSignIn();
-    }
-
-    function signIn() {
       doSignIn();
     }
 

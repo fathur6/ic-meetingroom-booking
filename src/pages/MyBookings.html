@@ -22,7 +22,6 @@
       <div style="text-align:center;margin-top:10px;display:flex;gap:8px;justify-content:center">
         <input type="email" id="manualEmail" placeholder="your@email.com" style="flex:1;max-width:280px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)">
         <button class="btn btn-primary btn-sm" onclick="manualLookup()">Look Up</button>
-        <button class="btn btn-ghost btn-sm" onclick="signIn()">Sign in with Google</button>
       </div>
     </div>
     <? } ?>
@@ -160,10 +159,6 @@
     }
 
     function changeUser() {
-      doSignIn();
-    }
-
-    function signIn() {
       doSignIn();
     }
 
