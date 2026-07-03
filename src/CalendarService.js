@@ -97,14 +97,20 @@ var CalendarService = {
     var colorId = this.getRoomColor(booking.room);
 
     try {
-      var event = Calendar.Events.insert({
+      var eventOpts = {
         summary: title,
         description: desc,
         start: { dateTime: this._formatISO(startDate), timeZone: CONFIG.TIMEZONE },
         end: { dateTime: this._formatISO(endDate), timeZone: CONFIG.TIMEZONE },
         colorId: colorId,
         transparency: 'transparent'
-      }, calId);
+      };
+
+      if (booking.email) {
+        eventOpts.attendees = [{ email: booking.email }];
+      }
+
+      var event = Calendar.Events.insert(eventOpts, calId, { sendUpdates: 'all' });
       return event.id;
     } catch (e) {
       Logger.log('Calendar.Events.insert error: ' + e.toString());

@@ -78,11 +78,19 @@ var BookingService = {
       return { success: false, message: 'Bookings must be between ' + String(CONFIG.START_HOUR).padStart(2, '0') + ':00 and ' + String(CONFIG.END_HOUR).padStart(2, '0') + ':00.' };
     }
 
-    var lock = LockService.getDocumentLock();
+    var lock = null;
     var acquired = false;
     try {
-      lock.waitLock(8000);
-      acquired = true;
+      lock = LockService.getDocumentLock();
+      if (lock) {
+        lock.waitLock(8000);
+        acquired = true;
+      }
+    } catch (ex) {
+      Logger.log('Lock acquire failed: ' + ex);
+    }
+
+    try {
 
       var existing = SheetService.getBookingsByDateAndRoom(form.date, form.room);
       for (var i = 0; i < existing.length; i++) {
@@ -117,7 +125,9 @@ var BookingService = {
 
       return { success: true, bookingId: bookingId, message: 'Booking submitted. You will be emailed within 1 working day.' };
     } finally {
-      if (acquired) lock.releaseLock();
+      if (lock && acquired) {
+        try { lock.releaseLock(); } catch (ex) {}
+      }
     }
   },
 

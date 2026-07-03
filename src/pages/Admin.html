@@ -54,6 +54,20 @@
       <div id="adminListContainer"></div>
     </div>
 
+    <div id="addAdminModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center">
+      <div class="card" style="max-width:400px;width:90%">
+        <h2>Add <span>Admin</span></h2>
+        <p class="text-muted" id="addAdminModalEmail" style="margin-bottom:6px"></p>
+        <label for="addAdminName">Full Name</label>
+        <input type="text" id="addAdminName" placeholder="e.g. John Doe" style="width:100%;margin-bottom:4px">
+        <p style="color:var(--muted);font-size:11px;margin-bottom:16px">Enter the admin's full name.</p>
+        <div class="row row-end mt-20">
+          <button class="btn btn-ghost btn-sm" onclick="closeAddAdminModal()">Cancel</button>
+          <button class="btn btn-primary btn-sm" id="confirmAddAdminBtn" onclick="confirmAddAdmin()">Confirm</button>
+        </div>
+      </div>
+    </div>
+
     <div id="rejectModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center">
       <div class="card" style="max-width:400px;width:90%">
         <h2>Reject <span>Booking</span></h2>
@@ -216,6 +230,21 @@
     function doAddAdmin() {
       var email = document.getElementById('newAdminEmail').value.trim();
       if (!email) { showToast('Enter an email address.', 'error'); return; }
+      document.getElementById('addAdminModalEmail').innerHTML = 'Email: <strong>' + esc(email) + '</strong>';
+      document.getElementById('addAdminName').value = '';
+      document.getElementById('addAdminModal').style.display = 'flex';
+      document.getElementById('addAdminName').focus();
+    }
+
+    function closeAddAdminModal() {
+      document.getElementById('addAdminModal').style.display = 'none';
+    }
+
+    function confirmAddAdmin() {
+      var email = document.getElementById('newAdminEmail').value.trim();
+      var name = document.getElementById('addAdminName').value.trim();
+      if (!name) { showToast('Enter the admin\'s name.', 'error'); return; }
+      closeAddAdminModal();
       var btn = document.getElementById('addAdminBtn');
       btn.disabled = true; btn.textContent = 'Adding...';
       google.script.run
@@ -226,7 +255,7 @@
           else { showToast(r.message, 'error'); }
         })
         .withFailureHandler(function(err) { btn.disabled = false; btn.textContent = 'Add Admin'; showToast('Error: ' + err.message, 'error'); })
-        .addAdmin('', email, '');
+        .addAdmin('', email, name);
     }
 
     function doRemoveAdmin(email) {
