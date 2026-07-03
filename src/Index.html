@@ -267,43 +267,26 @@
 
       for (var ti = 0; ti < timeSlots.length; ti++) {
         var ts = timeSlots[ti];
-        html += '<div class="cal-cell time-label">' + ts + '</div>';
+        var rowNum = ti + 2;
+        html += '<div class="cal-cell time-label" style="grid-column:1;grid-row:' + rowNum + '">' + ts + '</div>';
 
         for (var ri = 0; ri < ROOMS.length; ri++) {
           var booking = null;
           for (var bi = 0; bi < dayBookings.length; bi++) {
             var b = dayBookings[bi];
-            if (b.room === ROOMS[ri] && !b._placed) {
-              if (b.startTime <= ts && b.endTime > ts) {
-                booking = b;
-                break;
-              }
+            if (b.room === ROOMS[ri] && b.startTime <= ts && b.endTime > ts) {
+              booking = b;
+              break;
             }
           }
+          var colNum = ri + 2;
           if (booking) {
-            var startIdx = timeSlots.indexOf(booking.startTime);
-            var endIdx = timeSlots.indexOf(booking.endTime);
-            if (endIdx < 0) {
-              for (var ei = 0; ei < timeSlots.length; ei++) {
-                if (timeSlots[ei] >= booking.endTime) { endIdx = ei; break; }
-              }
-            }
-            var span = endIdx - startIdx;
-            if (span < 1) span = 1;
-            if (ti === startIdx) {
-              html += '<div class="cal-cell booking" style="grid-row:span ' + span + ';align-self:stretch">' +
-                esc(booking.name) + '<span style="opacity:.6;font-weight:400;margin-left:4px;font-size:10px">' + booking.startTime + '</span></div>';
-              booking._placed = true;
-            }
+            html += '<div class="cal-cell booking" style="grid-column:' + colNum + ';grid-row:' + rowNum + '">' +
+              esc(booking.name) + '<span style="opacity:.6;font-weight:400;margin-left:4px;font-size:10px">' + booking.startTime + '</span></div>';
           } else {
-            html += '<div class="cal-cell empty"></div>';
+            html += '<div class="cal-cell empty" style="grid-column:' + colNum + ';grid-row:' + rowNum + '"></div>';
           }
         }
-      }
-
-      // Clear _placed flags
-      for (var bi2 = 0; bi2 < dayBookings.length; bi2++) {
-        delete dayBookings[bi2]._placed;
       }
 
       grid.style.gridTemplateColumns = cols;
