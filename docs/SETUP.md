@@ -1,8 +1,8 @@
-# Setup Guide — IC Meeting Room Booking
+# Setup Guide — UGS Meeting Room Booking
 
 ## Prerequisites
 
-- Google Account: `YOUR_SCRIPT_OWNER_EMAIL` (script owner)
+- Google Account: `pps_tdakademik@unisza.edu.my` (script owner)
 - Node.js (for clasp CLI)
 - Google Sheets backend: https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit
 - Existing Apps Script project: `YOUR_SCRIPT_ID`
@@ -22,7 +22,7 @@ npm install -g @google/clasp
 clasp login
 ```
 
-Sign in as the owner Google account.
+Sign in as `pps_tdakademik@unisza.edu.my`.
 
 ## 3. Push code to Apps Script
 
@@ -53,38 +53,38 @@ In the Apps Script editor:
 3. Grant permissions when prompted (Sheets, Calendar, Gmail).
 4. You should see a success log in View → Logs:
    ```
-    Setup complete. Calendar ID: xxxxx@group.calendar.google.com. Calendar shared with APPROVAL_EMAIL
+    Setup complete. Calendar ID: xxxxx@group.calendar.google.com. Calendar shared with pps@unisza.edu.my
    ```
 
 This will:
 - Create/verify the 4 sheet tabs: `Bookings`, `Rooms`, `Settings`, `Admins`
-- Seed `Rooms` with 3 starter rooms
+- Seed `Rooms` with 4 UGS rooms
 - Seed `Settings` with defaults (admin key: `change-me-on-first-run`)
-- Seed `Admins` with placeholder emails (update them in the sheet after setup)
-- Find or create the Google Calendar **"IC Booking Schedule"**
-- Share the calendar with `APPROVAL_EMAIL` (writer access)
+- Seed `Admins` with `pps_tdakademik@unisza.edu.my` (Owner)
+- Find or create the Google Calendar **"UGS Booking Schedule"**
+- Share the calendar with `pps@unisza.edu.my` (writer access)
 
 ## 6. Set Gmail "Send mail as" alias
 
 This is **critical** — without it, emails will fail or come from the wrong address.
 
-On the script owner's Gmail account:
+On the `pps_tdakademik@unisza.edu.my` Gmail account:
 
 1. Open [Gmail](https://mail.google.com).
 2. Click the gear icon (top-right) → **See all settings**.
 3. Go to the **Accounts and Import** tab.
 4. In the **Send mail as** section, click **Add another email address**.
 5. A popup will appear. Fill in:
-   - **Name**: `IC Meeting Room`
-   - **Email address**: `APPROVAL_EMAIL`
+   - **Name**: `UGS Meeting Room`
+   - **Email address**: `pps@unisza.edu.my`
    - Leave "Treat as an alias" checked.
  6. Click **Next Step**.
- 7. Gmail will send a verification code to `APPROVAL_EMAIL`.
- 8. Go to the approval email inbox, find the verification email, copy the code.
+ 7. Gmail will send a verification code to `pps@unisza.edu.my`.
+ 8. Go to the PPS email inbox, find the verification email, copy the code.
  9. Enter the code in the popup, click **Verify**.
- 10. Done — the script owner can now send emails **as** `APPROVAL_EMAIL`.
+ 10. Done — the script owner can now send emails **as** `pps@unisza.edu.my`.
 
-This allows `EmailService` to use `GmailApp.sendEmail({from: 'APPROVAL_EMAIL'})` — all booking notifications will appear to come from APPROVAL_EMAIL.
+This allows `EmailService` to use `GmailApp.sendEmail({from: 'pps@unisza.edu.my'})` — all booking notifications will appear to come from PPS.
 
 ## 7. Update web app deployment
 
@@ -97,7 +97,7 @@ This updates the **existing** deployment (same URL, no new deployment is created
 If you want a version description:
 
 ```bash
-clasp deploy -i YOUR_DEPLOYMENT_ID -d "v1.0 theme"
+clasp deploy -i YOUR_DEPLOYMENT_ID -d "v1.0 UGS"
 ```
 
 ## 8. Access the app
@@ -135,8 +135,8 @@ Add `?page=booking` / `?page=my` / `?page=admin` as needed.
 If the automatic sharing in `setup()` doesn't work (e.g. permissions issue with Calendar API), share manually:
 
 1. Open Google Calendar as the script owner.
-2. Find **IC Booking Schedule**.
-3. Settings → Share with specific people → Add `APPROVAL_EMAIL` with **Make changes to events** permission.
+2. Find **UGS Booking Schedule**.
+3. Settings → Share with specific people → Add `pps@unisza.edu.my` with **Make changes to events** permission.
 
 ---
 
@@ -146,8 +146,10 @@ Edit the `Rooms` tab in the sheet directly:
 
 | RoomID | RoomName | Active | Description |
 |---|---|---|---|
-| MR-01 | Meeting Room 1 | Yes | Main meeting room |
-| MR-02 | Meeting Room 2 | Yes | Secondary meeting room |
+| UGS-MR | UGS Meeting Room | Yes | Bilik Mesyuarat PPS |
+| UGS-DR | UGS Discussion Room | Yes | Bilik Perbincangan PPS |
+| UGS-VR1 | Viva Room 1 | Yes | Bilik Viva 1 |
+| UGS-VR2 | Viva Room 2 | Yes | Bilik Viva 2 |
 
 Set `Active` to `No` to hide a room from the booking form. Add new rows for additional rooms.
 

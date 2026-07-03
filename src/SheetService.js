@@ -8,7 +8,9 @@ var SheetService = {
     ]);
     this._ensureSheet(ss, CONFIG.SHEET_ROOMS, ['RoomID', 'RoomName', 'Active', 'Description']);
     this._ensureSheet(ss, CONFIG.SHEET_SETTINGS, ['Key', 'Value']);
-    this._ensureSheet(ss, CONFIG.SHEET_ADMINS, ['Email', 'Role']);
+    this._ensureSheet(ss, CONFIG.SHEET_ADMINS, ['Email', 'Role', 'Name']);
+    this._ensureSheet(ss, 'Reminders', ['BookingID', 'ReminderType', 'SentAt']);
+    this._ensureSheet(ss, 'Feedback', ['BookingID', 'Timestamp', 'Name', 'Office', 'Room', 'EventDate', 'StartTime', 'EndTime', 'Readiness', 'Cleanliness', 'Staff', 'Comments']);
   },
 
   _ensureSheet: function (ss, name, headers) {
@@ -58,7 +60,6 @@ var SheetService = {
 
   seedSettings: function () {
     var defaults = {
-      'adminKey': 'change-me-on-first-run',
       'timezone': CONFIG.TIMEZONE,
       'startHour': CONFIG.START_HOUR,
       'endHour': CONFIG.END_HOUR,
@@ -81,17 +82,18 @@ var SheetService = {
     var sheet = this._getSheet(CONFIG.SHEET_ROOMS);
     var data = sheet.getDataRange().getValues();
     if (data.length > 1) return;
-    sheet.appendRow(['MR-01', 'Meeting Room 1', 'Yes', 'Main meeting room']);
-    sheet.appendRow(['MR-02', 'Meeting Room 2', 'Yes', 'Secondary meeting room']);
-    sheet.appendRow(['MR-03', 'Seminar Room',  'Yes', 'Seminar / workshop space']);
+    sheet.appendRow(['UGS-MR', 'UGS Meeting Room', 'Yes', 'Bilik Mesyuarat PPS']);
+    sheet.appendRow(['UGS-DR', 'UGS Discussion Room', 'Yes', 'Bilik Perbincangan PPS']);
+    sheet.appendRow(['UGS-VR1', 'Viva Room 1', 'Yes', 'Bilik Viva 1']);
+    sheet.appendRow(['UGS-VR2', 'Viva Room 2', 'Yes', 'Bilik Viva 2']);
   },
 
   seedAdmins: function () {
     var sheet = this._getSheet(CONFIG.SHEET_ADMINS);
     var data = sheet.getDataRange().getValues();
     if (data.length > 1) return;
-    sheet.appendRow(['admin1@example.com', 'Owner']);
-    sheet.appendRow(['admin2@example.com', 'Admin']);
+    sheet.appendRow(['admin1@example.com', 'Owner', 'Admin Name']);
+    sheet.appendRow(['admin2@example.com', 'Admin', '']);
   },
 
   getAdminList: function () {
@@ -100,12 +102,12 @@ var SheetService = {
     var data = sheet.getDataRange().getValues();
     var admins = [];
     for (var i = 1; i < data.length; i++) {
-      if (data[i][0]) admins.push({ email: String(data[i][0]).trim(), role: String(data[i][1] || '').trim() || 'Admin' });
+      if (data[i][0]) admins.push({ email: String(data[i][0]).trim(), role: String(data[i][1] || '').trim() || 'Admin', name: String(data[i][2] || '').trim() });
     }
     return admins;
   },
 
-  addAdmin: function (email, role) {
+  addAdmin: function (email, name, role) {
     var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) return { success: false, message: 'Invalid email address.' };
     var clean = email.trim().toLowerCase();
@@ -114,7 +116,7 @@ var SheetService = {
       if (existing[i].email.toLowerCase() === clean) return { success: false, message: 'Admin already exists.' };
     }
     var sheet = this._getSheet(CONFIG.SHEET_ADMINS);
-    sheet.appendRow([clean, role || 'Admin']);
+    sheet.appendRow([clean, role || 'Admin', name || '']);
     return { success: true, message: 'Admin added: ' + clean };
   },
 
@@ -215,6 +217,7 @@ var SheetService = {
     sheet.getRange(row, 14).setValue(new Date());
     if (calendarEventId != null) sheet.getRange(row, 15).setValue(calendarEventId);
     if (notes != null) sheet.getRange(row, 16).setValue(notes);
+    SpreadsheetApp.flush();
     return true;
   },
 
@@ -275,7 +278,7 @@ var SheetService = {
     var sheet = this._getSheet(CONFIG.SHEET_BOOKINGS);
     var lastRow = sheet.getLastRow();
     var seq = String(lastRow).padStart(4, '0');
-    return 'IC-' + dateStr + '-' + seq;
+    return 'UGS-' + dateStr + '-' + seq;
   },
 
   cancelBooking: function (bookingId, email) {
@@ -311,5 +314,68 @@ var SheetService = {
       calendarEventId: String(data[14] || ''),
       notes: String(data[15] || '')
     };
+  },
+
+  hasReminderSent: function (bookingId, type) {
+    var sheet = this._getSheet('Reminders');
+    if (!sheet) return false;
+    var data = sheet.getDataRange().getValues();
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][0]).trim() === String(bookingId).trim() && String(data[i][1]).trim() === type) return true;
+    }
+    return false;
+  },
+
+  markReminderSent: function (bookingId, type) {
+    var sheet = this._getSheet('Reminders');
+    sheet.appendRow([bookingId, type, new Date()]);
+  },
+
+  getApprovedBookings: function () {
+    var sheet = this._getSheet(CONFIG.SHEET_BOOKINGS);
+    if (!sheet) return [];
+    var data = sheet.getDataRange().getValues();
+    var approved = [];
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][11]) === 'Approved') {
+        approved.push(this._rowToBooking(i + 1, data[i]));
+      }
+    }
+    return approved;
+  },
+
+  submitFeedback: function (feedback) {
+    var sheet = this._getSheet('Feedback');
+    sheet.appendRow([
+      feedback.bookingId, new Date(), feedback.name, feedback.office,
+      feedback.room, feedback.date, feedback.startTime, feedback.endTime,
+      feedback.readiness, feedback.cleanliness, feedback.staff, feedback.comments
+    ]);
+    return { success: true, message: 'Feedback submitted. Thank you.' };
+  },
+
+  getFeedbackByBookingId: function (bookingId) {
+    var sheet = this._getSheet('Feedback');
+    if (!sheet) return null;
+    var data = sheet.getDataRange().getValues();
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][0]).trim() === String(bookingId).trim()) {
+        return {
+          bookingId: String(data[i][0]),
+          timestamp: data[i][1] ? new Date(data[i][1]).toISOString() : '',
+          name: String(data[i][2] || ''),
+          office: String(data[i][3] || ''),
+          room: String(data[i][4] || ''),
+          date: this._cellToDateStr(data[i][5]),
+          startTime: this._cellToTimeStr(data[i][6]),
+          endTime: this._cellToTimeStr(data[i][7]),
+          readiness: parseInt(data[i][8], 10) || 0,
+          cleanliness: parseInt(data[i][9], 10) || 0,
+          staff: parseInt(data[i][10], 10) || 0,
+          comments: String(data[i][11] || '')
+        };
+      }
+    }
+    return null;
   }
 };

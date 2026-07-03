@@ -1,4 +1,4 @@
-var APP_TITLE = 'IC Meeting Room Booking';
+var APP_TITLE = 'UGS Meeting Room Booking';
 
 function doGet(e) {
   var page = e && e.parameter && e.parameter.page ? e.parameter.page : 'index';
@@ -6,20 +6,24 @@ function doGet(e) {
     'index': 'Index',
     'booking': 'pages/Booking',
     'my': 'pages/MyBookings',
-    'admin': 'pages/Admin'
+    'admin': 'pages/Admin',
+    'feedback': 'pages/Feedback'
   };
   var titleMap = {
     'index': APP_TITLE,
     'booking': APP_TITLE,
     'my': 'My Bookings — ' + APP_TITLE,
-    'admin': 'Admin — ' + APP_TITLE
+    'admin': 'Admin — ' + APP_TITLE,
+    'feedback': 'Feedback — ' + APP_TITLE
   };
 
   var file = fileMap[page] || fileMap['index'];
   var title = titleMap[page] || APP_TITLE;
 
-  return HtmlService.createTemplateFromFile(file)
-    .evaluate()
+  var tmpl = HtmlService.createTemplateFromFile(file);
+  tmpl.param_bid = (e && e.parameter && e.parameter.bid) ? e.parameter.bid : '';
+
+  return tmpl.evaluate()
     .setTitle(title)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
@@ -32,7 +36,11 @@ function include(filename) {
 function getDeploymentUrl() {
   var id = CONFIG.DEPLOYMENT_ID || PropertiesService.getScriptProperties().getProperty('DEPLOYMENT_ID') || '';
   if (!id) return '';
-  return 'https://script.google.com/a/macros/unisza.edu.my/s/' + id + '/exec';
+  return 'https://script.google.com/macros/s/' + id + '/exec';
+}
+
+function getGoogleClientId() {
+  return CONFIG.GOOGLE_CLIENT_ID || '';
 }
 
 function getCurrentUser() {
@@ -54,6 +62,21 @@ function checkAuth() {
   } catch (e) {}
 
   return { authorized: true, user: email, needsAuth: false, authUrl: '' };
+}
+
+function forceOAuth() {
+  var token = ScriptApp.getOAuthToken();
+  var user = Session.getActiveUser().getEmail();
+  var count = GmailApp.getInboxUnreadCount();
+  var calId = CalendarService.getCalendarId();
+  var calName = CalendarApp.getCalendarById(calId).getName();
+  return {
+    authorized: true,
+    tokenPrefix: token.substring(0, 10) + '...',
+    user: user,
+    inboxUnread: count,
+    calendar: calName,
+  };
 }
 
 function getAuthUrl() {
@@ -86,9 +109,10 @@ function setup(sheetId, approvalEmail) {
     SheetService.seedAdmins();
     var calId = CalendarService.ensureCalendar();
     var shareResult = CalendarService.shareCalendar();
+    var triggerResult = setupReminderTrigger();
     return {
       success: true,
-      message: 'Setup complete. Calendar: ' + calId + '. ' + shareResult,
+      message: 'Setup complete. Calendar: ' + calId + '. ' + shareResult + ' ' + triggerResult,
       calendarId: calId,
       shareResult: shareResult
     };
@@ -122,8 +146,8 @@ function submitBooking(form) {
   return BookingService.submitBooking(form);
 }
 
-function getMyBookings() {
-  return BookingService.getMyBookings();
+function getMyBookings(email) {
+  return BookingService.getMyBookings(email);
 }
 
 function cancelMyBooking(bookingId, email) {
@@ -131,15 +155,15 @@ function cancelMyBooking(bookingId, email) {
 }
 
 function getDashboard(adminKey) {
-  return AdminService.getDashboard(adminKey);
+  return AdminService.getDashboard();
 }
 
 function approveBooking(bookingId, adminKey, notes) {
-  return AdminService.approveBooking(bookingId, adminKey, notes);
+  return AdminService.approveBooking(bookingId, notes);
 }
 
 function rejectBooking(bookingId, adminKey, reason) {
-  return AdminService.rejectBooking(bookingId, adminKey, reason);
+  return AdminService.rejectBooking(bookingId, reason);
 }
 
 function getBookingById(bookingId) {
@@ -147,15 +171,56 @@ function getBookingById(bookingId) {
 }
 
 function getAdminListFn(adminKey) {
-  return AdminService.getAdmins(adminKey);
+  return AdminService.getAdmins();
 }
 
-function addAdmin(adminKey, email) {
-  return AdminService.addAdmin(adminKey, email);
+function addAdmin(adminKey, email, name) {
+  return AdminService.addAdmin(email, name);
 }
 
 function removeAdminFn(adminKey, email) {
-  return AdminService.removeAdmin(adminKey, email);
+  return AdminService.removeAdmin(email);
+}
+
+function getBookingForFeedback(bookingId) {
+  var booking = SheetService.getBookingById(bookingId);
+  if (!booking) return null;
+  var existing = SheetService.getFeedbackByBookingId(bookingId);
+  if (existing) return { alreadySubmitted: true };
+  return {
+    bookingId: booking.bookingId,
+    name: booking.name,
+    office: booking.office,
+    room: booking.room,
+    date: booking.date,
+    startTime: booking.startTime,
+    endTime: booking.endTime,
+    alreadySubmitted: false
+  };
+}
+
+function submitFeedback(feedback) {
+  var existing = SheetService.getFeedbackByBookingId(feedback.bookingId);
+  if (existing) return { success: false, message: 'Feedback already submitted for this booking.' };
+  return SheetService.submitFeedback(feedback);
+}
+
+function processReminders() {
+  return ReminderService.checkAndSendReminders();
+}
+
+function setupReminderTrigger() {
+  var triggers = ScriptApp.getProjectTriggers();
+  for (var i = 0; i < triggers.length; i++) {
+    if (triggers[i].getHandlerFunction() === 'processReminders') {
+      ScriptApp.deleteTrigger(triggers[i]);
+    }
+  }
+  ScriptApp.newTrigger('processReminders')
+    .timeBased()
+    .everyMinutes(5)
+    .create();
+  return 'Reminder trigger created. Runs every 5 minutes.';
 }
 
 function diagnose() {
@@ -240,7 +305,7 @@ function backfillCalendarEvents() {
       var eventId = CalendarService.createEvent(booking);
       if (eventId) {
         if (b.status === 'Approved') {
-          CalendarService.updateEventColor(eventId, 'Approved');
+          CalendarService.updateEventColor(eventId, 'Approved', b.room);
         }
         var sheet = SpreadsheetApp.openById(CONFIG.SHEET_ID).getSheetByName(CONFIG.SHEET_BOOKINGS);
         sheet.getRange(b.row, 15).setValue(eventId);

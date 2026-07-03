@@ -8,24 +8,10 @@
   <div class="container">
     <?!= include('pages/_header') ?>
 
-    <? var u = getCurrentUser(); if (u) { ?>
-    <div style="text-align:right;margin-top:-14px;margin-bottom:20px;padding-right:8px">
-      <span class="user-banner">
-        <span class="u-dot"></span>
-        <span class="u-email"><?= u ?></span>
-        <button class="u-change" onclick="changeUser()">Change user</button>
-      </span>
-    </div>
-    <? } else { ?>
-    <div class="card" style="margin-bottom:20px;background:rgba(255,176,32,.06);border:1px solid rgba(255,176,32,.25)">
-      <p style="color:var(--amber);text-align:center;margin:0;font-weight:600">Sign in with your Google account to book.</p>
-    </div>
-    <? } ?>
-
     <a class="back-link" href="javascript:void(0)" onclick="goBack()">← Back</a>
 
     <div class="card" id="bookingForm">
-      <h2>Book a <span>Meeting Room</span></h2>
+      <h2>Book a <span>Meeting Room</span> · UGS</h2>
       <p class="text-muted mb-12">Fill in the details below. You will be notified within 1 working day.</p>
       <form id="form" onsubmit="return handleSubmit(event)">
         <div class="form-grid">
@@ -42,8 +28,8 @@
             <input type="tel" id="tel" placeholder="01X-XXXXXXX" required>
           </div>
           <div>
-            <label for="email">Email * <span style="color:var(--cyan);font-size:10px">(from your Google account)</span></label>
-            <input type="email" id="email" readonly value="<?!= getCurrentUser() ?>">
+             <label for="email">Email *</label>
+            <input type="email" id="email" placeholder="your@email.com" value="<?!= getCurrentUser() ?>">
           </div>
           <div>
             <label for="room">Room *</label>
@@ -96,7 +82,7 @@
         Bookings can be checked or modified <strong style="color:var(--text)">only</strong> with this same Google account.
       </p>
       <button class="btn btn-primary" onclick="closeIntroModal()">I understand</button>
-      <button class="btn btn-ghost" onclick="changeUser()">Change user</button>
+      <button class="btn btn-ghost" onclick="changeGoogleUser()">Change user</button>
     </div>
   </div>
   <? } ?>
@@ -121,8 +107,8 @@
       setDateConstraints();
       var introEl = document.getElementById('firstVisitModal');
       if (introEl) {
-        if (!sessionStorage.getItem('icBookingIntroShown')) {
-          sessionStorage.setItem('icBookingIntroShown', '1');
+        if (!sessionStorage.getItem('ugsBookingIntroShown')) {
+          sessionStorage.setItem('ugsBookingIntroShown', '1');
         } else { introEl.style.display = 'none'; }
       }
       doAuthCheck();
@@ -181,8 +167,11 @@
       window.top.location.href = '<?!= getDeploymentUrl() ?>';
     }
 
-    function changeUser() {
-      window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>?page=booking');
+    function onUserIdentified(email) {
+      var emailField = document.getElementById('email');
+      if (emailField && email && !emailField.value) {
+        emailField.value = email;
+      }
     }
 
     function setDateConstraints() {

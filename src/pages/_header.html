@@ -1,8 +1,87 @@
 <div class="hero">
   <div class="logos">
-    <img src="https://i.postimg.cc/bYkKDFc0/Uni-SZA-Logo-(Plain).png" alt="UniSZA">
-    <img src="https://i.postimg.cc/4xtbXPdh/IC-Logo-Transparent.png" alt="IC">
+    <img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UniSZA Graduate School" style="height:48px">
   </div>
-  <h1 class="title">International Centre · Meeting Room Booking</h1>
+  <h1 class="title">UniSZA Graduate School · Meeting Room Booking</h1>
   <p class="subtitle">Sunday – Thursday · 08:00 – 17:00 · Book up to 60 days ahead</p>
 </div>
+
+<? var u = getCurrentUser(); ?>
+<div id="userBannerWrap" style="text-align:right;margin-top:-14px;margin-bottom:20px;padding-right:8px;<? if (!u) { ?>display:none<? } ?>">
+  <span class="user-banner">
+    <span class="u-dot"></span>
+    <span class="u-email" id="userEmailSpan"><?= u ?></span>
+    <button class="u-change" onclick="changeGoogleUser()">Change user</button>
+  </span>
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+  var GCID = <?!= JSON.stringify(getGoogleClientId()) ?>;
+
+  function getStoredEmail() {
+    return sessionStorage.getItem('gsUserEmail') || '';
+  }
+
+  function showUserBanner(email) {
+    var wrap = document.getElementById('userBannerWrap');
+    var span = document.getElementById('userEmailSpan');
+    if (!wrap || !span) return;
+    span.textContent = email;
+    wrap.style.display = 'block';
+  }
+
+  function updatePageForUser(email) {
+    showUserBanner(email);
+    if (typeof onUserIdentified === 'function') onUserIdentified(email);
+  }
+
+  function initGoogleIdentity() {
+    if (!GCID) return;
+
+    var stored = getStoredEmail();
+    if (stored) {
+      updatePageForUser(stored);
+      return;
+    }
+
+    try {
+      google.accounts.id.initialize({
+        client_id: GCID,
+        callback: function (resp) {
+          try {
+            var payload = JSON.parse(atob(resp.credential.split('.')[1]));
+            var email = payload.email;
+            sessionStorage.setItem('gsUserEmail', email);
+            updatePageForUser(email);
+          } catch(e) {}
+        },
+        auto_select: true,
+        cancel_on_tap_outside: false
+      });
+      google.accounts.id.prompt(function (notification) {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          var wrap = document.getElementById('userBannerWrap');
+          if (wrap && !getStoredEmail()) wrap.style.display = 'none';
+        }
+      });
+    } catch(e) {}
+  }
+
+  function changeGoogleUser() {
+    var current = getStoredEmail();
+    sessionStorage.removeItem('gsUserEmail');
+    document.getElementById('userBannerWrap').style.display = 'none';
+    if (GCID && typeof google !== 'undefined' && google.accounts) {
+      google.accounts.id.disableAutoSelect();
+      if (current) {
+        try { google.accounts.id.revoke(current, function() {}); } catch(e) {}
+      }
+      setTimeout(function() {
+        try { google.accounts.id.prompt(); } catch(e) {}
+      }, 300);
+    }
+  }
+
+  window.addEventListener('load', initGoogleIdentity);
+</script>

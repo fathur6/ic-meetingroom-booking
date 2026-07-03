@@ -1,3 +1,10 @@
+var ROOM_COLORS = {
+  'UGS-MR': '9',
+  'UGS-DR': '10',
+  'UGS-VR1': '3',
+  'UGS-VR2': '4'
+};
+
 var CalendarService = {
   _calendarIdCache: null,
 
@@ -45,6 +52,10 @@ var CalendarService = {
     }
   },
 
+  getRoomColor: function (roomId) {
+    return ROOM_COLORS[roomId] || '8';
+  },
+
   parseDateTime: function (dateStr, timeStr) {
     var parts = dateStr.split('-');
     var timeParts = timeStr.split(':');
@@ -58,16 +69,16 @@ var CalendarService = {
     );
   },
 
+  _formatISO: function (dt) {
+    return Utilities.formatDate(dt, CONFIG.TIMEZONE, "yyyy-MM-dd'T'HH:mm:ss");
+  },
+
   createEvent: function (booking) {
-    var cal = CalendarApp.getCalendarById(this.getCalendarId());
-    if (!cal) {
-      Logger.log('Cannot access calendar: ' + this.getCalendarId());
-      return '';
-    }
+    var calId = this.getCalendarId();
     var startDate = this.parseDateTime(booking.date, booking.startTime);
     var endDate = this.parseDateTime(booking.date, booking.endTime);
 
-    var office = booking.office || 'IC';
+    var office = booking.office || 'UGS';
     var title = '[' + office + '] - ' + (booking.purpose || 'Meeting');
     if (title.length > 200) title = title.substring(0, 197) + '...';
 
@@ -83,24 +94,60 @@ var CalendarService = {
     if (roomInfo) desc.push('Room: ' + roomInfo);
     desc = desc.join('\n');
 
-    var event = cal.createEvent(title, startDate, endDate, { description: desc });
-    event.setColor(CalendarApp.EventColor.GRAY);
-    return event.getId();
+    var colorId = this.getRoomColor(booking.room);
+
+    try {
+      var eventOpts = {
+        summary: title,
+        description: desc,
+        start: { dateTime: this._formatISO(startDate), timeZone: CONFIG.TIMEZONE },
+        end: { dateTime: this._formatISO(endDate), timeZone: CONFIG.TIMEZONE },
+        colorId: colorId,
+        transparency: 'transparent'
+      };
+
+      if (booking.email) {
+        eventOpts.attendees = [{ email: booking.email }];
+      }
+
+      var event = Calendar.Events.insert(eventOpts, calId, { sendUpdates: 'all' });
+      return event.id;
+    } catch (e) {
+      Logger.log('Calendar.Events.insert error: ' + e.toString());
+      try {
+        var cal = CalendarApp.getCalendarById(calId);
+        if (cal) {
+          var ev = cal.createEvent(title, startDate, endDate, { description: desc });
+          ev.setColor(CalendarApp.EventColor.GRAY);
+          return ev.getId();
+        }
+      } catch (e2) {
+        Logger.log('CalendarApp createEvent fallback error: ' + e2.toString());
+      }
+      return '';
+    }
   },
 
-  updateEventColor: function (eventId, status) {
+  updateEventColor: function (eventId, status, roomId) {
     if (!eventId) return;
     try {
-      var cal = CalendarApp.getCalendarById(this.getCalendarId());
-      if (!cal) return;
-      var event = cal.getEventById(eventId);
-      if (!event) return;
-      switch (status) {
-        case 'Approved':  event.setColor(CalendarApp.EventColor.GREEN); break;
-        default:          event.setColor(CalendarApp.EventColor.GRAY); break;
+      var calId = this.getCalendarId();
+      if (status === 'Approved') {
+        var patch = { transparency: 'opaque' };
+        if (roomId) patch.colorId = this.getRoomColor(roomId);
+        Calendar.Events.patch(patch, calId, eventId);
       }
     } catch (e) {
-      Logger.log('updateEventColor error: ' + e.toString());
+      Logger.log('Calendar.Events.patch error: ' + e.toString());
+      try {
+        var cal = CalendarApp.getCalendarById(this.getCalendarId());
+        if (!cal) return;
+        var event = cal.getEventById(eventId);
+        if (!event) return;
+        event.setColor(status === 'Approved' ? CalendarApp.EventColor.GREEN : CalendarApp.EventColor.GRAY);
+      } catch (e2) {
+        Logger.log('CalendarApp updateEvent fallback error: ' + e2.toString());
+      }
     }
   },
 

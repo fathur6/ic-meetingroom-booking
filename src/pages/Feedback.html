@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <?!= include('pages/_styles') ?>
+  <style>
+    .likert-row { display: flex; gap: 6px; justify-content: flex-start; }
+    .likert-opt { flex: 1; min-width: 58px; text-align: center; cursor: pointer; }
+    .likert-opt input { display: none; }
+    .likert-opt label { display: block; padding: 10px 6px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--muted); background: rgba(15,23,42,.6); border: 1px solid var(--border); transition: .18s; cursor: pointer; line-height: 1.6; }
+    .likert-opt input:checked + label { background: rgba(0,240,255,.12); border-color: var(--cyan); color: var(--cyan); }
+    .likert-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .feedback-group { margin-bottom: 20px; }
+    .feedback-group h4 { color: var(--text); font-size: 14px; margin-bottom: 8px; font-weight: 600; }
+    .done-box { text-align: center; padding: 40px 20px; }
+    .done-box .icon { font-size: 48px; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <?!= include('pages/_header') ?>
+
+    <a class="back-link" href="javascript:void(0)" onclick="goBack()">← Back</a>
+
+    <div class="card" id="feedbackForm">
+      <h2>Room <span>Feedback</span></h2>
+      <p class="text-muted mb-20">Please rate your experience with the meeting room.</p>
+
+      <div id="loadingMsg" class="text-center" style="padding:16px">
+        <span class="spinner"></span> <span class="text-muted">Loading booking details...</span>
+      </div>
+
+      <div id="feedbackContent" style="display:none">
+        <div class="card" style="background:rgba(15,23,42,.5);border-color:rgba(0,240,255,.1);margin-bottom:20px">
+          <table style="width:100%;font-size:13px">
+            <tr><td style="color:var(--muted);padding:4px 8px">Name</td><td id="fbName" style="color:var(--text)">—</td></tr>
+            <tr><td style="color:var(--muted);padding:4px 8px">Office</td><td id="fbOffice" style="color:var(--text)">—</td></tr>
+            <tr><td style="color:var(--muted);padding:4px 8px">Room</td><td id="fbRoom" style="color:var(--text)">—</td></tr>
+            <tr><td style="color:var(--muted);padding:4px 8px">Date</td><td id="fbDate" style="color:var(--text)">—</td></tr>
+            <tr><td style="color:var(--muted);padding:4px 8px">Time</td><td id="fbTime" style="color:var(--text)">—</td></tr>
+          </table>
+        </div>
+
+        <div class="feedback-group">
+          <h4>i. Room Readiness</h4>
+          <p style="color:var(--muted);font-size:12px;margin-bottom:6px">The room's equipment and appliances were in good working order</p>
+          <div class="likert-row" id="likertReadiness"></div>
+        </div>
+
+        <div class="feedback-group">
+          <h4>ii. Room Cleanliness</h4>
+          <p style="color:var(--muted);font-size:12px;margin-bottom:6px">The room was tidy, clean, and comfortable</p>
+          <div class="likert-row" id="likertCleanliness"></div>
+        </div>
+
+        <div class="feedback-group">
+          <h4>iii. Staff Service</h4>
+          <p style="color:var(--muted);font-size:12px;margin-bottom:6px">The staff were friendly and helpful</p>
+          <div class="likert-row" id="likertStaff"></div>
+        </div>
+
+        <div class="feedback-group">
+          <h4>iv. Additional Comments</h4>
+          <textarea id="fbComments" class="input" rows="3" placeholder="Any other feedback or suggestions..."></textarea>
+        </div>
+
+        <div style="text-align:center;margin-top:24px">
+          <button class="btn btn-primary" id="submitBtn" onclick="submitFeedback()">Submit Feedback</button>
+        </div>
+        <p id="submitError" style="color:var(--red);text-align:center;font-size:12px;display:none"></p>
+      </div>
+    </div>
+
+    <div class="card" id="thankYou" style="display:none">
+      <div class="done-box">
+        <div class="icon">&#x2705;</div>
+        <h2 style="color:var(--green)">Feedback Submitted</h2>
+        <p style="color:var(--muted)">Thank you for your feedback. It helps us improve our service.</p>
+        <button class="btn btn-ghost" style="margin-top:12px" onclick="goBack()">Return to Home</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var bookingId = '<?!= param_bid ?>';
+    var bookingData = null;
+
+    function init() {
+      if (!bookingId) {
+        document.getElementById('loadingMsg').innerHTML = '<p style="color:var(--red)">No booking ID provided.</p>';
+        return;
+      }
+      google.script.run
+        .withSuccessHandler(function(data) {
+          document.getElementById('loadingMsg').style.display = 'none';
+          if (!data) {
+            document.getElementById('feedbackForm').innerHTML = '<p style="color:var(--red);text-align:center;padding:24px">Booking not found.</p>';
+            return;
+          }
+          if (data.alreadySubmitted) {
+            document.getElementById('feedbackForm').innerHTML = '<div class="card"><div class="done-box"><div class="icon">&#x2705;</div><h2 style="color:var(--cyan)">Feedback Already Submitted</h2><p style="color:var(--muted)">You have already provided feedback for this booking.</p></div></div>';
+            return;
+          }
+          bookingData = data;
+          document.getElementById('feedbackContent').style.display = 'block';
+          document.getElementById('fbName').textContent = data.name || '—';
+          document.getElementById('fbOffice').textContent = data.office || '—';
+          document.getElementById('fbRoom').textContent = data.room || '—';
+          document.getElementById('fbDate').textContent = data.date || '—';
+          document.getElementById('fbTime').textContent = (data.startTime || '—') + ' – ' + (data.endTime || '—');
+
+          buildLikert('likertReadiness', 'readiness');
+          buildLikert('likertCleanliness', 'cleanliness');
+          buildLikert('likertStaff', 'staff');
+        })
+        .withFailureHandler(function(err) {
+          document.getElementById('loadingMsg').innerHTML = '<p style="color:var(--red)">Error: ' + err.message + '</p>';
+        })
+        .getBookingForFeedback(bookingId);
+    }
+
+    function buildLikert(containerId, name) {
+      var html = '';
+      for (var i = 1; i <= 6; i++) {
+        var stars = '';
+        for (var s = 0; s < i; s++) stars += '&#x2B50;';
+        html += '<div class="likert-opt">' +
+          '<input type="radio" id="' + name + '_' + i + '" name="' + name + '" value="' + i + '">' +
+          '<label for="' + name + '_' + i + '">' + i + '<br>' + stars + '</label>' +
+        '</div>';
+      }
+      document.getElementById(containerId).innerHTML = html;
+    }
+
+    function submitFeedback() {
+      var readiness = document.querySelector('input[name="readiness"]:checked');
+      var cleanliness = document.querySelector('input[name="cleanliness"]:checked');
+      var staff = document.querySelector('input[name="staff"]:checked');
+
+      if (!readiness || !cleanliness || !staff) {
+        document.getElementById('submitError').style.display = 'block';
+        document.getElementById('submitError').textContent = 'Please rate all three categories.';
+        return;
+      }
+
+      document.getElementById('submitError').style.display = 'none';
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+
+      google.script.run
+        .withSuccessHandler(function(r) {
+          if (r.success) {
+            document.getElementById('feedbackForm').style.display = 'none';
+            document.getElementById('thankYou').style.display = 'block';
+          } else {
+            document.getElementById('submitError').style.display = 'block';
+            document.getElementById('submitError').textContent = r.message;
+            btn.disabled = false;
+            btn.textContent = 'Submit Feedback';
+          }
+        })
+        .withFailureHandler(function(err) {
+          document.getElementById('submitError').style.display = 'block';
+          document.getElementById('submitError').textContent = 'Error: ' + err.message;
+          btn.disabled = false;
+          btn.textContent = 'Submit Feedback';
+        })
+        .submitFeedback({
+          bookingId: bookingId,
+          name: bookingData.name,
+          office: bookingData.office,
+          room: bookingData.room,
+          date: bookingData.date,
+          startTime: bookingData.startTime,
+          endTime: bookingData.endTime,
+          readiness: parseInt(readiness.value, 10),
+          cleanliness: parseInt(cleanliness.value, 10),
+          staff: parseInt(staff.value, 10),
+          comments: document.getElementById('fbComments').value
+        });
+    }
+
+    function goBack() {
+      window.top.location.href = '<?!= getDeploymentUrl() ?>';
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
