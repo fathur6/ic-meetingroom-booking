@@ -5,9 +5,9 @@
   <?!= include('pages/_styles') ?>
   <style>
     .likert-row { display: flex; gap: 6px; justify-content: flex-start; }
-    .likert-opt { flex: 1; max-width: 52px; text-align: center; cursor: pointer; }
+    .likert-opt { flex: 1; min-width: 58px; text-align: center; cursor: pointer; }
     .likert-opt input { display: none; }
-    .likert-opt label { display: block; padding: 10px 4px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--muted); background: rgba(15,23,42,.6); border: 1px solid var(--border); transition: .18s; cursor: pointer; }
+    .likert-opt label { display: block; padding: 10px 6px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--muted); background: rgba(15,23,42,.6); border: 1px solid var(--border); transition: .18s; cursor: pointer; line-height: 1.6; }
     .likert-opt input:checked + label { background: rgba(0,240,255,.12); border-color: var(--cyan); color: var(--cyan); }
     .likert-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
     .feedback-group { margin-bottom: 20px; }
@@ -122,10 +122,11 @@
     function buildLikert(containerId, name) {
       var html = '';
       for (var i = 1; i <= 6; i++) {
-        var label = i <= 3 ? '&#x1F61E;' : (i <= 4 ? '&#x1F610;' : '&#x1F60A;');
+        var stars = '';
+        for (var s = 0; s < i; s++) stars += '&#x2B50;';
         html += '<div class="likert-opt">' +
           '<input type="radio" id="' + name + '_' + i + '" name="' + name + '" value="' + i + '">' +
-          '<label for="' + name + '_' + i + '">' + label + '<br>' + i + '</label>' +
+          '<label for="' + name + '_' + i + '">' + i + '<br>' + stars + '</label>' +
         '</div>';
       }
       document.getElementById(containerId).innerHTML = html;
