@@ -8,7 +8,7 @@ var SheetService = {
     ]);
     this._ensureSheet(ss, CONFIG.SHEET_ROOMS, ['RoomID', 'RoomName', 'Active', 'Description']);
     this._ensureSheet(ss, CONFIG.SHEET_SETTINGS, ['Key', 'Value']);
-    this._ensureSheet(ss, CONFIG.SHEET_ADMINS, ['Email', 'Name', 'Role']);
+    this._ensureSheet(ss, CONFIG.SHEET_ADMINS, ['Email', 'Role', 'Name']);
   },
 
   _ensureSheet: function (ss, name, headers) {
@@ -90,9 +90,9 @@ var SheetService = {
     var sheet = this._getSheet(CONFIG.SHEET_ADMINS);
     var data = sheet.getDataRange().getValues();
     if (data.length > 1) return;
-    sheet.appendRow(['pps_tdakademik@unisza.edu.my', 'TD Akademik PPS', 'Owner']);
-    sheet.appendRow(['fathurrahman@unisza.edu.my', 'Fathurrahman Lananan', 'Admin']);
-    sheet.appendRow(['atiqqusyeri@unisza.edu.my', 'Atiq Qusyeri A Rashid', 'Admin']);
+    sheet.appendRow(['pps_tdakademik@unisza.edu.my', 'Owner', 'TD Akademik PPS']);
+    sheet.appendRow(['fathurrahman@unisza.edu.my', 'Admin', 'Fathurrahman Lananan']);
+    sheet.appendRow(['atiqqusyeri@unisza.edu.my', 'Admin', 'Atiq Qusyeri A Rashid']);
   },
 
   getAdminList: function () {
@@ -101,7 +101,7 @@ var SheetService = {
     var data = sheet.getDataRange().getValues();
     var admins = [];
     for (var i = 1; i < data.length; i++) {
-      if (data[i][0]) admins.push({ email: String(data[i][0]).trim(), name: String(data[i][1] || '').trim(), role: String(data[i][2] || '').trim() || 'Admin' });
+      if (data[i][0]) admins.push({ email: String(data[i][0]).trim(), role: String(data[i][1] || '').trim() || 'Admin', name: String(data[i][2] || '').trim() });
     }
     return admins;
   },
@@ -115,7 +115,7 @@ var SheetService = {
       if (existing[i].email.toLowerCase() === clean) return { success: false, message: 'Admin already exists.' };
     }
     var sheet = this._getSheet(CONFIG.SHEET_ADMINS);
-    sheet.appendRow([clean, name || '', role || 'Admin']);
+    sheet.appendRow([clean, role || 'Admin', name || '']);
     return { success: true, message: 'Admin added: ' + clean };
   },
 
