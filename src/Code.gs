@@ -35,7 +35,7 @@ function include(filename) {
 
 function getDeploymentUrl() {
   var id = CONFIG.DEPLOYMENT_ID || PropertiesService.getScriptProperties().getProperty('DEPLOYMENT_ID') || '';
-  if (!id || id.indexOf('YOUR_') === 0) return 'https://script.google.com/macros/s/AKfycbw9nthz4zYsknIVcQWAoke45peeYWzTzljaUu1UZ4dumHOoxSItbSOfWzocRUq81mI/exec';
+  if (!id) return '';
   return 'https://script.google.com/macros/s/' + id + '/exec';
 }
 
@@ -88,8 +88,8 @@ function getAuthUrl() {
 }
 
 function setup(sheetId, approvalEmail) {
-  if (!sheetId) sheetId = '1PSdfrQN1xnCtPx_dGKoj7v_ttIFO1u1zN3P4-nEQQ_8';
-  if (!approvalEmail) approvalEmail = 'pps@unisza.edu.my';
+  if (!sheetId) sheetId = 'YOUR_SHEET_ID';
+  if (!approvalEmail) approvalEmail = 'YOUR_EMAIL';
 
   var adminEmails = '';
   try { adminEmails = Session.getActiveUser().getEmail() + ',' + approvalEmail; } catch (ex) {}
@@ -97,7 +97,7 @@ function setup(sheetId, approvalEmail) {
     'SHEET_ID': sheetId,
     'APPROVAL_EMAIL': approvalEmail,
     'ADMIN_EMAILS': adminEmails,
-    'CALENDAR_ID': 'c_9efcafb3465e76b522ec27e40c57def79acd2fb31e8ab78fa08813b960d942f9@group.calendar.google.com',
+    'CALENDAR_ID': 'YOUR_CALENDAR_ID',
     'SCRIPT_OWNER': Session.getActiveUser().getEmail() || 'YOUR_EMAIL',
     'DEPLOYMENT_ID': 'YOUR_DEPLOYMENT_ID'
   }, true);

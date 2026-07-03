@@ -92,9 +92,8 @@ var SheetService = {
     var sheet = this._getSheet(CONFIG.SHEET_ADMINS);
     var data = sheet.getDataRange().getValues();
     if (data.length > 1) return;
-    sheet.appendRow(['pps_tdakademik@unisza.edu.my', 'Owner', 'TD Akademik PPS']);
-    sheet.appendRow(['fathurrahman@unisza.edu.my', 'Admin', 'Fathurrahman Lananan']);
-    sheet.appendRow(['atiqqusyeri@unisza.edu.my', 'Admin', 'Atiq Qusyeri A Rashid']);
+    sheet.appendRow(['admin1@example.com', 'Owner', 'Admin Name']);
+    sheet.appendRow(['admin2@example.com', 'Admin', '']);
   },
 
   getAdminList: function () {
