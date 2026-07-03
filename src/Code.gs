@@ -32,7 +32,7 @@ function include(filename) {
 function getDeploymentUrl() {
   var id = CONFIG.DEPLOYMENT_ID || PropertiesService.getScriptProperties().getProperty('DEPLOYMENT_ID') || '';
   if (!id) return '';
-  return 'https://script.google.com/a/macros/unisza.edu.my/s/' + id + '/exec';
+  return 'https://script.google.com/macros/s/' + id + '/exec';
 }
 
 function getCurrentUser() {
