@@ -56,6 +56,18 @@ function checkAuth() {
   return { authorized: true, user: email, needsAuth: false, authUrl: '' };
 }
 
+function forceOAuth() {
+  var token = ScriptApp.getOAuthToken();
+  var count = GmailApp.getInboxUnreadCount();
+  var user = Session.getActiveUser().getEmail();
+  return {
+    authorized: true,
+    tokenPrefix: token.substring(0, 10) + '...',
+    inboxUnread: count,
+    user: user,
+  };
+}
+
 function getAuthUrl() {
   try {
     return ScriptApp.getAuthorizationInfo(ScriptApp.AuthMode.FULL).getAuthorizationUrl();
