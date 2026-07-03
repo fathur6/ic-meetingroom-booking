@@ -185,11 +185,26 @@
     }
 
     function changeUser() {
-      window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>?page=booking');
+      doSignIn();
     }
 
     function signIn() {
-      window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>?page=booking');
+      doSignIn();
+    }
+
+    function doSignIn() {
+      google.script.run
+        .withSuccessHandler(function(authUrl) {
+          if (authUrl) {
+            window.top.location.href = authUrl;
+          } else {
+            window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>?page=booking');
+          }
+        })
+        .withFailureHandler(function() {
+          window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>?page=booking');
+        })
+        .getAuthUrl();
     }
 
     function setDateConstraints() {

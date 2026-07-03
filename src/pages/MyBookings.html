@@ -136,11 +136,26 @@
     }
 
     function changeUser() {
-      window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>?page=my');
+      doSignIn();
     }
 
     function signIn() {
-      window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>?page=my');
+      doSignIn();
+    }
+
+    function doSignIn() {
+      google.script.run
+        .withSuccessHandler(function(authUrl) {
+          if (authUrl) {
+            window.top.location.href = authUrl;
+          } else {
+            window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>?page=my');
+          }
+        })
+        .withFailureHandler(function() {
+          window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>?page=my');
+        })
+        .getAuthUrl();
     }
 
     function goBack() {

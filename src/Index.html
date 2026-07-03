@@ -70,7 +70,18 @@
       window.top.location.href = '<?!= getDeploymentUrl() ?>?page=' + page;
     }
     function changeUser() {
-      window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>');
+      google.script.run
+        .withSuccessHandler(function(authUrl) {
+          if (authUrl) {
+            window.top.location.href = authUrl;
+          } else {
+            window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>');
+          }
+        })
+        .withFailureHandler(function() {
+          window.top.location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent('<?!= getDeploymentUrl() ?>');
+        })
+        .getAuthUrl();
     }
   </script>
 </body>
