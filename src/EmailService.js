@@ -13,10 +13,10 @@ var EmailService = {
   },
 
   sendReceipt: function (booking) {
-    var subject = 'Booking Received: ' + booking.bookingId + ' — IC Meeting Room';
+    var subject = 'Booking Received: ' + booking.bookingId + ' — UGS Meeting Room';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
-      '<h2 style="color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.4)">International Centre · Meeting Room</h2>',
+      '<h2 style="color:#00f0ff;text-shadow:0 0 12px rgba(0,240,255,.4)">UniSZA Graduate School · Meeting Room</h2>',
       '<p>Your booking request has been <strong style="color:#ffb020">received</strong>.</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
       '<tr><td style="color:#8892b0;white-space:nowrap">Booking ID</td><td style="color:#e6f1ff;font-family:monospace">' + booking.bookingId + '</td></tr>',
@@ -27,7 +27,7 @@ var EmailService = {
       '</table>',
       '<p style="color:#8892b0">You will be notified within <strong>1 working day</strong> once your booking is reviewed.</p>',
       '<hr style="border-color:rgba(0,240,255,.12)">',
-      '<p style="font-size:11px;color:#555">UniSZA International Centre · Meeting Room Booking System</p>',
+      '<p style="font-size:11px;color:#555">UniSZA Graduate School · Meeting Room Booking System</p>',
       '</div>'
     ].join('');
     this._send(booking.email, subject, body);
@@ -53,18 +53,18 @@ var EmailService = {
       '<p style="color:#8892b0;margin-bottom:16px">Log in to the Admin Panel to approve or reject.</p>',
       this._adminBtn(),
       '<hr style="border-color:rgba(0,240,255,.12)">',
-      '<p style="font-size:11px;color:#555">UniSZA International Centre · Meeting Room Booking System</p>',
+      '<p style="font-size:11px;color:#555">UniSZA Graduate School · Meeting Room Booking System</p>',
       '</div>'
     ].join('');
     this._send(adminEmails[0], subject, body, adminEmails.slice(1).join(','));
   },
 
   sendApproval: function (booking) {
-    var subject = 'Booking Approved: ' + booking.bookingId + ' — IC Meeting Room';
+    var subject = 'Booking Approved: ' + booking.bookingId + ' — UGS Meeting Room';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
       '<h2 style="color:#39ff14;text-shadow:0 0 12px rgba(57,255,20,.4)">Booking Approved</h2>',
-      '<p>Your booking has been <strong style="color:#39ff14">approved</strong> and added to the IC Booking Schedule calendar.</p>',
+      '<p>Your booking has been <strong style="color:#39ff14">approved</strong> and added to the UGS Booking Schedule calendar.</p>',
       '<table cellpadding="8" style="background:rgba(15,23,42,.8);border-radius:10px;width:100%;margin:16px 0">',
       '<tr><td style="color:#8892b0">Booking ID</td><td style="color:#e6f1ff;font-family:monospace">' + booking.bookingId + '</td></tr>',
       '<tr><td style="color:#8892b0">Room</td><td style="color:#e6f1ff">' + booking.room + '</td></tr>',
@@ -72,16 +72,16 @@ var EmailService = {
       '<tr><td style="color:#8892b0">Time</td><td style="color:#e6f1ff">' + booking.startTime + ' – ' + booking.endTime + '</td></tr>',
       '<tr><td style="color:#8892b0">Notes</td><td style="color:#e6f1ff">' + (booking.notes || '—') + '</td></tr>',
       '</table>',
-      '<p style="color:#8892b0">Thank you for using the IC Meeting Room Booking System.</p>',
+      '<p style="color:#8892b0">Thank you for using the UGS Meeting Room Booking System.</p>',
       '<hr style="border-color:rgba(57,255,20,.12)">',
-      '<p style="font-size:11px;color:#555">UniSZA International Centre · Meeting Room Booking System</p>',
+      '<p style="font-size:11px;color:#555">UniSZA Graduate School · Meeting Room Booking System</p>',
       '</div>'
     ].join('');
     this._send(booking.email, subject, body);
   },
 
   sendRejection: function (booking) {
-    var subject = 'Booking Update: ' + booking.bookingId + ' — IC Meeting Room';
+    var subject = 'Booking Update: ' + booking.bookingId + ' — UGS Meeting Room';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
       '<h2 style="color:#ff3860;text-shadow:0 0 12px rgba(255,56,96,.4)">Booking Not Approved</h2>',
@@ -95,7 +95,7 @@ var EmailService = {
       '</table>',
       '<p style="color:#8892b0">Please try another time slot on the booking page.</p>',
       '<hr style="border-color:rgba(255,56,96,.12)">',
-      '<p style="font-size:11px;color:#555">UniSZA International Centre · Meeting Room Booking System</p>',
+      '<p style="font-size:11px;color:#555">UniSZA Graduate School · Meeting Room Booking System</p>',
       '</div>'
     ].join('');
     this._send(booking.email, subject, body);
@@ -119,14 +119,14 @@ var EmailService = {
       '<p style="color:#8892b0;margin-bottom:16px">The slot is now available. Check the Admin Panel for details.</p>',
       this._adminBtn(),
       '<hr style="border-color:rgba(136,146,176,.12)">',
-      '<p style="font-size:11px;color:#555">UniSZA International Centre · Meeting Room Booking System</p>',
+      '<p style="font-size:11px;color:#555">UniSZA Graduate School · Meeting Room Booking System</p>',
       '</div>'
     ].join('');
     this._send(adminEmails[0], subject, body, adminEmails.slice(1).join(','));
   },
 
   sendCancellationToUser: function (booking) {
-    var subject = 'Booking Cancelled: ' + booking.bookingId + ' — IC Meeting Room';
+    var subject = 'Booking Cancelled: ' + booking.bookingId + ' — UGS Meeting Room';
     var body = [
       '<div style="font-family:Inter,sans-serif;color:#e6f1ff;background:#05060d;padding:32px;border-radius:12px;max-width:560px">',
       '<h2 style="color:#8892b0">Booking Cancelled</h2>',
@@ -139,7 +139,7 @@ var EmailService = {
       '</table>',
       '<p style="color:#8892b0">The slot is now available for other bookings.</p>',
       '<hr style="border-color:rgba(136,146,176,.12)">',
-      '<p style="font-size:11px;color:#555">UniSZA International Centre · Meeting Room Booking System</p>',
+      '<p style="font-size:11px;color:#555">UniSZA Graduate School · Meeting Room Booking System</p>',
       '</div>'
     ].join('');
     if (booking.email) this._send(booking.email, subject, body);
@@ -156,7 +156,7 @@ var EmailService = {
     var from = CONFIG.APPROVAL_EMAIL;
     var opts = {
       htmlBody: htmlBody,
-      name: 'IC Meeting Room'
+      name: 'UGS Meeting Room'
     };
     if (bcc) opts.bcc = bcc;
     try {

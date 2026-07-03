@@ -81,17 +81,17 @@ var SheetService = {
     var sheet = this._getSheet(CONFIG.SHEET_ROOMS);
     var data = sheet.getDataRange().getValues();
     if (data.length > 1) return;
-    sheet.appendRow(['MR-01', 'Meeting Room 1', 'Yes', 'Main meeting room']);
-    sheet.appendRow(['MR-02', 'Meeting Room 2', 'Yes', 'Secondary meeting room']);
-    sheet.appendRow(['MR-03', 'Seminar Room',  'Yes', 'Seminar / workshop space']);
+    sheet.appendRow(['UGS-MR', 'UGS Meeting Room', 'Yes', 'Bilik Mesyuarat PPS']);
+    sheet.appendRow(['UGS-DR', 'UGS Discussion Room', 'Yes', 'Bilik Perbincangan PPS']);
+    sheet.appendRow(['UGS-VR1', 'Viva Room 1', 'Yes', 'Bilik Viva 1']);
+    sheet.appendRow(['UGS-VR2', 'Viva Room 2', 'Yes', 'Bilik Viva 2']);
   },
 
   seedAdmins: function () {
     var sheet = this._getSheet(CONFIG.SHEET_ADMINS);
     var data = sheet.getDataRange().getValues();
     if (data.length > 1) return;
-    sheet.appendRow(['admin1@example.com', 'Owner']);
-    sheet.appendRow(['admin2@example.com', 'Admin']);
+    sheet.appendRow(['pps_tdakademik@unisza.edu.my', 'Owner']);
   },
 
   getAdminList: function () {
@@ -275,7 +275,7 @@ var SheetService = {
     var sheet = this._getSheet(CONFIG.SHEET_BOOKINGS);
     var lastRow = sheet.getLastRow();
     var seq = String(lastRow).padStart(4, '0');
-    return 'IC-' + dateStr + '-' + seq;
+    return 'UGS-' + dateStr + '-' + seq;
   },
 
   cancelBooking: function (bookingId, email) {

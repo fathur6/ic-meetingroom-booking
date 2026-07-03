@@ -1,6 +1,6 @@
-# IC Meeting Room Booking
+# UGS Meeting Room Booking
 
-Web app for UniSZA International Centre meeting room bookings — built on Google Apps Script with Google Sheets & Calendar backend.
+Web app for UniSZA Graduate School (Pusat Pengajian Siswazah) meeting room bookings — built on Google Apps Script with Google Sheets & Calendar backend.
 
 ## Pages
 
@@ -10,12 +10,21 @@ Web app for UniSZA International Centre meeting room bookings — built on Googl
 | My Bookings | `?page=my` | Public (email + booking ID) |
 | Admin | `?page=admin` | Admin key required |
 
+## Rooms
+
+| Room ID | Room Name | Description |
+|---|---|---|
+| UGS-MR | UGS Meeting Room | Bilik Mesyuarat PPS |
+| UGS-DR | UGS Discussion Room | Bilik Perbincangan PPS |
+| UGS-VR1 | Viva Room 1 | Bilik Viva 1 |
+| UGS-VR2 | Viva Room 2 | Bilik Viva 2 |
+
 ## Tech
 
 - Google Apps Script (V8 runtime)
 - Google Sheets (backend database)
 - Google Calendar (approved bookings)
-- Gmail (email notifications via APPROVAL_EMAIL alias)
+- Gmail (email notifications via pps@unisza.edu.my)
 - [clasp](https://github.com/google/clasp) for local dev & versioning
 
 ## Setup

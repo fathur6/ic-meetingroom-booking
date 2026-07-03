@@ -1,4 +1,4 @@
-var APP_TITLE = 'IC Meeting Room Booking';
+var APP_TITLE = 'UGS Meeting Room Booking';
 
 function doGet(e) {
   var page = e && e.parameter && e.parameter.page ? e.parameter.page : 'index';
@@ -65,8 +65,8 @@ function getAuthUrl() {
 }
 
 function setup(sheetId, approvalEmail) {
-  if (!sheetId) sheetId = 'YOUR_SHEET_ID';
-  if (!approvalEmail) approvalEmail = 'YOUR_EMAIL';
+  if (!sheetId) sheetId = '1PSdfrQN1xnCtPx_dGKoj7v_ttIFO1u1zN3P4-nEQQ_8';
+  if (!approvalEmail) approvalEmail = 'pps@unisza.edu.my';
 
   var adminEmails = '';
   try { adminEmails = Session.getActiveUser().getEmail() + ',' + approvalEmail; } catch (ex) {}
@@ -74,7 +74,7 @@ function setup(sheetId, approvalEmail) {
     'SHEET_ID': sheetId,
     'APPROVAL_EMAIL': approvalEmail,
     'ADMIN_EMAILS': adminEmails,
-    'CALENDAR_ID': 'YOUR_CALENDAR_ID',
+    'CALENDAR_ID': 'c_9efcafb3465e76b522ec27e40c57def79acd2fb31e8ab78fa08813b960d942f9@group.calendar.google.com',
     'SCRIPT_OWNER': Session.getActiveUser().getEmail() || 'YOUR_EMAIL',
     'DEPLOYMENT_ID': 'YOUR_DEPLOYMENT_ID'
   }, true);

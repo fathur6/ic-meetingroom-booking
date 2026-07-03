@@ -67,7 +67,7 @@ var CalendarService = {
     var startDate = this.parseDateTime(booking.date, booking.startTime);
     var endDate = this.parseDateTime(booking.date, booking.endTime);
 
-    var office = booking.office || 'IC';
+    var office = booking.office || 'UGS';
     var title = '[' + office + '] - ' + (booking.purpose || 'Meeting');
     if (title.length > 200) title = title.substring(0, 197) + '...';
 

@@ -25,7 +25,7 @@
     <a class="back-link" href="javascript:void(0)" onclick="goBack()">← Back</a>
 
     <div class="card" id="bookingForm">
-      <h2>Book a <span>Meeting Room</span></h2>
+      <h2>Book a <span>Meeting Room</span> · UGS</h2>
       <p class="text-muted mb-12">Fill in the details below. You will be notified within 1 working day.</p>
       <form id="form" onsubmit="return handleSubmit(event)">
         <div class="form-grid">
@@ -121,8 +121,8 @@
       setDateConstraints();
       var introEl = document.getElementById('firstVisitModal');
       if (introEl) {
-        if (!sessionStorage.getItem('icBookingIntroShown')) {
-          sessionStorage.setItem('icBookingIntroShown', '1');
+        if (!sessionStorage.getItem('ugsBookingIntroShown')) {
+          sessionStorage.setItem('ugsBookingIntroShown', '1');
         } else { introEl.style.display = 'none'; }
       }
       doAuthCheck();
