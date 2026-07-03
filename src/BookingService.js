@@ -21,9 +21,11 @@ var BookingService = {
     };
   },
 
-  getMyBookings: function () {
-    var email = '';
-    try { email = Session.getActiveUser().getEmail(); } catch (ex) {}
+  getMyBookings: function (manualEmail) {
+    var email = manualEmail || '';
+    if (!email) {
+      try { email = Session.getActiveUser().getEmail(); } catch (ex) {}
+    }
     if (!email) return [];
     return SheetService.getBookingsByEmail(email);
   },
@@ -32,11 +34,8 @@ var BookingService = {
     var currentUser = '';
     try { currentUser = Session.getActiveUser().getEmail().toLowerCase(); } catch (ex) {}
 
-    if (!currentUser) {
-      return { success: false, message: 'Please sign in with your Google account to book.' };
-    }
-    if (String(form.email).toLowerCase() !== currentUser) {
-      return { success: false, message: 'Email must match your signed-in Google account.' };
+    if (currentUser && String(form.email).toLowerCase() !== currentUser) {
+      return { success: false, message: 'Email must match your signed-in Google account (' + currentUser + ').' };
     }
 
     if (!form.name || !form.email || !form.phone || !form.room || !form.date || !form.startTime || !form.endTime || !form.purpose) {

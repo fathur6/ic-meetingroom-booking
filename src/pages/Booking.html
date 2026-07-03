@@ -17,9 +17,9 @@
       </span>
     </div>
     <? } else { ?>
-    <div class="card" style="margin-bottom:20px;background:rgba(255,176,32,.06);border:1px solid rgba(255,176,32,.25)">
-      <p style="color:var(--amber);text-align:center;margin:0;font-weight:600">Sign in with your Google account to book.</p>
-      <div style="text-align:center;margin-top:12px">
+    <div class="card" style="margin-bottom:20px;background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.18)">
+      <p style="color:var(--cyan);text-align:center;margin:0;font-weight:600">Sign in for faster booking — your email will be pre-filled.</p>
+      <div style="text-align:center;margin-top:10px">
         <button class="btn btn-primary btn-sm" onclick="signIn()">Sign in with Google</button>
       </div>
     </div>
@@ -45,8 +45,8 @@
             <input type="tel" id="tel" placeholder="01X-XXXXXXX" required>
           </div>
           <div>
-            <label for="email">Email * <span style="color:var(--cyan);font-size:10px">(from your Google account)</span></label>
-            <input type="email" id="email" readonly value="<?!= getCurrentUser() ?>">
+             <label for="email">Email *</label>
+            <input type="email" id="email" placeholder="your@email.com" value="<?!= getCurrentUser() ?>">
           </div>
           <div>
             <label for="room">Room *</label>

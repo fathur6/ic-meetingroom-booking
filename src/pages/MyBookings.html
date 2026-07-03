@@ -17,10 +17,12 @@
       </span>
     </div>
     <? } else { ?>
-    <div class="card" style="margin-bottom:20px;background:rgba(255,176,32,.06);border:1px solid rgba(255,176,32,.25)">
-      <p style="color:var(--amber);text-align:center;margin:0;font-weight:600">Sign in with your Google account to view your bookings.</p>
-      <div style="text-align:center;margin-top:12px">
-        <button class="btn btn-primary btn-sm" onclick="signIn()">Sign in with Google</button>
+    <div class="card" style="margin-bottom:20px;background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.18)">
+      <p style="color:var(--cyan);text-align:center;margin:0;font-weight:600">Enter your booking email to view your bookings.</p>
+      <div style="text-align:center;margin-top:10px;display:flex;gap:8px;justify-content:center">
+        <input type="email" id="manualEmail" placeholder="your@email.com" style="flex:1;max-width:280px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)">
+        <button class="btn btn-primary btn-sm" onclick="manualLookup()">Look Up</button>
+        <button class="btn btn-ghost btn-sm" onclick="signIn()">Sign in with Google</button>
       </div>
     </div>
     <? } ?>
@@ -55,8 +57,30 @@
   <script>
     var allBookings = [];
     var selectedId = null;
+    var currentEmail = '<?!= getCurrentUser() ?>';
 
     function init() {
+      if (currentEmail) {
+        loadBookings('');
+      } else {
+        document.getElementById('loadingMsg').style.display = 'none';
+      }
+    }
+
+    function manualLookup() {
+      var email = document.getElementById('manualEmail').value.trim();
+      if (!email) { showToast('Please enter your email address.', 'error'); return; }
+      var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!re.test(email)) { showToast('Please enter a valid email.', 'error'); return; }
+      currentEmail = email;
+      document.getElementById('loadingMsg').style.display = 'block';
+      document.getElementById('loadingMsg').innerHTML = '<span class="spinner"></span> <span class="text-muted">Loading your bookings...</span>';
+      document.getElementById('bookingContainer').style.display = 'none';
+      document.getElementById('emptyMsg').style.display = 'none';
+      loadBookings(email);
+    }
+
+    function loadBookings(email) {
       google.script.run
         .withSuccessHandler(function(bookings) {
           document.getElementById('loadingMsg').style.display = 'none';
@@ -71,7 +95,7 @@
         .withFailureHandler(function(err) {
           document.getElementById('loadingMsg').innerHTML = '<span class="text-muted">Error: ' + err.message + '</span>';
         })
-        .getMyBookings();
+        .getMyBookings(email);
     }
 
     function renderList() {
@@ -124,7 +148,7 @@
           closeCancelModal();
           if (r.success) {
             showToast('Booking cancelled. Email sent to you and admin.', 'success');
-            init();
+            loadBookings(currentEmail);
           } else { showToast(r.message, 'error'); }
         })
         .withFailureHandler(function(err) {
@@ -132,7 +156,7 @@
           btn.textContent = 'Cancel Booking';
           showToast('Error: ' + err.message, 'error');
         })
-        .cancelMyBooking(selectedId, '<?!= getCurrentUser() ?>');
+        .cancelMyBooking(selectedId, currentEmail);
     }
 
     function changeUser() {

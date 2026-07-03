@@ -142,8 +142,8 @@ function submitBooking(form) {
   return BookingService.submitBooking(form);
 }
 
-function getMyBookings() {
-  return BookingService.getMyBookings();
+function getMyBookings(email) {
+  return BookingService.getMyBookings(email);
 }
 
 function cancelMyBooking(bookingId, email) {
