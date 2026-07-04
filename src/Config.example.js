@@ -3,7 +3,7 @@ var CONFIG = (function () {
   return {
     GOOGLE_CLIENT_ID: sp.getProperty('GOOGLE_CLIENT_ID') || 'YOUR_CLIENT_ID.apps.googleusercontent.com',
     SHEET_ID: sp.getProperty('SHEET_ID') || 'YOUR_SHEET_ID',
-    DEPLOYMENT_ID: sp.getProperty('DEPLOYMENT_ID') || 'AKfycbw9nthz4zYsknIVcQWAoke45peeYWzTzljaUu1UZ4dumHOoxSItbSOfWzocRUq81mI',
+    DEPLOYMENT_ID: sp.getProperty('DEPLOYMENT_ID') || '',
     CALENDAR_NAME: 'UGS Booking Schedule',
     CALENDAR_ID: sp.getProperty('CALENDAR_ID') || 'YOUR_CALENDAR_ID',
     SCRIPT_OWNER: sp.getProperty('SCRIPT_OWNER') || '',
