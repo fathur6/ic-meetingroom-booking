@@ -1,5 +1,9 @@
 # UGS Meeting Room Booking
 
+<a href="https://i.postimg.cc/KzVrT3PZ/Gemini-Generated-Image-521twq521twq521t.png" target="_blank">
+  <img src="https://i.postimg.cc/KzVrT3PZ/Gemini-Generated-Image-521twq521twq521t.png" alt="Booking Process Flowchart" width="100%" style="max-width:900px;border-radius:8px;margin-bottom:20px">
+</a>
+
 Web app for UniSZA Graduate School (Pusat Pengajian Siswazah) meeting room bookings — built on Google Apps Script with Google Sheets & Calendar backend.
 
 ## Pages
