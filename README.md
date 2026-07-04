@@ -2,6 +2,10 @@
 
 Web app for UniSZA Graduate School (Pusat Pengajian Siswazah) meeting room bookings — built on Google Apps Script with Google Sheets & Calendar backend.
 
+![Booking Process Flowchart](docs/booking-flowchart.png)
+
+> Full documentation: [docs/BOOKING_PROCESS_FLOW.md](docs/BOOKING_PROCESS_FLOW.md)
+
 ## Pages
 
 | Page | URL param | Access |
