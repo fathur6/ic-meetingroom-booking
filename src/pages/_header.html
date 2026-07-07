@@ -6,45 +6,64 @@
   <p class="subtitle">Sunday – Thursday · 08:00 – 17:00 · Book up to 60 days ahead</p>
 </div>
 
-<? var u = CURRENT_USER_EMAIL; ?>
-<div id="userBannerWrap" style="text-align:right;margin-bottom:20px;padding-right:4px;<? if (!u) { ?>display:none<? } ?>">
+<div id="userBannerWrap" style="text-align:right;margin-bottom:20px;padding-right:4px;display:none">
   <span class="user-banner">
     <span class="u-dot"></span>
-    <span class="u-email" id="userEmailSpan"><?= u ?></span>
+    <span class="u-email" id="userEmailSpan"></span>
     <button class="u-change" onclick="changeGoogleUser()">Change user</button>
   </span>
 </div>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
-  var GCID = <?!= JSON.stringify(getGoogleClientId()) ?>;
+  function initHeaderUser() {
+    google.script.run
+      .withSuccessHandler(function(email) {
+        if (email) {
+          showBanner(email);
+          sessionStorage.setItem('gsUserEmail', email);
+          if (typeof onUserIdentified === 'function') onUserIdentified(email);
+        }
+      })
+      .getCurrentUser();
+
+    google.script.run
+      .withSuccessHandler(function(clientId) {
+        if (clientId) initGoogleIdentity(clientId);
+      })
+      .getGoogleClientId();
+  }
+
+  function showBanner(email) {
+    var wrap = document.getElementById('userBannerWrap');
+    var span = document.getElementById('userEmailSpan');
+    if (!wrap || !span) return;
+    span.textContent = email;
+    wrap.style.display = '';
+  }
 
   function getStoredEmail() {
     return sessionStorage.getItem('gsUserEmail') || '';
   }
 
-  function showUserBanner(email) {
-    var wrap = document.getElementById('userBannerWrap');
-    var span = document.getElementById('userEmailSpan');
-    if (!wrap || !span) return;
-    span.textContent = email;
-    wrap.style.display = 'block';
-  }
-
-  function updatePageForUser(email) {
-    showUserBanner(email);
-    if (typeof onUserIdentified === 'function') onUserIdentified(email);
-  }
-
-  function initGoogleIdentity() {
-    if (!GCID) return;
-
-    var stored = getStoredEmail();
-    if (stored) {
-      updatePageForUser(stored);
-      return;
+  function changeGoogleUser() {
+    var current = getStoredEmail();
+    sessionStorage.removeItem('gsUserEmail');
+    document.getElementById('userBannerWrap').style.display = 'none';
+    if (typeof google !== 'undefined' && google.accounts) {
+      google.accounts.id.disableAutoSelect();
+      if (current) {
+        try { google.accounts.id.revoke(current, function() {}); } catch(e) {}
+      }
+      setTimeout(function() {
+        try { google.accounts.id.prompt(); } catch(e) {}
+      }, 300);
     }
+  }
 
+  function initGoogleIdentity(GCID) {
+    if (!GCID) return;
+    if (getStoredEmail()) return;
     try {
       google.accounts.id.initialize({
         client_id: GCID,
@@ -53,7 +72,8 @@
             var payload = JSON.parse(atob(resp.credential.split('.')[1]));
             var email = payload.email;
             sessionStorage.setItem('gsUserEmail', email);
-            updatePageForUser(email);
+            showBanner(email);
+            if (typeof onUserIdentified === 'function') onUserIdentified(email);
           } catch(e) {}
         },
         auto_select: true,
@@ -68,20 +88,5 @@
     } catch(e) {}
   }
 
-  function changeGoogleUser() {
-    var current = getStoredEmail();
-    sessionStorage.removeItem('gsUserEmail');
-    document.getElementById('userBannerWrap').style.display = 'none';
-    if (GCID && typeof google !== 'undefined' && google.accounts) {
-      google.accounts.id.disableAutoSelect();
-      if (current) {
-        try { google.accounts.id.revoke(current, function() {}); } catch(e) {}
-      }
-      setTimeout(function() {
-        try { google.accounts.id.prompt(); } catch(e) {}
-      }, 300);
-    }
-  }
-
-  window.addEventListener('load', initGoogleIdentity);
+  document.addEventListener('DOMContentLoaded', initHeaderUser);
 </script>
