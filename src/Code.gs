@@ -1,6 +1,8 @@
 var APP_TITLE = 'UGS Meeting Room Booking';
+var CURRENT_USER_EMAIL = '';
 
 function doGet(e) {
+  CURRENT_USER_EMAIL = getCurrentUser();
   var page = e && e.parameter && e.parameter.page ? e.parameter.page : 'index';
   var fileMap = {
     'index': 'Index',
@@ -123,6 +125,10 @@ function setup(sheetId, approvalEmail) {
 
 function getRooms() {
   return SheetService.getRooms();
+}
+
+function getWeekBookingsFn(weekStart, weekEnd) {
+  return SheetService.getWeekBookings(weekStart, weekEnd);
 }
 
 function getConfig() {

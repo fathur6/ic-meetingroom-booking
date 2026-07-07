@@ -331,6 +331,13 @@ var SheetService = {
     sheet.appendRow([bookingId, type, new Date()]);
   },
 
+  getWeekBookings: function (weekStartStr, weekEndStr) {
+    return this.getAllBookings({
+      dateFrom: weekStartStr,
+      dateTo: weekEndStr
+    });
+  },
+
   getApprovedBookings: function () {
     var sheet = this._getSheet(CONFIG.SHEET_BOOKINGS);
     if (!sheet) return [];
