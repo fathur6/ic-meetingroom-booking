@@ -22,22 +22,23 @@
     .cal-legend button.active { border-color: var(--primary); color: var(--primary); background: #f5f5f5; }
 
     .cal-wrap { overflow-x: auto; }
-    .cal-grid { display: grid; min-width: 620px; }
-    .cal-row { display: grid; grid-template-columns: 60px repeat(5, 1fr); }
-    .cal-row.head { border-bottom: 1px solid var(--hairline); }
-    .cal-head { padding: 8px 4px; text-align: center; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
-    .cal-head span { display: block; font-size: 13px; font-weight: 500; color: var(--ink); text-transform: none; letter-spacing: 0; margin-top: 2px; }
-    .cal-head.today span { color: var(--action-blue); }
-    .cal-time { font-size: 10px; color: var(--muted); padding: 0 8px 0 0; text-align: right; font-family: var(--font-mono); line-height: 32px; white-space: nowrap; }
-    .cal-cell { min-height: 32px; border-right: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; position: relative; cursor: default; transition: .1s; }
-    .cal-cell:last-child { border-right: none; }
-    .cal-cell.free { background: #fafafa; }
-    .cal-cell.booked { cursor: pointer; }
-    .cal-cell.booked:hover { opacity: .85; }
-
+    .cal-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 620px; }
+    .cal-table th, .cal-table td { border: 1px solid var(--hairline); vertical-align: top; }
+    .cal-table th { padding: 8px 4px; text-align: center; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; background: var(--canvas); }
+    .cal-table th .cal-th-date { display: block; font-size: 16px; font-weight: 500; color: var(--ink); text-transform: none; letter-spacing: 0; margin-top: 2px; }
+    .cal-table th.today .cal-th-date { color: var(--action-blue); }
+    .cal-th-time { width: 60px; text-align: right; padding-right: 8px !important; font-weight: 600; }
+    .cal-td-time { font-size: 10px; color: var(--muted); text-align: right; padding: 0 8px !important; font-family: var(--font-mono); white-space: nowrap; width: 60px; height: 32px; border-bottom: none !important; }
+    .cal-cell-free { background: #fafafa; height: 32px; }
+    .cal-cell-booked { padding: 0 !important; height: 32px; position: relative; }
+    .cal-cell-split { display: flex; height: 100%; min-height: 32px; }
+    .cal-cell-room { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 10px; line-height: 1.2; padding: 1px; overflow: hidden; cursor: pointer; border-right: 1px solid rgba(255,255,255,.6); }
+    .cal-cell-room:last-child { border-right: none; }
+    .cal-cell-room.merged { writing-mode: vertical-lr; text-orientation: mixed; align-items: center; justify-content: center; font-size: 11px; letter-spacing: 1px; padding: 4px 2px; min-height: 64px; }
     .cal-tooltip { position: absolute; z-index: 50; background: var(--primary); color: white; padding: 10px 14px; border-radius: var(--radius-xs); font-size: 12px; line-height: 1.5; min-width: 180px; box-shadow: 0 4px 12px rgba(0,0,0,.15); pointer-events: none; white-space: nowrap; left: 50%; bottom: 100%; transform: translateX(-50%); margin-bottom: 6px; }
     .cal-tooltip strong { display: block; font-weight: 600; font-size: 13px; margin-bottom: 2px; }
     .cal-tooltip .muted { color: rgba(255,255,255,.6); font-size: 11px; }
+    td.cal-cell-booked { position: relative; }
   </style>
 </head>
 <body>
@@ -71,116 +72,197 @@
         <button class="btn btn-ghost btn-sm" onclick="shiftWeek(1)">Next Week →</button>
       </div>
       <div id="legendWrap" class="cal-legend"></div>
-      <div class="cal-wrap"><div id="calGrid" class="cal-grid"></div></div>
+      <div class="cal-wrap"><div id="calGrid"></div></div>
     </div>
   </div>
 
   <script>
     var ROOM_COLORS = ['#c7d2fe','#fde68a','#a7f3d0','#fecaca','#bfdbfe','#f0abfc','#fde047','#86efac'];
     var ROOM_TEXT = ['#4338ca','#92400e','#065f46','#991b1b','#1e40af','#7c1d6e','#713f12','#166534'];
-    var DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    var WEEKDAYS = ['Sun','Mon','Tue','Wed','Thu'];
+    var DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     var now = new Date();
-    var currentMonday = getWeekStart(now);
+    var currentWeekStart = getWeekStart(now);
     var rooms = [];
     var filterRoom = '';
 
     function getWeekStart(d) {
-      var diff = d.getDay() === 0 ? -6 : 1 - d.getDay();
-      var m = new Date(d);
-      m.setDate(m.getDate() + diff);
-      m.setHours(0,0,0,0);
-      return m;
+      var s = new Date(d);
+      s.setDate(d.getDate() - d.getDay());
+      s.setHours(0,0,0,0);
+      return s;
     }
 
-    function fmtDate(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+    function fmtDate(d) {
+      return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    }
+
+    function pad(n) { return String(n).padStart(2,'0'); }
 
     function shiftWeek(dir) {
-      currentMonday.setDate(currentMonday.getDate() + dir * 7);
+      currentWeekStart.setDate(currentWeekStart.getDate() + dir * 7);
       loadWeek();
     }
 
-    function loadWeek() {
-      var sun = new Date(currentMonday);
-      sun.setDate(sun.getDate() - 1);
-      var end = new Date(currentMonday);
-      end.setDate(end.getDate() + 7);
-      var sunStr = fmtDate(sun);
-      var endStr = fmtDate(end);
-      document.getElementById('calTitle').textContent = 'Week of ' + fmtDate(sun);
-
-      google.script.run
-        .withSuccessHandler(function(bookings) {
-          renderCalendar(bookings);
-        })
-        .withFailureHandler(function() {
-          document.getElementById('calGrid').innerHTML = '<p class="text-muted" style="padding:20px;text-align:center">Could not load bookings.</p>';
-        })
-        .getWeekBookingsFn(sunStr, endStr);
+    function getDayDate(offset) {
+      var d = new Date(currentWeekStart);
+      d.setDate(currentWeekStart.getDate() + offset);
+      return d;
     }
 
-    function renderCalendar(bookings) {
-      var html = '<div class="cal-row head">';
-      html += '<div class="cal-head" style="text-align:right;padding-right:8px">Time</div>';
-      var todayStr = fmtDate(new Date());
-      for (var d = 0; d < 5; d++) {
-        var day = new Date(currentMonday);
-        day.setDate(currentMonday.getDate() + d);
-        var dayStr = fmtDate(day);
-        var cls = dayStr === todayStr ? ' today' : '';
-        html += '<div class="cal-head' + cls + '">' + WEEKDAYS[d] + '<span>' + day.getDate() + '</span></div>';
+    function getCoveredSlots(startTime, endTime) {
+      var slots = [];
+      var sh = parseInt(startTime.split(':')[0]), sm = parseInt(startTime.split(':')[1]);
+      var eh = parseInt(endTime.split(':')[0]), em = parseInt(endTime.split(':')[1]);
+      var h = sh, m = sm;
+      while (h < eh || (h === eh && m < em)) {
+        slots.push(pad(h) + ':' + pad(m));
+        m += 30;
+        if (m === 60) { h++; m = 0; }
       }
-      html += '</div>';
+      return slots;
+    }
+
+    function loadWeek() {
+      var end = new Date(currentWeekStart);
+      end.setDate(currentWeekStart.getDate() + 7);
+      document.getElementById('calTitle').textContent = 'Week of ' + fmtDate(currentWeekStart);
+      google.script.run
+        .withSuccessHandler(function(bookings) { renderCalendar(bookings); })
+        .withFailureHandler(function() { document.getElementById('calGrid').innerHTML = '<p class="text-muted" style="padding:20px;text-align:center">Could not load bookings.</p>'; })
+        .getWeekBookingsFn(fmtDate(currentWeekStart), fmtDate(end));
+    }
+
+    function getRoomIndex(roomIdOrName) {
+      for (var i = 0; i < rooms.length; i++) {
+        if (rooms[i].roomId === roomIdOrName || rooms[i].roomName === roomIdOrName) return i;
+      }
+      return -1;
+    }
+
+    function isFiltered(room) { return filterRoom && room !== filterRoom; }
+
+    function renderCalendar(bookings) {
+      var todayStr = fmtDate(now);
+      var tgl = function(d) { return d.getDate(); };
+
+      var cellMap = {};
+      for (var b = 0; b < bookings.length; b++) {
+        var bk = bookings[b];
+        var slots = getCoveredSlots(bk.startTime, bk.endTime);
+        for (var s = 0; s < slots.length; s++) {
+          var key = bk.date + '_' + slots[s];
+          if (!cellMap[key]) cellMap[key] = [];
+          cellMap[key].push(bk);
+        }
+      }
+
+      var spanLen = {};
+      for (var b = 0; b < bookings.length; b++) {
+        var bk = bookings[b];
+        var slots = getCoveredSlots(bk.startTime, bk.endTime);
+        if (slots.length <= 1) { spanLen[bk.bookingId] = 1; continue; }
+        var canSpan = true;
+        for (var s = 0; s < slots.length; s++) {
+          var key = bk.date + '_' + slots[s];
+          var allSlots = cellMap[key] || [];
+          var visCount = 0;
+          for (var x = 0; x < allSlots.length; x++) {
+            if (!isFiltered(allSlots[x].room)) visCount++;
+          }
+          if (visCount > 1 || isFiltered(bk.room)) { canSpan = false; break; }
+        }
+        spanLen[bk.bookingId] = canSpan ? slots.length : 1;
+      }
+
+      var html = '<table class="cal-table"><thead><tr>';
+      html += '<th class="cal-th-time">Time</th>';
+      for (var d = 0; d < 7; d++) {
+        var day = getDayDate(d);
+        var ds = fmtDate(day);
+        var cls = ds === todayStr ? ' today' : '';
+        html += '<th' + cls + '>' + DAYS[d] + '<span class="cal-th-date">' + day.getDate() + '</span></th>';
+      }
+      html += '</tr></thead><tbody>';
+
+      var activeSpan = {};
 
       for (var h = 8; h < 17; h++) {
         for (var m = 0; m < 60; m += 30) {
           if (h === 16 && m === 30) break;
-          var time = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
-          var nextTime = m === 30 ? String(h+1).padStart(2,'0')+':00' : String(h).padStart(2,'0')+':30';
-          html += '<div class="cal-row">';
-          html += '<div class="cal-time">' + time + '</div>';
-          for (var d = 0; d < 5; d++) {
-            var day = new Date(currentMonday);
-            day.setDate(currentMonday.getDate() + d);
-            var dayStr = fmtDate(day);
-            var cellBookings = [];
-            for (var b = 0; b < bookings.length; b++) {
-              var bk = bookings[b];
-              if (bk.date === dayStr && bk.startTime < nextTime && bk.endTime > time) {
-                cellBookings.push(bk);
+          var time = pad(h) + ':' + pad(m);
+          html += '<tr><td class="cal-td-time">' + time + '</td>';
+
+          for (var d = 0; d < 7; d++) {
+            if (activeSpan[d] && activeSpan[d] > 0) { activeSpan[d]--; continue; }
+
+            var day = getDayDate(d);
+            var ds = fmtDate(day);
+            var key = ds + '_' + time;
+            var cellBks = cellMap[key] || [];
+
+            var displayBks = [];
+            for (var b = 0; b < cellBks.length; b++) {
+              if (!isFiltered(cellBks[b].room)) displayBks.push(cellBks[b]);
+            }
+
+            if (displayBks.length === 0) {
+              html += '<td class="cal-cell-free"></td>';
+              continue;
+            }
+
+            var used = false;
+            for (var b = 0; b < displayBks.length; b++) {
+              var bk = displayBks[b];
+              if (bk.startTime !== time) continue;
+              var sp = spanLen[bk.bookingId] || 1;
+              if (sp > 1) {
+                var ri = getRoomIndex(bk.room);
+                var bg = ri >= 0 ? ROOM_COLORS[ri % ROOM_COLORS.length] : '#e0e0e0';
+                var tx = ri >= 0 ? ROOM_TEXT[ri % ROOM_TEXT.length] : '#555';
+                html += '<td class="cal-cell-booked" rowspan="' + sp + '" style="background:' + bg + '">';
+                html += '<div class="cal-cell-room merged" style="color:' + tx + '" onmouseenter="showTip(this,\'' + esc(bk.name) + '\',\'' + esc(bk.room) + '\',\'' + esc(bk.purpose) + '\',\'' + bk.startTime + '\',\'' + bk.endTime + '\',\'' + esc(bk.status) + '\')" onmouseleave="hideTip(this)">';
+                html += esc(bk.name) + ' &middot; ' + esc(bk.purpose);
+                html += '</div></td>';
+                activeSpan[d] = sp - 1;
+                used = true;
+                break;
               }
             }
-            if (cellBookings.length === 0) {
-              html += '<div class="cal-cell free"></div>';
-            } else {
-              var bk = cellBookings[0];
-              var rIdx = -1;
-              for (var i = 0; i < rooms.length; i++) {
-                if (rooms[i].roomId === bk.room || rooms[i].roomName === bk.room) { rIdx = i; break; }
+
+            if (!used) {
+              html += '<td class="cal-cell-booked"><div class="cal-cell-split">';
+              for (var b = 0; b < displayBks.length; b++) {
+                var bk = displayBks[b];
+                var ri = getRoomIndex(bk.room);
+                var bg = ri >= 0 ? ROOM_COLORS[ri % ROOM_COLORS.length] : '#e0e0e0';
+                var tx = ri >= 0 ? ROOM_TEXT[ri % ROOM_TEXT.length] : '#555';
+                html += '<div class="cal-cell-room" style="background:' + bg + ';color:' + tx + '" onmouseenter="showTip(this,\'' + esc(bk.name) + '\',\'' + esc(bk.room) + '\',\'' + esc(bk.purpose) + '\',\'' + bk.startTime + '\',\'' + bk.endTime + '\',\'' + esc(bk.status) + '\')" onmouseleave="hideTip(this)">';
+                html += esc(bk.name);
+                html += '</div>';
               }
-              var color = rIdx >= 0 ? ROOM_COLORS[rIdx % ROOM_COLORS.length] : '#e0e0e0';
-              var txtColor = rIdx >= 0 ? ROOM_TEXT[rIdx % ROOM_TEXT.length] : '#555';
-              var isFiltered = filterRoom && bk.room !== filterRoom;
-              html += '<div class="cal-cell booked" style="background:' + (isFiltered ? 'transparent' : color) + '" onmouseenter="showTip(this,\'' + esc(bk.name) + '\',\'' + esc(bk.room) + '\',\'' + esc(bk.purpose) + '\',\'' + bk.startTime + '\',\'' + bk.endTime + '\',\'' + esc(bk.status) + '\')" onmouseleave="hideTip(this)"></div>';
+              html += '</div></td>';
             }
           }
-          html += '</div>';
+          html += '</tr>';
         }
       }
+      html += '</tbody></table>';
       document.getElementById('calGrid').innerHTML = html;
     }
 
     function showTip(el, name, room, purpose, st, et, status) {
-      var existing = el.querySelector('.cal-tooltip');
+      var td = el.closest('td') || el.closest('.cal-cell-booked') || el;
+      var existing = td.querySelector('.cal-tooltip');
       if (existing) return;
       var tip = document.createElement('div');
       tip.className = 'cal-tooltip';
       tip.innerHTML = '<strong>' + esc(name) + '</strong><span class="muted">' + esc(room) + ' · ' + st + '–' + et + '</span><div style="margin-top:4px;font-size:11px;opacity:.75">' + esc(purpose) + '</div><span class="muted" style="font-size:10px">' + esc(status) + '</span>';
-      el.appendChild(tip);
+      td.appendChild(tip);
     }
 
     function hideTip(el) {
-      var tip = el.querySelector('.cal-tooltip');
+      var td = el.closest('td') || el.closest('.cal-cell-booked') || el;
+      var tip = td.querySelector('.cal-tooltip');
       if (tip) tip.remove();
     }
 
