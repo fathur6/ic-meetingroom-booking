@@ -7,7 +7,7 @@
 </div>
 
 <? var u = getCurrentUser(); ?>
-<div id="userBannerWrap" style="text-align:right;margin-top:-14px;margin-bottom:20px;padding-right:8px;<? if (!u) { ?>display:none<? } ?>">
+<div id="userBannerWrap" style="text-align:right;margin-bottom:20px;padding-right:4px;<? if (!u) { ?>display:none<? } ?>">
   <span class="user-banner">
     <span class="u-dot"></span>
     <span class="u-email" id="userEmailSpan"><?= u ?></span>

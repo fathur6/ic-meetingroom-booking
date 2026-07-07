@@ -4,15 +4,21 @@
   <base target="_top">
   <?!= include('pages/_styles') ?>
   <style>
-    .nav-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
-    .nav-card { display: block; padding: 28px 24px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); text-decoration: none; color: var(--text); transition: .22s; text-align: center; cursor: pointer; }
-    .nav-card:hover { border-color: var(--cyan); box-shadow: 0 0 24px rgba(0,240,255,.2); transform: translateY(-2px); }
-    .nav-card .icon { font-size: 36px; margin-bottom: 10px; }
-    .nav-card .label { font-weight: 700; font-size: 16px; letter-spacing: .3px; }
-    .nav-card .desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
-    .cal-embed-wrap { width: 100%; height: 520px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); position: relative; }
-    .cal-embed { width: 100%; height: 570px; border: none; margin-top: -50px; filter: invert(.92) hue-rotate(180deg); }
-    .cal-label { font-size: 10px; color: var(--muted); letter-spacing: .6px; text-transform: uppercase; margin-bottom: 6px; }
+    .nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+    .nav-card { display: block; padding: 28px 24px; border-radius: var(--radius-sm); background: var(--canvas); border: 1px solid var(--hairline); text-decoration: none; color: var(--ink); transition: .2s; text-align: center; cursor: pointer; }
+    .nav-card:hover { border-color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+    .nav-card .icon { font-size: 32px; margin-bottom: 8px; opacity: .7; }
+    .nav-card .label { font-weight: 500; font-size: 16px; letter-spacing: .2px; }
+    .nav-card .desc { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+    .room-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+    .room-card { padding: 16px; border-radius: var(--radius-xs); background: var(--soft-stone); cursor: default; }
+    .room-card strong { display: block; font-size: 14px; font-weight: 500; }
+    .room-card span { font-size: 11px; color: var(--muted); }
+
+    .cal-embed-wrap { width: 100%; height: 480px; overflow: hidden; border: 1px solid var(--hairline); border-radius: var(--radius-sm); position: relative; }
+    .cal-embed { width: 100%; height: 530px; border: none; margin-top: -50px; }
+    .cal-label { font-size: 11px; color: var(--muted); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 6px; }
   </style>
 </head>
 <body>
@@ -20,9 +26,7 @@
     <?!= include('pages/_header') ?>
 
     <div class="card">
-      <h2>Welcome — <span>UGS Meeting Room</span></h2>
-      <p class="text-muted mb-20">Select a page below:</p>
-      <div class="nav-links">
+      <div class="nav-grid">
         <div class="nav-card" onclick="navigateTo('booking')">
           <div class="icon">&#x1F4C5;</div>
           <div class="label">Book a Room</div>
@@ -39,19 +43,20 @@
           <div class="desc">Manage bookings and approvals</div>
         </div>
       </div>
-      <p class="text-muted text-center mt-20" style="font-size:11px">Sunday – Thursday · 08:00 – 17:00 · Book up to 60 days ahead</p>
+      <p class="text-muted text-center mt-20" style="font-size:11px;color:var(--slate)">Sunday – Thursday · 08:00 – 17:00 · Book up to 60 days ahead</p>
     </div>
-    <div class="card" style="border-color:rgba(0,240,255,.08)">
-      <h2><span>Rooms</span> Available</h2>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
-        <div class="nav-card" style="cursor:default;text-align:left;padding:16px"><strong>UGS Meeting Room</strong><br><span style="font-size:11px;color:var(--muted)">Bilik Mesyuarat PPS</span></div>
-        <div class="nav-card" style="cursor:default;text-align:left;padding:16px"><strong>UGS Discussion Room</strong><br><span style="font-size:11px;color:var(--muted)">Bilik Perbincangan PPS</span></div>
-        <div class="nav-card" style="cursor:default;text-align:left;padding:16px"><strong>Viva Room 1</strong><br><span style="font-size:11px;color:var(--muted)">Bilik Viva 1</span></div>
-        <div class="nav-card" style="cursor:default;text-align:left;padding:16px"><strong>Viva Room 2</strong><br><span style="font-size:11px;color:var(--muted)">Bilik Viva 2</span></div>
+
+    <div class="card">
+      <h2>Rooms</h2>
+      <div class="room-grid">
+        <div class="room-card"><strong>UGS Meeting Room</strong><span>Bilik Mesyuarat PPS</span></div>
+        <div class="room-card"><strong>UGS Discussion Room</strong><span>Bilik Perbincangan PPS</span></div>
+        <div class="room-card"><strong>Viva Room 1</strong><span>Bilik Viva 1</span></div>
+        <div class="room-card"><strong>Viva Room 2</strong><span>Bilik Viva 2</span></div>
       </div>
     </div>
 
-    <div class="cal-label">UGS Booking Schedule · Calendar</div>
+    <div class="cal-label">UGS Booking Schedule</div>
     <div class="cal-embed-wrap"><iframe class="cal-embed" src="https://calendar.google.com/calendar/embed?src=YOUR_CALENDAR_ID&mode=MONTH&showTitle=0&showNav=0&showPrint=0&showTabs=0&showCalendars=0&showTz=0" scrolling="no"></iframe></div>
   </div>
 

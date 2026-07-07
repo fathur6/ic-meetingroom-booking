@@ -3,10 +3,14 @@
 <head>
   <base target="_top">
   <?!= include('pages/_styles') ?>
+  <style>
+    .add-admin-form { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .add-admin-form input { flex: 1; min-width: 200px; }
+  </style>
 </head>
 <body>
   <div class="container" id="dashboardContainer">
-    <div class="hero">
+    <div class="hero" style="margin-bottom:20px">
       <div class="logos">
         <img src="https://i.postimg.cc/WzPdKT2p/GS-logo-color-light-crop.png" alt="UniSZA Graduate School" style="height:48px">
       </div>
@@ -17,14 +21,14 @@
     <a class="back-link" href="javascript:void(0)" onclick="goBack()">← Back</a>
 
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('pending')">Pending <span id="pendingCount" style="margin-left:4px;color:var(--amber)"></span></button>
+      <button class="tab active" onclick="switchTab('pending')">Pending <span id="pendingCount" style="margin-left:4px;color:var(--ink)"></span></button>
       <button class="tab" onclick="switchTab('history')">History</button>
       <button class="tab" onclick="switchTab('admins')">Admins</button>
     </div>
 
     <div class="card" id="pendingCard">
       <div class="row mb-12">
-        <h2 style="margin:0">Pending <span>Approvals</span></h2>
+        <h2 style="margin:0">Pending Approvals</h2>
         <span class="spacer"></span>
         <button class="btn btn-ghost btn-sm" onclick="refreshDashboard()">Refresh</button>
       </div>
@@ -32,22 +36,22 @@
     </div>
 
     <div class="card" id="historyCard" style="display:none">
-      <h2>Booking <span>History</span></h2>
+      <h2>Booking History</h2>
       <div id="historyTable"></div>
     </div>
 
     <div class="card" id="adminsCard" style="display:none">
-      <h2>Admin <span>Management</span></h2>
-      <div class="add-admin-form" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
-        <input type="email" id="newAdminEmail" placeholder="admin@unisza.edu.my" style="flex:1;min-width:200px">
+      <h2>Admin Management</h2>
+      <div class="add-admin-form">
+        <input type="email" id="newAdminEmail" placeholder="admin@unisza.edu.my">
         <button class="btn btn-primary btn-sm" onclick="doAddAdmin()" id="addAdminBtn">Add Admin</button>
       </div>
       <div id="adminListContainer"></div>
     </div>
 
-    <div id="addAdminModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center">
-      <div class="card" style="max-width:400px;width:90%">
-        <h2>Add <span>Admin</span></h2>
+    <div id="addAdminModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center">
+      <div class="modal-box" style="text-align:left">
+        <h2>Add Admin</h2>
         <p class="text-muted" id="addAdminModalEmail" style="margin-bottom:6px"></p>
         <label for="addAdminName">Full Name</label>
         <input type="text" id="addAdminName" placeholder="e.g. John Doe" style="width:100%;margin-bottom:4px">
@@ -59,11 +63,11 @@
       </div>
     </div>
 
-    <div id="rejectModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center">
-      <div class="card" style="max-width:400px;width:90%">
-        <h2>Reject <span>Booking</span></h2>
+    <div id="rejectModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center">
+      <div class="modal-box" style="text-align:left">
+        <h2>Reject Booking</h2>
         <label for="rejectReason">Reason (optional)</label>
-        <textarea id="rejectReason" placeholder="Why is this booking rejected?"></textarea>
+        <textarea id="rejectReason" placeholder="Why is this booking rejected?" style="margin-bottom:0"></textarea>
         <div class="row row-end mt-20">
           <button class="btn btn-ghost btn-sm" onclick="closeRejectModal()">Cancel</button>
           <button class="btn btn-danger btn-sm" id="confirmRejectBtn" onclick="confirmReject()">Reject</button>

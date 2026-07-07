@@ -1,0 +1,10 @@
+/Users/aman/Documents/ic-meetingroom-booking/.playwright-mcp/page-2026-07-01T03-51-24-024Z.yml
+/Users/aman/Documents/ic-meetingroom-booking/README.md
+/Users/aman/Documents/ic-meetingroom-booking/docs/SETUP.md
+/Users/aman/Documents/ic-meetingroom-booking/src/Index.html
+/Users/aman/Documents/ic-meetingroom-booking/src/pages/Admin.html
+/Users/aman/Documents/ic-meetingroom-booking/src/pages/Booking.html
+/Users/aman/Documents/ic-meetingroom-booking/src/pages/Feedback.html
+/Users/aman/Documents/ic-meetingroom-booking/src/pages/MyBookings.html
+/Users/aman/Documents/ic-meetingroom-booking/src/pages/_header.html
+/Users/aman/Documents/ic-meetingroom-booking/src/pages/_styles.html

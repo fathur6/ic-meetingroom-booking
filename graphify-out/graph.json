@@ -1,0 +1,1325 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {
+    "hyperedges": [
+      {
+        "id": "booking_lifecycle_pipeline",
+        "label": "Booking Lifecycle Pipeline",
+        "nodes": [
+          "src_pages_Booking_html_booking_form",
+          "src_pages_Admin_html_approve_reject",
+          "src_pages_MyBookings_html_my_bookings",
+          "src_pages_Feedback_html_feedback_form"
+        ],
+        "relation": "form",
+        "confidence": "INFERRED",
+        "confidence_score": 0.85,
+        "source_file": "src/pages/Booking.html"
+      },
+      {
+        "id": "shared_page_infrastructure",
+        "label": "Shared Page Infrastructure",
+        "nodes": [
+          "src_pages__header_html_google_identity",
+          "src_pages__header_html_user_banner",
+          "src_pages__styles_html_design_tokens",
+          "src_pages__styles_html_shared_ui"
+        ],
+        "relation": "participate_in",
+        "confidence": "INFERRED",
+        "confidence_score": 0.95,
+        "source_file": "src/pages/_styles.html"
+      },
+      {
+        "id": "google_backend_stack",
+        "label": "Google Backend Stack",
+        "nodes": [
+          "README_md_google_apps_script",
+          "README_md_google_sheets_backend",
+          "README_md_google_calendar",
+          "README_md_gmail_notifications",
+          "README_md_clasp_cli"
+        ],
+        "relation": "form",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "README.md"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "label": "appsscript.json",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "appsscript",
+      "community": 3,
+      "norm_label": "appsscript.json"
+    },
+    {
+      "label": "timeZone",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "appsscript_timezone",
+      "community": 3,
+      "norm_label": "timezone"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "appsscript_dependencies",
+      "community": 3,
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "enabledAdvancedServices",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "appsscript_dependencies_enabledadvancedservices",
+      "community": 3,
+      "norm_label": "enabledadvancedservices"
+    },
+    {
+      "label": "webapp",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "appsscript_webapp",
+      "community": 3,
+      "norm_label": "webapp"
+    },
+    {
+      "label": "access",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "appsscript_webapp_access",
+      "community": 3,
+      "norm_label": "access"
+    },
+    {
+      "label": "executeAs",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "appsscript_webapp_executeas",
+      "community": 3,
+      "norm_label": "executeas"
+    },
+    {
+      "label": "exceptionLogging",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "appsscript_exceptionlogging",
+      "community": 3,
+      "norm_label": "exceptionlogging"
+    },
+    {
+      "label": "runtimeVersion",
+      "file_type": "code",
+      "source_file": "appsscript.json",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "appsscript_runtimeversion",
+      "community": 3,
+      "norm_label": "runtimeversion"
+    },
+    {
+      "label": "AdminService.js",
+      "file_type": "code",
+      "source_file": "src/AdminService.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_adminservice",
+      "community": 8,
+      "norm_label": "adminservice.js"
+    },
+    {
+      "label": "Auth.js",
+      "file_type": "code",
+      "source_file": "src/Auth.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_auth",
+      "community": 9,
+      "norm_label": "auth.js"
+    },
+    {
+      "label": "BookingService.js",
+      "file_type": "code",
+      "source_file": "src/BookingService.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_bookingservice",
+      "community": 10,
+      "norm_label": "bookingservice.js"
+    },
+    {
+      "label": "CalendarService.js",
+      "file_type": "code",
+      "source_file": "src/CalendarService.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_calendarservice",
+      "community": 11,
+      "norm_label": "calendarservice.js"
+    },
+    {
+      "label": "Config.example.js",
+      "file_type": "code",
+      "source_file": "src/Config.example.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_config_example",
+      "community": 12,
+      "norm_label": "config.example.js"
+    },
+    {
+      "label": "EmailService.js",
+      "file_type": "code",
+      "source_file": "src/EmailService.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_emailservice",
+      "community": 6,
+      "norm_label": "emailservice.js"
+    },
+    {
+      "label": "_adminPanelUrl()",
+      "file_type": "code",
+      "source_file": "src/EmailService.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_emailservice_adminpanelurl",
+      "community": 6,
+      "norm_label": "_adminpanelurl()"
+    },
+    {
+      "label": "_myBookingsUrl()",
+      "file_type": "code",
+      "source_file": "src/EmailService.js",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "src_emailservice_mybookingsurl",
+      "community": 6,
+      "norm_label": "_mybookingsurl()"
+    },
+    {
+      "label": "_feedbackUrl()",
+      "file_type": "code",
+      "source_file": "src/EmailService.js",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "src_emailservice_feedbackurl",
+      "community": 6,
+      "norm_label": "_feedbackurl()"
+    },
+    {
+      "label": "ReminderService.js",
+      "file_type": "code",
+      "source_file": "src/ReminderService.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_reminderservice",
+      "community": 13,
+      "norm_label": "reminderservice.js"
+    },
+    {
+      "label": "SheetService.js",
+      "file_type": "code",
+      "source_file": "src/SheetService.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_sheetservice",
+      "community": 14,
+      "norm_label": "sheetservice.js"
+    },
+    {
+      "label": "appsscript.json",
+      "file_type": "code",
+      "source_file": "src/appsscript.json",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_appsscript",
+      "community": 1,
+      "norm_label": "appsscript.json"
+    },
+    {
+      "label": "timeZone",
+      "file_type": "code",
+      "source_file": "src/appsscript.json",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "src_appsscript_timezone",
+      "community": 1,
+      "norm_label": "timezone"
+    },
+    {
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "src/appsscript.json",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "src_appsscript_dependencies",
+      "community": 1,
+      "norm_label": "dependencies"
+    },
+    {
+      "label": "enabledAdvancedServices",
+      "file_type": "code",
+      "source_file": "src/appsscript.json",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "src_appsscript_dependencies_enabledadvancedservices",
+      "community": 1,
+      "norm_label": "enabledadvancedservices"
+    },
+    {
+      "label": "webapp",
+      "file_type": "code",
+      "source_file": "src/appsscript.json",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "src_appsscript_webapp",
+      "community": 1,
+      "norm_label": "webapp"
+    },
+    {
+      "label": "access",
+      "file_type": "code",
+      "source_file": "src/appsscript.json",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "src_appsscript_webapp_access",
+      "community": 1,
+      "norm_label": "access"
+    },
+    {
+      "label": "executeAs",
+      "file_type": "code",
+      "source_file": "src/appsscript.json",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "src_appsscript_webapp_executeas",
+      "community": 1,
+      "norm_label": "executeas"
+    },
+    {
+      "label": "exceptionLogging",
+      "file_type": "code",
+      "source_file": "src/appsscript.json",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "src_appsscript_exceptionlogging",
+      "community": 1,
+      "norm_label": "exceptionlogging"
+    },
+    {
+      "label": "runtimeVersion",
+      "file_type": "code",
+      "source_file": "src/appsscript.json",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "src_appsscript_runtimeversion",
+      "community": 1,
+      "norm_label": "runtimeversion"
+    },
+    {
+      "label": "oauthScopes",
+      "file_type": "code",
+      "source_file": "src/appsscript.json",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "src_appsscript_oauthscopes",
+      "community": 1,
+      "norm_label": "oauthscopes"
+    },
+    {
+      "label": "UGS Meeting Room Booking System",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "id": "README_md_ugs_meeting_room_booking",
+      "community": 2,
+      "norm_label": "ugs meeting room booking system"
+    },
+    {
+      "label": "Google Apps Script Runtime",
+      "file_type": "concept",
+      "source_file": "README.md",
+      "source_location": null,
+      "id": "README_md_google_apps_script",
+      "community": 2,
+      "norm_label": "google apps script runtime"
+    },
+    {
+      "label": "Google Sheets Backend Database",
+      "file_type": "concept",
+      "source_file": "README.md",
+      "source_location": null,
+      "id": "README_md_google_sheets_backend",
+      "community": 2,
+      "norm_label": "google sheets backend database"
+    },
+    {
+      "label": "Google Calendar Integration",
+      "file_type": "concept",
+      "source_file": "README.md",
+      "source_location": null,
+      "id": "README_md_google_calendar",
+      "community": 4,
+      "norm_label": "google calendar integration"
+    },
+    {
+      "label": "Gmail Email Notifications",
+      "file_type": "concept",
+      "source_file": "README.md",
+      "source_location": null,
+      "id": "README_md_gmail_notifications",
+      "community": 2,
+      "norm_label": "gmail email notifications"
+    },
+    {
+      "label": "clasp CLI Deployment Tool",
+      "file_type": "concept",
+      "source_file": "README.md",
+      "source_location": null,
+      "id": "README_md_clasp_cli",
+      "community": 2,
+      "norm_label": "clasp cli deployment tool"
+    },
+    {
+      "label": "Rooms Configuration (UGS-MR, UGS-DR, UGS-VR1, UGS-VR2)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "id": "README_md_rooms_config",
+      "community": 4,
+      "norm_label": "rooms configuration (ugs-mr, ugs-dr, ugs-vr1, ugs-vr2)"
+    },
+    {
+      "label": "Setup & Deployment Procedure",
+      "file_type": "document",
+      "source_file": "docs/SETUP.md",
+      "source_location": null,
+      "id": "docs_SETUP_md_setup_procedure",
+      "community": 2,
+      "norm_label": "setup & deployment procedure"
+    },
+    {
+      "label": "Gmail Send-As Alias Requirement",
+      "file_type": "rationale",
+      "source_file": "docs/SETUP.md",
+      "source_location": null,
+      "id": "docs_SETUP_md_email_alias_rationale",
+      "community": 2,
+      "norm_label": "gmail send-as alias requirement"
+    },
+    {
+      "label": "Admin Key Security Pattern",
+      "file_type": "rationale",
+      "source_file": "docs/SETUP.md",
+      "source_location": null,
+      "id": "docs_SETUP_md_admin_key_security",
+      "community": 2,
+      "norm_label": "admin key security pattern"
+    },
+    {
+      "label": "Calendar Sharing with pps@unisza.edu.my",
+      "file_type": "document",
+      "source_file": "docs/SETUP.md",
+      "source_location": null,
+      "id": "docs_SETUP_md_calendar_sharing",
+      "community": 2,
+      "norm_label": "calendar sharing with pps@unisza.edu.my"
+    },
+    {
+      "label": "Home Page / Navigation Hub",
+      "file_type": "code",
+      "source_file": "src/Index.html",
+      "source_location": null,
+      "id": "src_Index_html_home_page",
+      "community": 4,
+      "norm_label": "home page / navigation hub"
+    },
+    {
+      "label": "Navigation Card UI Pattern",
+      "file_type": "code",
+      "source_file": "src/Index.html",
+      "source_location": null,
+      "id": "src_Index_html_navigation_cards",
+      "community": 4,
+      "norm_label": "navigation card ui pattern"
+    },
+    {
+      "label": "Embedded Google Calendar View",
+      "file_type": "code",
+      "source_file": "src/Index.html",
+      "source_location": null,
+      "id": "src_Index_html_calendar_embed",
+      "community": 4,
+      "norm_label": "embedded google calendar view"
+    },
+    {
+      "label": "Room Info Display Cards",
+      "file_type": "code",
+      "source_file": "src/Index.html",
+      "source_location": null,
+      "id": "src_Index_html_room_cards",
+      "community": 4,
+      "norm_label": "room info display cards"
+    },
+    {
+      "label": "Booking Form Page",
+      "file_type": "code",
+      "source_file": "src/pages/Booking.html",
+      "source_location": null,
+      "id": "src_pages_Booking_html_booking_form",
+      "community": 5,
+      "norm_label": "booking form page"
+    },
+    {
+      "label": "Real-Time Availability Check",
+      "file_type": "code",
+      "source_file": "src/pages/Booking.html",
+      "source_location": null,
+      "id": "src_pages_Booking_html_availability_check",
+      "community": 5,
+      "norm_label": "real-time availability check"
+    },
+    {
+      "label": "30-Minute Slot Grid Visualization",
+      "file_type": "code",
+      "source_file": "src/pages/Booking.html",
+      "source_location": null,
+      "id": "src_pages_Booking_html_slot_grid",
+      "community": 5,
+      "norm_label": "30-minute slot grid visualization"
+    },
+    {
+      "label": "Google Authorization Flow",
+      "file_type": "code",
+      "source_file": "src/pages/Booking.html",
+      "source_location": null,
+      "id": "src_pages_Booking_html_auth_flow",
+      "community": 0,
+      "norm_label": "google authorization flow"
+    },
+    {
+      "label": "First Visit Intro Modal",
+      "file_type": "code",
+      "source_file": "src/pages/Booking.html",
+      "source_location": null,
+      "id": "src_pages_Booking_html_first_visit_modal",
+      "community": 5,
+      "norm_label": "first visit intro modal"
+    },
+    {
+      "label": "Admin Panel Page",
+      "file_type": "code",
+      "source_file": "src/pages/Admin.html",
+      "source_location": null,
+      "id": "src_pages_Admin_html_admin_page",
+      "community": 4,
+      "norm_label": "admin panel page"
+    },
+    {
+      "label": "Approve/Reject Booking Workflow",
+      "file_type": "code",
+      "source_file": "src/pages/Admin.html",
+      "source_location": null,
+      "id": "src_pages_Admin_html_approve_reject",
+      "community": 5,
+      "norm_label": "approve/reject booking workflow"
+    },
+    {
+      "label": "Admin CRUD Management",
+      "file_type": "code",
+      "source_file": "src/pages/Admin.html",
+      "source_location": null,
+      "id": "src_pages_Admin_html_admin_crud",
+      "community": 4,
+      "norm_label": "admin crud management"
+    },
+    {
+      "label": "Reject Booking with Reason Modal",
+      "file_type": "code",
+      "source_file": "src/pages/Admin.html",
+      "source_location": null,
+      "id": "src_pages_Admin_html_reject_modal",
+      "community": 5,
+      "norm_label": "reject booking with reason modal"
+    },
+    {
+      "label": "My Bookings Page",
+      "file_type": "code",
+      "source_file": "src/pages/MyBookings.html",
+      "source_location": null,
+      "id": "src_pages_MyBookings_html_my_bookings",
+      "community": 0,
+      "norm_label": "my bookings page"
+    },
+    {
+      "label": "Cancel Booking Workflow",
+      "file_type": "code",
+      "source_file": "src/pages/MyBookings.html",
+      "source_location": null,
+      "id": "src_pages_MyBookings_html_cancel_workflow",
+      "community": 0,
+      "norm_label": "cancel booking workflow"
+    },
+    {
+      "label": "Email-Based Manual Booking Lookup",
+      "file_type": "code",
+      "source_file": "src/pages/MyBookings.html",
+      "source_location": null,
+      "id": "src_pages_MyBookings_html_email_lookup",
+      "community": 0,
+      "norm_label": "email-based manual booking lookup"
+    },
+    {
+      "label": "Feedback Form Page",
+      "file_type": "code",
+      "source_file": "src/pages/Feedback.html",
+      "source_location": null,
+      "id": "src_pages_Feedback_html_feedback_form",
+      "community": 0,
+      "norm_label": "feedback form page"
+    },
+    {
+      "label": "6-Point Likert Rating System",
+      "file_type": "code",
+      "source_file": "src/pages/Feedback.html",
+      "source_location": null,
+      "id": "src_pages_Feedback_html_likert_system",
+      "community": 0,
+      "norm_label": "6-point likert rating system"
+    },
+    {
+      "label": "Google Identity Services Integration",
+      "file_type": "code",
+      "source_file": "src/pages/_header.html",
+      "source_location": null,
+      "id": "src_pages__header_html_google_identity",
+      "community": 0,
+      "norm_label": "google identity services integration"
+    },
+    {
+      "label": "Authenticated User Email Banner",
+      "file_type": "code",
+      "source_file": "src/pages/_header.html",
+      "source_location": null,
+      "id": "src_pages__header_html_user_banner",
+      "community": 0,
+      "norm_label": "authenticated user email banner"
+    },
+    {
+      "label": "Session Storage Email Persistence",
+      "file_type": "code",
+      "source_file": "src/pages/_header.html",
+      "source_location": null,
+      "id": "src_pages__header_html_session_email",
+      "community": 0,
+      "norm_label": "session storage email persistence"
+    },
+    {
+      "label": "CSS Custom Property Design Tokens",
+      "file_type": "code",
+      "source_file": "src/pages/_styles.html",
+      "source_location": null,
+      "id": "src_pages__styles_html_design_tokens",
+      "community": 7,
+      "norm_label": "css custom property design tokens"
+    },
+    {
+      "label": "Cyber/Neon Dark Design Aesthetic",
+      "file_type": "rationale",
+      "source_file": "src/pages/_styles.html",
+      "source_location": null,
+      "id": "src_pages__styles_html_cyber_aesthetic",
+      "community": 7,
+      "norm_label": "cyber/neon dark design aesthetic"
+    },
+    {
+      "label": "Shared UI Component Classes",
+      "file_type": "code",
+      "source_file": "src/pages/_styles.html",
+      "source_location": null,
+      "id": "src_pages__styles_html_shared_ui",
+      "community": 7,
+      "norm_label": "shared ui component classes"
+    },
+    {
+      "label": "UniSZA SSO Login Page Capture",
+      "file_type": "image",
+      "source_file": ".playwright-mcp/page-2026-07-01T03-51-24-024Z.yml",
+      "source_location": null,
+      "id": "dot_playwright_mcp_captured_unisza_login",
+      "community": 0,
+      "norm_label": "unisza sso login page capture"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "appsscript.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "appsscript",
+      "target": "appsscript_dependencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "appsscript.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "appsscript",
+      "target": "appsscript_exceptionlogging",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "appsscript.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "appsscript",
+      "target": "appsscript_runtimeversion",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "appsscript.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "appsscript",
+      "target": "appsscript_timezone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "appsscript.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "appsscript",
+      "target": "appsscript_webapp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "appsscript.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "appsscript_dependencies",
+      "target": "appsscript_dependencies_enabledadvancedservices",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "appsscript.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "appsscript_webapp",
+      "target": "appsscript_webapp_access",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "appsscript.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "appsscript_webapp",
+      "target": "appsscript_webapp_executeas",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/EmailService.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_emailservice",
+      "target": "src_emailservice_adminpanelurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/EmailService.js",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_emailservice",
+      "target": "src_emailservice_feedbackurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/EmailService.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_emailservice",
+      "target": "src_emailservice_mybookingsurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/appsscript.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_appsscript",
+      "target": "src_appsscript_dependencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/appsscript.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "src_appsscript",
+      "target": "src_appsscript_exceptionlogging",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/appsscript.json",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "src_appsscript",
+      "target": "src_appsscript_oauthscopes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/appsscript.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "src_appsscript",
+      "target": "src_appsscript_runtimeversion",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/appsscript.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_appsscript",
+      "target": "src_appsscript_timezone",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/appsscript.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "src_appsscript",
+      "target": "src_appsscript_webapp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/appsscript.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_appsscript_dependencies",
+      "target": "src_appsscript_dependencies_enabledadvancedservices",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/appsscript.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "src_appsscript_webapp",
+      "target": "src_appsscript_webapp_access",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/appsscript.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "src_appsscript_webapp",
+      "target": "src_appsscript_webapp_executeas",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "README_md_ugs_meeting_room_booking",
+      "target": "README_md_clasp_cli"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "README_md_ugs_meeting_room_booking",
+      "target": "README_md_gmail_notifications"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "README_md_ugs_meeting_room_booking",
+      "target": "README_md_google_apps_script"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "README_md_ugs_meeting_room_booking",
+      "target": "README_md_google_calendar"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "README_md_ugs_meeting_room_booking",
+      "target": "README_md_google_sheets_backend"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "README_md_ugs_meeting_room_booking",
+      "target": "README_md_rooms_config"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "src/Index.html",
+      "source_location": 55,
+      "weight": 1.0,
+      "source": "src_Index_html_calendar_embed",
+      "target": "README_md_google_calendar"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "docs/SETUP.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "docs_SETUP_md_email_alias_rationale",
+      "target": "README_md_gmail_notifications"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SETUP.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "docs_SETUP_md_setup_procedure",
+      "target": "README_md_clasp_cli"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "README_md_rooms_config",
+      "target": "src_Index_html_room_cards"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SETUP.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "docs_SETUP_md_setup_procedure",
+      "target": "docs_SETUP_md_admin_key_security"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SETUP.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "docs_SETUP_md_setup_procedure",
+      "target": "docs_SETUP_md_calendar_sharing"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/SETUP.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "docs_SETUP_md_setup_procedure",
+      "target": "docs_SETUP_md_email_alias_rationale"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/Index.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_Index_html_home_page",
+      "target": "src_Index_html_calendar_embed"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/Index.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_Index_html_home_page",
+      "target": "src_Index_html_navigation_cards"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/Index.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_Index_html_home_page",
+      "target": "src_Index_html_room_cards"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "src/Index.html",
+      "source_location": 36,
+      "weight": 1.0,
+      "source": "src_Index_html_home_page",
+      "target": "src_pages_Admin_html_admin_page"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "src/Index.html",
+      "source_location": 26,
+      "weight": 1.0,
+      "source": "src_Index_html_home_page",
+      "target": "src_pages_Booking_html_booking_form"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "src/Index.html",
+      "source_location": 31,
+      "weight": 1.0,
+      "source": "src_Index_html_home_page",
+      "target": "src_pages_MyBookings_html_my_bookings"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "src/pages/Booking.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages_Booking_html_booking_form",
+      "target": "src_pages_Admin_html_approve_reject"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/Booking.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages_Booking_html_booking_form",
+      "target": "src_pages_Booking_html_auth_flow"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/Booking.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages_Booking_html_booking_form",
+      "target": "src_pages_Booking_html_availability_check"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/Booking.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages_Booking_html_booking_form",
+      "target": "src_pages_Booking_html_first_visit_modal"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/Booking.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages_Booking_html_availability_check",
+      "target": "src_pages_Booking_html_slot_grid"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.65,
+      "source_file": "src/pages/Booking.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages_Booking_html_slot_grid",
+      "target": "src_pages_Admin_html_approve_reject"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "src/pages/_header.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages__header_html_google_identity",
+      "target": "src_pages_Booking_html_auth_flow"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/Admin.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages_Admin_html_admin_page",
+      "target": "src_pages_Admin_html_admin_crud"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/Admin.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages_Admin_html_admin_page",
+      "target": "src_pages_Admin_html_approve_reject"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/Admin.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages_Admin_html_approve_reject",
+      "target": "src_pages_Admin_html_reject_modal"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "src/pages/Admin.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages_Admin_html_approve_reject",
+      "target": "src_pages_MyBookings_html_my_bookings"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "src/pages/MyBookings.html",
+      "source_location": 97,
+      "weight": 1.0,
+      "source": "src_pages_MyBookings_html_my_bookings",
+      "target": "src_pages_Feedback_html_feedback_form"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/MyBookings.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages_MyBookings_html_my_bookings",
+      "target": "src_pages_MyBookings_html_cancel_workflow"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/MyBookings.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages_MyBookings_html_my_bookings",
+      "target": "src_pages_MyBookings_html_email_lookup"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "src/pages/_header.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages__header_html_session_email",
+      "target": "src_pages_MyBookings_html_email_lookup"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/Feedback.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages_Feedback_html_feedback_form",
+      "target": "src_pages_Feedback_html_likert_system"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.65,
+      "source_file": "src/pages/_header.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages__header_html_google_identity",
+      "target": "dot_playwright_mcp_captured_unisza_login"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/_header.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages__header_html_google_identity",
+      "target": "src_pages__header_html_session_email"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/_header.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages__header_html_google_identity",
+      "target": "src_pages__header_html_user_banner"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/_styles.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages__styles_html_design_tokens",
+      "target": "src_pages__styles_html_cyber_aesthetic"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/_styles.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "src_pages__styles_html_design_tokens",
+      "target": "src_pages__styles_html_shared_ui"
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "booking_lifecycle_pipeline",
+      "label": "Booking Lifecycle Pipeline",
+      "nodes": [
+        "src_pages_Booking_html_booking_form",
+        "src_pages_Admin_html_approve_reject",
+        "src_pages_MyBookings_html_my_bookings",
+        "src_pages_Feedback_html_feedback_form"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "src/pages/Booking.html"
+    },
+    {
+      "id": "shared_page_infrastructure",
+      "label": "Shared Page Infrastructure",
+      "nodes": [
+        "src_pages__header_html_google_identity",
+        "src_pages__header_html_user_banner",
+        "src_pages__styles_html_design_tokens",
+        "src_pages__styles_html_shared_ui"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "src/pages/_styles.html"
+    },
+    {
+      "id": "google_backend_stack",
+      "label": "Google Backend Stack",
+      "nodes": [
+        "README_md_google_apps_script",
+        "README_md_google_sheets_backend",
+        "README_md_google_calendar",
+        "README_md_gmail_notifications",
+        "README_md_clasp_cli"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md"
+    }
+  ],
+  "built_at_commit": "79cc49eff2a8e762ca65a89ab50563aa402e44a2"
+}
